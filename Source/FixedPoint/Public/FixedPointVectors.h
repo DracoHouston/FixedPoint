@@ -744,6 +744,134 @@ public:
 		}
 	}
 
+	/**
+	 * Get a copy of the vector as sign only.
+	 * Each component is set to +1 or -1, with the sign of zero treated as +1.
+	 *
+	 * @param A copy of the vector with each component set to +1 or -1
+	 */
+	FORCEINLINE FFixedVector GetSignVector() const
+	{
+		return FFixedVector
+			(
+				FFixedPointMath::FloatSelect(X, FixedPoint::Constants::Fixed64::One, -FixedPoint::Constants::Fixed64::One),
+				FFixedPointMath::FloatSelect(Y, FixedPoint::Constants::Fixed64::One, -FixedPoint::Constants::Fixed64::One),
+				FFixedPointMath::FloatSelect(Z, FixedPoint::Constants::Fixed64::One, -FixedPoint::Constants::Fixed64::One)
+			);
+	}
+
+	/**
+	 * Projects 2D components of vector based on Z.
+	 *
+	 * @return Projected version of vector based on Z.
+	 */
+	FORCEINLINE FFixedVector Projection() const
+	{
+		const FFixed64 RZ = FixedPoint::Constants::Fixed64::One / Z;
+		return FFixedVector(X * RZ, Y * RZ, FixedPoint::Constants::Fixed64::One);
+	}
+
+	/**
+	 * Gets a copy of this vector snapped to a grid.
+	 *
+	 * @param GridSz Grid dimension.
+	 * @return A copy of this vector snapped to a grid.
+	 * @see FMath::GridSnap()
+	 */
+	FORCEINLINE FFixedVector GridSnap(const FFixed64& GridSz) const
+	{
+		return FFixedVector(FFixedPointMath::GridSnap(X, GridSz), FFixedPointMath::GridSnap(Y, GridSz), FFixedPointMath::GridSnap(Z, GridSz));
+	}
+
+	/**
+	 * Get a copy of this vector, clamped inside of a cube.
+	 *
+	 * @param Radius Half size of the cube.
+	 * @return A copy of this vector, bound by cube.
+	 */
+	FORCEINLINE FFixedVector BoundToCube(FFixed64 Radius) const
+	{
+		return FFixedVector
+			(
+				FFixedPointMath::Clamp(X, -Radius, Radius),
+				FFixedPointMath::Clamp(Y, -Radius, Radius),
+				FFixedPointMath::Clamp(Z, -Radius, Radius)
+			);
+	}
+
+	/** Get a copy of this vector, clamped inside of a cube. */
+	FORCEINLINE FFixedVector BoundToBox(const FFixedVector& Min, const FFixedVector& Max) const
+	{
+		return FFixedVector
+			(
+				FFixedPointMath::Clamp(X, Min.X, Max.X),
+				FFixedPointMath::Clamp(Y, Min.Y, Max.Y),
+				FFixedPointMath::Clamp(Z, Min.Z, Max.Z)
+			);
+	}
+
+	/** Create a copy of this vector, with its magnitude clamped between Min and Max. */
+	FORCEINLINE FFixedVector GetClampedToSize(FFixed64 Min, FFixed64 Max) const
+	{
+		FFixed64 VecSize = Size();
+		const FFixedVector VecDir = (VecSize > FixedPoint::Constants::Fixed64::SmallNumber) ? (*this / VecSize) : ZeroVector;
+
+		VecSize = FFixedPointMath::Clamp(VecSize, Min, Max);
+
+		return VecDir * VecSize;
+	}
+
+	/** Create a copy of this vector, with the 2D magnitude clamped between Min and Max. Z is unchanged. */
+	FORCEINLINE FFixedVector GetClampedToSize2D(FFixed64 Min, FFixed64 Max) const
+	{
+		FFixed64 VecSize2D = Size2D();
+		const FFixedVector VecDir = (VecSize2D > FixedPoint::Constants::Fixed64::SmallNumber) ? (*this / VecSize2D) : ZeroVector;
+
+		VecSize2D = FFixedPointMath::Clamp(VecSize2D, Min, Max);
+
+		return FFixedVector(VecSize2D * VecDir.X, VecSize2D * VecDir.Y, Z);
+	}
+
+	/** Create a copy of this vector, with its maximum magnitude clamped to MaxSize. */
+	FORCEINLINE FFixedVector GetClampedToMaxSize(FFixed64 MaxSize) const
+	{
+		if (MaxSize < FixedPoint::Constants::Fixed64::KindaSmallNumber)
+		{
+			return ZeroVector;
+		}
+
+		const FFixed64 VSq = SizeSquared();
+		if (VSq > FFixedPointMath::Square(MaxSize))
+		{
+			const FFixed64 Scale = MaxSize * FFixedPointMath::InvSqrt(VSq);
+			return FFixedVector(X * Scale, Y * Scale, Z * Scale);
+		}
+		else
+		{
+			return *this;
+		}
+	}
+
+	/** Create a copy of this vector, with the maximum 2D magnitude clamped to MaxSize. Z is unchanged. */
+	FORCEINLINE FFixedVector GetClampedToMaxSize2D(FFixed64 MaxSize) const
+	{
+		if (MaxSize < FixedPoint::Constants::Fixed64::KindaSmallNumber)
+		{
+			return FFixedVector(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, Z);
+		}
+
+		const FFixed64 VSq2D = SizeSquared2D();
+		if (VSq2D > FFixedPointMath::Square(MaxSize))
+		{
+			const FFixed64 Scale = MaxSize * FFixedPointMath::InvSqrt(VSq2D);
+			return FFixedVector(X * Scale, Y * Scale, Z);
+		}
+		else
+		{
+			return *this;
+		}
+	}
+
 	FORCEINLINE operator FVector() const
 	{
 		return FVector((double)X,(double)Y,(double)Z);

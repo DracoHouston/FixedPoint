@@ -162,4 +162,27 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	* Note: this avoids calling FFixed32::Sin twice over calling FFixed32::Sin then FFixed32::Cos, which uses this!
 	*/
 	static void SinAndCos(const FFixed32& inValue, FFixed32& outSin, FFixed32& outCos);
+
+	/**
+	 * Returns value based on comparand. The main purpose of this function is to avoid
+	 * branching based on floating point comparison which can be avoided via compiler
+	 * intrinsics.
+	 *
+	 * Please note that we don't define what happens in the case of NaNs as there might
+	 * be platform specific differences.
+	 *
+	 * @param	Comparand		Comparand the results are based on
+	 * @param	ValueGEZero		Return value if Comparand >= 0
+	 * @param	ValueLTZero		Return value if Comparand < 0
+	 *
+	 * @return	ValueGEZero if Comparand >= 0, ValueLTZero otherwise
+	 */
+	static constexpr FORCEINLINE FFixed64 FloatSelect(FFixed64 Comparand, FFixed64 ValueGEZero, FFixed64 ValueLTZero)
+	{
+		return Comparand >= FixedPoint::Constants::Fixed64::Zero ? ValueGEZero : ValueLTZero;
+	}
+	static constexpr FORCEINLINE FFixed32 FloatSelect(FFixed32 Comparand, FFixed32 ValueGEZero, FFixed32 ValueLTZero)
+	{
+		return Comparand >= FixedPoint::Constants::Fixed32::Zero ? ValueGEZero : ValueLTZero;
+	}
 };
