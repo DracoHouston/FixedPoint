@@ -19,6 +19,12 @@ FFixed64 FFixedPointMath::Sqrt(const FFixed64& inValue)
 	}
 	return FFixed64::MakeFromRawInt(a << (FixedPoint::Constants::BinaryPoint64 / 2));
 }
+
+FFixed64 FFixedPointMath::InvSqrt(const FFixed64& inValue)
+{
+	return FixedPoint::Constants::Fixed64::One / Sqrt(inValue);
+}
+
 FFixed32 FFixedPointMath::Sqrt(const FFixed32& inValue)
 {
 	if (inValue.Value == 0)
@@ -33,6 +39,11 @@ FFixed32 FFixedPointMath::Sqrt(const FFixed32& inValue)
 		b = (a + (inValue.Value / a)) >> 1;
 	}
 	return FFixed32::MakeFromRawInt(a << (FixedPoint::Constants::BinaryPoint32 / 2));
+}
+
+FFixed32 FFixedPointMath::InvSqrt(const FFixed32& inValue)
+{
+	return FixedPoint::Constants::Fixed32::One / Sqrt(inValue);
 }
 
 FFixed64 FFixedPointMath::Sin(const FFixed64& inValue)

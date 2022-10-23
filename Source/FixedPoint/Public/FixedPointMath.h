@@ -113,10 +113,13 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	*/
 	static FFixed32 Sqrt(const FFixed32& inValue);
 
+	static FFixed32 InvSqrt(const FFixed32& inValue);
 	/**
 	* Square Root
 	*/
 	static FFixed64 Sqrt(const FFixed64& inValue);
+
+	static FFixed64 InvSqrt(const FFixed64& inValue);
 
 	/**
 	* Sin, returns the sine of a FFixed64 angle in radians

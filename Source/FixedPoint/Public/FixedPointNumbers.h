@@ -32,7 +32,7 @@ public:
 	/**
 	* Default constructor, initializes at 0
 	*/
-	 FFixed64()
+	FORCEINLINE FFixed64()
 	 {
 		 Value = 0;
 	 }
@@ -47,7 +47,7 @@ public:
 	/**
 	* Constructor that casts int64 to FFixed64
 	*/
-	FFixed64(int32 Other)
+	FORCEINLINE FFixed64(int32 Other)
 	{
 		Value = (int64)Other << FixedPoint::Constants::BinaryPoint64;
 	}
@@ -55,7 +55,7 @@ public:
 	/**
 	* Constructor that casts int64 to FFixed64
 	*/
-	FFixed64(int64 Other)
+	FORCEINLINE FFixed64(int64 Other)
 	{
 		Value = Other << FixedPoint::Constants::BinaryPoint64;
 	}
@@ -63,12 +63,12 @@ public:
 	/**
 	* Constructor that casts FFixed32 to FFixed64
 	*/
-	FFixed64(FFixed32 Other);
+	FORCEINLINE FFixed64(FFixed32 Other);
 
 	/**
 	* Constructor that casts double to FFixed64
 	*/
-	FFixed64(double Other)
+	FORCEINLINE FFixed64(double Other)
 	{
 		Value = (int64)(Other * FixedPoint::Constants::Raw64::OneD);
 	}
@@ -76,7 +76,7 @@ public:
 	/**
 	* Constructor that casts float to FFixed64
 	*/
-	FFixed64(float Other)
+	FORCEINLINE FFixed64(float Other)
 	{
 		Value = (int64)(Other * FixedPoint::Constants::Raw64::OneD);
 	}
@@ -251,7 +251,7 @@ public:
 	/**
 	* Default constructor, initializes to 0
 	*/
-	FFixed32()
+	FORCEINLINE FFixed32()
 	{
 		Value = 0;
 	}
@@ -266,7 +266,7 @@ public:
 	/**
 	* Constructor that casts int32 to FFixed32
 	*/
-	FFixed32(int32 Other)
+	FORCEINLINE FFixed32(int32 Other)
 	{
 		Value = Other << FixedPoint::Constants::BinaryPoint32;
 	}
@@ -274,7 +274,7 @@ public:
 	/**
 	* Constructor that casts int64 to FFixed32
 	*/
-	FFixed32(int64 Other)
+	FORCEINLINE FFixed32(int64 Other)
 	{
 		Value = (int32)Other << FixedPoint::Constants::BinaryPoint32;
 	}
@@ -282,12 +282,12 @@ public:
 	/**
 	* Constructor that casts FFixed64 to FFixed32
 	*/
-	FFixed32(FFixed64 Other);
+	FORCEINLINE FFixed32(FFixed64 Other);
 
 	/**
 	* Constructor that casts double to FFixed32
 	*/
-	FFixed32(double Other)
+	FORCEINLINE FFixed32(double Other)
 	{
 		Value = (int32)(Other * FixedPoint::Constants::Raw32::OneD);
 	}
@@ -295,7 +295,7 @@ public:
 	/**
 	* Constructor that casts float to FFixed32
 	*/
-	FFixed32(float Other)
+	FORCEINLINE FFixed32(float Other)
 	{
 		Value = (int32)(Other * FixedPoint::Constants::Raw32::OneD);
 	}
@@ -529,4 +529,14 @@ namespace FixedPoint
 			constexpr FFixed32 ThreshQuatNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshQuatNormalized);
 		}
 	}
+}
+
+FORCEINLINE FFixed64::FFixed64(FFixed32 Other)
+{
+	Value = (int64)(Other.Value) << FixedPoint::Constants::BinaryPointDifference;
+}
+
+FORCEINLINE FFixed32::FFixed32(FFixed64 Other)
+{
+	Value = (int32)((Other.Value) >> FixedPoint::Constants::BinaryPointDifference);
 }

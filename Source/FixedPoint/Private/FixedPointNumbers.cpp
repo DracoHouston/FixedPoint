@@ -2,15 +2,7 @@
 
 #include "FixedPointNumbers.h"
 
-FFixed64::FFixed64(FFixed32 Other)
-{
-	Value = (int64)(Other.Value) << FixedPoint::Constants::BinaryPointDifference;
-}
 
-FFixed32::FFixed32(FFixed64 Other)
-{
-	Value = (int32)((Other.Value) >> FixedPoint::Constants::BinaryPointDifference);
-}
 
 //
 //FFixed64 FFixed64::Square(const FFixed64& inValue)
