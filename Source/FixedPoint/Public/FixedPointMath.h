@@ -185,4 +185,79 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	{
 		return Comparand >= FixedPoint::Constants::Fixed32::Zero ? ValueGEZero : ValueLTZero;
 	}
+
+	UE_NODISCARD static constexpr FORCEINLINE FFixed64 GridSnap(FFixed64 Location, FFixed64 Grid)
+	{
+		return (Grid == FixedPoint::Constants::Fixed64::Zero) ? Location : (Floor((Location + (Grid / FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2))) / Grid) * Grid);
+	}
+
+	UE_NODISCARD static constexpr FORCEINLINE FFixed32 GridSnap(FFixed32 Location, FFixed32 Grid)
+	{
+		return (Grid == FixedPoint::Constants::Fixed32::Zero) ? Location : (Floor((Location + (Grid / FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::One * 2))) / Grid) * Grid);
+	}
+
+	UE_NODISCARD static constexpr FFixed32 UnwindDegrees(FFixed32 A)
+	{
+		while (A > FixedPoint::Constants::Fixed32::OneEighty)
+		{
+			A -= FixedPoint::Constants::Fixed32::ThreeSixty;
+		}
+
+		while (A < -FixedPoint::Constants::Fixed32::OneEighty)
+		{
+			A += FixedPoint::Constants::Fixed32::ThreeSixty;
+		}
+
+		return A;
+	}
+
+	UE_NODISCARD static constexpr FFixed64 UnwindDegrees(FFixed64 A)
+	{
+		while (A > FixedPoint::Constants::Fixed64::OneEighty)
+		{
+			A -= FixedPoint::Constants::Fixed64::ThreeSixty;
+		}
+
+		while (A < -FixedPoint::Constants::Fixed64::OneEighty)
+		{
+			A += FixedPoint::Constants::Fixed64::ThreeSixty;
+		}
+
+		return A;
+	}
+
+	UE_NODISCARD static constexpr FFixed64 UnwindRadians(FFixed64 A)
+	{
+		while (A > FixedPoint::Constants::Fixed64::Pi)
+		{
+			A -= FixedPoint::Constants::Fixed64::TwoPi;
+		}
+
+		while (A < -FixedPoint::Constants::Fixed64::Pi)
+		{
+			A += FixedPoint::Constants::Fixed64::TwoPi;
+		}
+
+		return A;
+	}
+
+	UE_NODISCARD static constexpr FFixed32 UnwindRadians(FFixed32 A)
+	{
+		while (A > FixedPoint::Constants::Fixed32::Pi)
+		{
+			A -= FixedPoint::Constants::Fixed32::TwoPi;
+		}
+
+		while (A < -FixedPoint::Constants::Fixed32::Pi)
+		{
+			A += FixedPoint::Constants::Fixed32::TwoPi;
+		}
+
+		return A;
+	}
+
+	static FORCEINLINE bool IsNaN(FFixed32 A) { return false; }//these all return false because fixed point numbers cant nan or inf, just here for compatibility
+	static FORCEINLINE bool IsNaN(FFixed64 A) { return false; }
+	static FORCEINLINE bool IsFinite(FFixed32 A) { return false; }
+	static FORCEINLINE bool IsFinite(FFixed64 A) { return false; }
 };

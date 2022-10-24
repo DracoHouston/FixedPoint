@@ -117,47 +117,47 @@ public:
 		return retval;
 	}
 
-	FORCEINLINE bool operator==(const FFixed64& Other) const
+	FORCEINLINE constexpr bool operator==(const FFixed64& Other) const
 	{
 		return Value == Other.Value;
 	}
 
-	FORCEINLINE bool operator!=(const FFixed64& Other) const
+	FORCEINLINE constexpr bool operator!=(const FFixed64& Other) const
 	{
 		return Value != Other.Value;
 	}
 
-	FORCEINLINE bool operator<=(const FFixed64& Other) const
+	FORCEINLINE constexpr bool operator<=(const FFixed64& Other) const
 	{
 		return Value <= Other.Value;
 	}
 
-	FORCEINLINE bool operator>=(const FFixed64& Other) const
+	FORCEINLINE constexpr bool operator>=(const FFixed64& Other) const
 	{
 		return Value >= Other.Value;
 	}
 
-	FORCEINLINE bool operator<(const FFixed64& Other) const
+	FORCEINLINE constexpr bool operator<(const FFixed64& Other) const
 	{
 		return Value < Other.Value;
 	}
 
-	FORCEINLINE bool operator>(const FFixed64& Other) const
+	FORCEINLINE constexpr bool operator>(const FFixed64& Other) const
 	{
 		return Value > Other.Value;
 	}
 
-	FORCEINLINE FFixed64 operator-() const
+	FORCEINLINE constexpr FFixed64 operator-() const
 	{
 		return FFixed64::MakeFromRawInt(-Value);
 	}
 
-	FORCEINLINE FFixed64 operator+(const FFixed64& Other) const
+	FORCEINLINE constexpr FFixed64 operator+(const FFixed64& Other) const
 	{
 		return FFixed64::MakeFromRawInt(Value + Other.Value);
 	}
 
-	FORCEINLINE FFixed64 operator-(const FFixed64& Other) const
+	FORCEINLINE constexpr FFixed64 operator-(const FFixed64& Other) const
 	{
 		return FFixed64::MakeFromRawInt(Value - Other.Value);
 	}
@@ -336,47 +336,47 @@ public:
 		return retval;
 	}
 
-	FORCEINLINE bool operator==(const FFixed32& Other) const
+	FORCEINLINE constexpr bool operator==(const FFixed32& Other) const
 	{
 		return Value == Other.Value;
 	}
 
-	FORCEINLINE bool operator!=(const FFixed32& Other) const
+	FORCEINLINE constexpr bool operator!=(const FFixed32& Other) const
 	{
 		return Value != Other.Value;
 	}
 
-	FORCEINLINE bool operator<=(const FFixed32& Other) const
+	FORCEINLINE constexpr bool operator<=(const FFixed32& Other) const
 	{
 		return Value <= Other.Value;
 	}
 
-	FORCEINLINE bool operator>=(const FFixed32& Other) const
+	FORCEINLINE constexpr bool operator>=(const FFixed32& Other) const
 	{
 		return Value >= Other.Value;
 	}
 
-	FORCEINLINE bool operator<(const FFixed32& Other) const
+	FORCEINLINE constexpr bool operator<(const FFixed32& Other) const
 	{
 		return Value < Other.Value;
 	}
 
-	FORCEINLINE bool operator>(const FFixed32& Other) const
+	FORCEINLINE constexpr bool operator>(const FFixed32& Other) const
 	{
 		return Value > Other.Value;
 	}
 
-	FORCEINLINE FFixed32 operator-() const
+	FORCEINLINE constexpr FFixed32 operator-() const
 	{
 		return FFixed32::MakeFromRawInt(-Value);
 	}
 
-	FORCEINLINE FFixed32 operator+(const FFixed32& Other) const
+	FORCEINLINE constexpr FFixed32 operator+(const FFixed32& Other) const
 	{
 		return FFixed32::MakeFromRawInt(Value + Other.Value);
 	}
 
-	FORCEINLINE FFixed32 operator-(const FFixed32& Other) const
+	FORCEINLINE constexpr FFixed32 operator-(const FFixed32& Other) const
 	{
 		return FFixed32::MakeFromRawInt(Value - Other.Value);
 	}

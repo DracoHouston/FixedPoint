@@ -872,6 +872,320 @@ public:
 		}
 	}
 
+	/**
+	 * Add a vector to this and clamp the result in a cube.
+	 *
+	 * @param V Vector to add.
+	 * @param Radius Half size of the cube.
+	 */
+	FORCEINLINE void AddBounded(const FFixedVector& V, FFixed64 Radius = MAX_int16)
+	{
+		*this = (*this + V).BoundToCube(Radius);
+	}
+
+	/**
+	 * Gets the reciprocal of this vector, avoiding division by zero.
+	 * Zero components are set to BIG_NUMBER.
+	 *
+	 * @return Reciprocal of this vector.
+	 */
+	FORCEINLINE FFixedVector Reciprocal() const
+	{
+		FFixedVector RecVector;
+		if (X != FixedPoint::Constants::Fixed64::Zero)
+		{
+			RecVector.X = FixedPoint::Constants::Fixed64::One / X;
+		}
+		else
+		{
+			RecVector.X = FixedPoint::Constants::Fixed64::BigNumber;
+		}
+		if (Y != FixedPoint::Constants::Fixed64::Zero)
+		{
+			RecVector.Y = FixedPoint::Constants::Fixed64::One / Y;
+		}
+		else
+		{
+			RecVector.Y = FixedPoint::Constants::Fixed64::BigNumber;
+		}
+		if (Z != FixedPoint::Constants::Fixed64::Zero)
+		{
+			RecVector.Z = FixedPoint::Constants::Fixed64::One / Z;
+		}
+		else
+		{
+			RecVector.Z = FixedPoint::Constants::Fixed64::BigNumber;
+		}
+
+		return RecVector;
+	}
+
+	/**
+	 * Check whether X, Y and Z are nearly equal.
+	 *
+	 * @param Tolerance Specified Tolerance.
+	 * @return true if X == Y == Z within the specified tolerance.
+	 */
+	FORCEINLINE bool IsUniform(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
+	{
+		return AllComponentsEqual(Tolerance);
+	}
+
+	//FIXME: NEED FIXED PLANE STRUCT
+
+	/**
+	 * Mirrors a vector about a plane.
+	 *
+	 * @param Plane Plane to mirror about.
+	 * @return Mirrored vector.
+	 */
+	//FFixedVector MirrorByPlane(const FFixedPlane& Plane) const;
+
+	/**
+	 * Calculate the projection of a point on the given plane.
+	 *
+	 * @param Point The point to project onto the plane
+	 * @param Plane The plane
+	 * @return Projection of Point onto Plane
+	 */
+	//static FFixedVector PointPlaneProject(const FFixedVector& Point, const FFixedPlane& Plane);
+
+	/**
+	 * Calculate the projection of a point on the plane defined by counter-clockwise (CCW) points A,B,C.
+	 *
+	 * @param Point The point to project onto the plane
+	 * @param A 1st of three points in CCW order defining the plane
+	 * @param B 2nd of three points in CCW order defining the plane
+	 * @param C 3rd of three points in CCW order defining the plane
+	 * @return Projection of Point onto plane ABC
+	 */
+	//static FFixedVector PointPlaneProject(const FFixedVector& Point, const FFixedVector& A, const FFixedVector& B, const FFixedVector& C);
+
+	/**
+	 * Rotates around Axis (assumes Axis.Size() == 1).
+	 *
+	 * @param AngleRad Angle to rotate (in radians).
+	 * @param Axis Axis to rotate around.
+	 * @return Rotated Vector.
+	 */
+	FORCEINLINE FFixedVector RotateAngleAxisRad(const FFixed64 AngleRad, const FFixedVector& Axis) const
+	{
+		FFixed64 S, C;
+		FFixedPointMath::SinCos(&S, &C, AngleRad);
+
+		const FFixed64 XX = Axis.X * Axis.X;
+		const FFixed64 YY = Axis.Y * Axis.Y;
+		const FFixed64 ZZ = Axis.Z * Axis.Z;
+			  
+		const FFixed64 XY = Axis.X * Axis.Y;
+		const FFixed64 YZ = Axis.Y * Axis.Z;
+		const FFixed64 ZX = Axis.Z * Axis.X;
+			  
+		const FFixed64 XS = Axis.X * S;
+		const FFixed64 YS = Axis.Y * S;
+		const FFixed64 ZS = Axis.Z * S;
+			  
+		const FFixed64 OMC = FixedPoint::Constants::Fixed64::One - C;
+
+		return FFixedVector(
+			(OMC * XX + C) * X + (OMC * XY - ZS) * Y + (OMC * ZX + YS) * Z,
+			(OMC * XY + ZS) * X + (OMC * YY + C) * Y + (OMC * YZ - XS) * Z,
+			(OMC * ZX - YS) * X + (OMC * YZ + XS) * Y + (OMC * ZZ + C) * Z
+			);
+	}
+
+	/**
+	 * Rotates around Axis (assumes Axis.Size() == 1).
+	 *
+	 * @param AngleDeg Angle to rotate (in degrees).
+	 * @param Axis Axis to rotate around.
+	 * @return Rotated Vector.
+	 */
+	FORCEINLINE FFixedVector RotateAngleAxis(const FFixed64 AngleDeg, const FFixedVector& Axis) const
+	{
+		return RotateAngleAxisRad(FFixedPointMath::DegreesToRadians(AngleDeg), Axis);
+	}
+
+	/**
+	 * Returns the cosine of the angle between this vector and another projected onto the XY plane (no Z).
+	 *
+	 * @param B the other vector to find the 2D cosine of the angle with.
+	 * @return The cosine.
+	 */
+	FORCEINLINE FFixed64 CosineAngle2D(FFixedVector B) const
+	{
+		FFixedVector A(*this);
+		A.Z = 0.0f;
+		B.Z = 0.0f;
+		A.Normalize();
+		B.Normalize();
+		return A | B;
+	}
+
+	/**
+	 * Gets a copy of this vector projected onto the input vector.
+	 *
+	 * @param A	Vector to project onto, does not assume it is normalized.
+	 * @return Projected vector.
+	 */
+	FORCEINLINE FFixedVector ProjectOnTo(const FFixedVector& A) const
+	{
+		return (A * ((*this | A) / (A | A)));
+	}
+
+	/**
+	 * Gets a copy of this vector projected onto the input vector, which is assumed to be unit length.
+	 *
+	 * @param  Normal Vector to project onto (assumed to be unit length).
+	 * @return Projected vector.
+	 */
+	FORCEINLINE FFixedVector ProjectOnToNormal(const FFixedVector& Normal) const
+	{
+		return (Normal * (*this | Normal));
+	}
+
+	/**
+	 * Return the TRotator orientation corresponding to the direction in which the vector points.
+	 * Sets Yaw and Pitch to the proper numbers, and sets Roll to zero because the roll can'T be determined from a vector.
+	 *
+	 * @return TRotator from the Vector's direction, without any roll.
+	 * @see ToOrientationQuat()
+	 */
+	//CORE_API TRotator<T> ToOrientationRotator() const;
+
+	/**
+	 * Return the Quaternion orientation corresponding to the direction in which the vector points.
+	 * Similar to the UE::Math::TRotator<T> version, returns a result without roll such that it preserves the up vector.
+	 *
+	 * @note If you don'T care about preserving the up vector and just want the most direct rotation, you can use the faster
+	 * 'FQuat::FindBetweenVectors(FVector::ForwardVector, YourVector)' or 'FQuat::FindBetweenNormals(...)' if you know the vector is of unit length.
+	 *
+	 * @return Quaternion from the Vector's direction, without any roll.
+	 * @see ToOrientationRotator(), FQuat::FindBetweenVectors()
+	 */
+	//CORE_API TQuat<T> ToOrientationQuat() const;
+
+	/**
+	 * Return the UE::Math::TRotator<T> orientation corresponding to the direction in which the vector points.
+	 * Sets Yaw and Pitch to the proper numbers, and sets Roll to zero because the roll can't be determined from a vector.
+	 * @note Identical to 'ToOrientationRotator()' and preserved for legacy reasons.
+	 * @return UE::Math::TRotator<T> from the Vector's direction.
+	 * @see ToOrientationRotator(), ToOrientationQuat()
+	 */
+	/*FORCEINLINE UE::Math::TRotator<T> Rotation() const
+	{
+		return ToOrientationRotator();
+	}*/
+
+	/**
+	 * Find good arbitrary axis vectors to represent U and V axes of a plane,
+	 * using this vector as the normal of the plane.
+	 *
+	 * @param Axis1 Reference to first axis.
+	 * @param Axis2 Reference to second axis.
+	 */
+	void FindBestAxisVectors(FFixedVector& Axis1, FFixedVector& Axis2) const
+	{
+		const FFixed64 NX = FFixedPointMath::Abs(X);
+		const FFixed64 NY = FFixedPointMath::Abs(Y);
+		const FFixed64 NZ = FFixedPointMath::Abs(Z);
+
+		// Find best basis vectors.
+		if (NZ > NX && NZ > NY)	Axis1 = FFixedVector(1, 0, 0);
+		else					Axis1 = FFixedVector(0, 0, 1);
+
+		FFixedVector Tmp = Axis1 - *this * (Axis1 | *this);
+		Axis1 = Tmp.GetSafeNormal();
+		Axis2 = Axis1 ^ *this;
+	}
+
+	/** When this vector contains Euler angles (degrees), ensure that angles are between +/-180 */
+	void UnwindEuler()
+	{
+		X = FFixedPointMath::UnwindDegrees(X);
+		Y = FFixedPointMath::UnwindDegrees(Y);
+		Z = FFixedPointMath::UnwindDegrees(Z);
+	}
+
+	/**
+	 * Utility to check if there are any non-finite values (NaN or Inf) in this vector.
+	 *
+	 * @return true if there are any non-finite values in this vector, false otherwise.
+	 */
+	FORCEINLINE bool ContainsNaN() const
+	{
+		return false;//no such thing as a nan fixed point number, friend.
+	}
+
+	/**
+	 * Get a textual representation of this vector.
+	 *
+	 * @return A string describing the vector.
+	 */
+	FORCEINLINE FString ToString() const
+	{
+		return ((FVector)*this).ToString();
+	}
+
+	/**
+	* Get a locale aware textual representation of this vector.
+	*
+	* @return A string describing the vector.
+	*/
+	FORCEINLINE FText ToText() const
+	{
+		return ((FVector)*this).ToText();
+	}
+
+	/** Get a short textural representation of this vector, for compact readable logging. */
+	FORCEINLINE FString ToCompactString() const
+	{
+		return ((FVector)*this).ToCompactString();
+	}
+
+	/** Get a short locale aware textural representation of this vector, for compact readable logging. */
+	FORCEINLINE FText ToCompactText() const
+	{
+		return ((FVector)*this).ToCompactText();
+	}
+
+	/**
+	 * Initialize this Vector based on an FString. The String is expected to contain X=, Y=, Z=.
+	 * The TVector<T> will be bogus when InitFromString returns false.
+	 *
+	 * @param	InSourceString	FString containing the vector values.
+	 * @return true if the X,Y,Z values were read successfully; false otherwise.
+	 */
+	FORCEINLINE bool InitFromString(const FString& InSourceString)
+	{
+		FVector parsedvector;
+		if (parsedvector.InitFromString(InSourceString))
+		{
+			*this = FFixedVector(parsedvector);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Initialize this Vector based on an FString. The String is expected to contain V(0)
+	 * or at least one value X=, Y=, Z=, previously produced by ToCompactString()
+	 * The TVector<T> will be bogus when InitFromString returns false.
+	 *
+	 * @param	InSourceString	FString containing the vector values.
+	 * @return true if any of the X,Y,Z values were read successfully; false otherwise.
+	 */
+	FORCEINLINE bool InitFromCompactString(const FString& InSourceString)
+	{
+		FVector parsedvector;
+		if (parsedvector.InitFromCompactString(InSourceString))
+		{
+			*this = FFixedVector(parsedvector);
+			return true;
+		}
+		return false;
+	}
+
 	FORCEINLINE operator FVector() const
 	{
 		return FVector((double)X,(double)Y,(double)Z);
