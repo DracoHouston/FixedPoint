@@ -485,6 +485,10 @@ namespace FixedPoint
 			constexpr FFixed64 ThreshNormalsAreOrthogonal =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::ThreshNormalsAreOrthogonal);
 			constexpr FFixed64 ThreshVectorNormalized =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::ThreshVectorNormalized);
 			constexpr FFixed64 ThreshQuatNormalized =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::ThreshQuatNormalized);
+
+			constexpr FFixed64 AcosMagicOne = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::AcosMagicOne);
+			constexpr FFixed64 AcosMagicTwo = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::AcosMagicTwo);
+			constexpr FFixed64 AcosMagicThree = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::AcosMagicThree);
 		}
 		namespace Fixed32
 		{
@@ -527,6 +531,9 @@ namespace FixedPoint
 			constexpr FFixed32 ThreshNormalsAreOrthogonal = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshNormalsAreOrthogonal);
 			constexpr FFixed32 ThreshVectorNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshVectorNormalized);
 			constexpr FFixed32 ThreshQuatNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshQuatNormalized);
+			constexpr FFixed32 AcosMagicOne = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::AcosMagicOne);
+			constexpr FFixed32 AcosMagicTwo = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::AcosMagicTwo);
+			constexpr FFixed32 AcosMagicThree = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::AcosMagicThree);
 		}
 	}
 }

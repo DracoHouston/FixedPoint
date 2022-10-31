@@ -142,6 +142,23 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	*/
 	static void SinCos(FFixed64* outSin, FFixed64* outCos, const FFixed64& inValue);
 
+	static FFixed64 Acos(FFixed64 x)
+	{
+		//copied from nvidias cg language reference implementation, full of magic numbers, i'm scared too.
+		FFixed64 negate = FFixed64((int64)(x < FixedPoint::Constants::Fixed64::Zero));
+		x = Abs(x);
+		FFixed64 ret = FixedPoint::Constants::Fixed64::AcosMagicOne;
+		ret = ret * x;
+		ret = ret + FixedPoint::Constants::Fixed64::AcosMagicTwo;
+		ret = ret * x;
+		ret = ret - FixedPoint::Constants::Fixed64::AcosMagicThree;
+		ret = ret * x;
+		ret = ret + FixedPoint::Constants::Fixed64::HalfPi;
+		ret = ret * Sqrt(FixedPoint::Constants::Fixed64::One - x);
+		ret = ret - FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2) * negate * ret;
+		return negate * FixedPoint::Constants::Fixed64::Pi + ret;
+	}
+
 	/**
 	* Sin, returns the sine of a FFixed32 angle in radians
 	*/
@@ -162,6 +179,23 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	* Note: this avoids calling FFixed32::Sin twice over calling FFixed32::Sin then FFixed32::Cos, which uses this!
 	*/
 	static void SinAndCos(const FFixed32& inValue, FFixed32& outSin, FFixed32& outCos);
+
+	static FFixed32 Acos(FFixed32 x)
+	{
+		//copied from nvidias cg language reference implementation, full of magic numbers, i'm scared too.
+		FFixed32 negate = FFixed32((int32)(x < FixedPoint::Constants::Fixed32::Zero));
+		x = Abs(x);
+		FFixed32 ret = FixedPoint::Constants::Fixed32::AcosMagicOne;
+		ret = ret * x;
+		ret = ret + FixedPoint::Constants::Fixed32::AcosMagicTwo;
+		ret = ret * x;
+		ret = ret - FixedPoint::Constants::Fixed32::AcosMagicThree;
+		ret = ret * x;
+		ret = ret + FixedPoint::Constants::Fixed32::HalfPi;
+		ret = ret * Sqrt(FixedPoint::Constants::Fixed32::One - x);
+		ret = ret - FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::One * 2) * negate * ret;
+		return negate * FixedPoint::Constants::Fixed32::Pi + ret;
+	}
 
 	/**
 	 * Returns value based on comparand. The main purpose of this function is to avoid

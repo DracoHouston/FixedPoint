@@ -1186,6 +1186,235 @@ public:
 		return false;
 	}
 
+	/**
+	 * Converts a Cartesian unit vector into spherical coordinates on the unit sphere.
+	 * @return Output Theta will be in the range [0, PI], and output Phi will be in the range [-PI, PI].
+	 * NOTE: uses floating point atan2 and acos, beware crossplatform desyncs
+	 */
+	FFixedVector2d UnitCartesianToSpherical() const;
+
+	/**
+	 * Convert a direction vector into a 'heading' angle.
+	 *
+	 * @return 'Heading' angle between +/-PI. 0 is pointing down +X.
+	 */
+	FFixed64 HeadingAngle() const
+	{
+		// Project Dir into Z plane.
+		FFixedVector PlaneDir = *this;
+		PlaneDir.Z = 0.f;
+		PlaneDir = PlaneDir.GetSafeNormal();
+
+		FFixed64 Angle = FFixedPointMath::Acos(PlaneDir.X);
+
+		if (PlaneDir.Y < FixedPoint::Constants::Fixed64::Zero)
+		{
+			Angle *= -FixedPoint::Constants::Fixed64::One;
+		}
+
+		return Angle;
+	}
+
+	/**
+	 * Create an orthonormal basis from a basis with at least two orthogonal vectors.
+	 * It may change the directions of the X and Y axes to make the basis orthogonal,
+	 * but it won'T change the direction of the Z axis.
+	 * All axes will be normalized.
+	 *
+	 * @param XAxis The input basis' XAxis, and upon return the orthonormal basis' XAxis.
+	 * @param YAxis The input basis' YAxis, and upon return the orthonormal basis' YAxis.
+	 * @param ZAxis The input basis' ZAxis, and upon return the orthonormal basis' ZAxis.
+	 */
+	static void CreateOrthonormalBasis(FFixedVector& XAxis, FFixedVector& YAxis, FFixedVector& ZAxis)
+	{
+		// Project the X and Y axes onto the plane perpendicular to the Z axis.
+		XAxis -= ZAxis * (ZAxis | ZAxis) / (XAxis | ZAxis);
+		YAxis -= ZAxis * (ZAxis | ZAxis) / (YAxis | ZAxis);
+
+		// If the X axis was parallel to the Z axis, choose a vector which is orthogonal to the Y and Z axes.
+		if (XAxis.SizeSquared() <= FixedPoint::Constants::Fixed64::SmallNumber)
+		{
+			XAxis = YAxis ^ ZAxis;
+		}
+
+		// If the Y axis was parallel to the Z axis, choose a vector which is orthogonal to the X and Z axes.
+		if (YAxis.SizeSquared() <= FixedPoint::Constants::Fixed64::SmallNumber)
+		{
+			YAxis = XAxis ^ ZAxis;
+		}
+
+		// Normalize the basis vectors.
+		XAxis.Normalize();
+		YAxis.Normalize();
+		ZAxis.Normalize();
+	}
+
+	/**
+	 * Compare two points and see if they're the same, using a threshold.
+	 *
+	 * @param P First vector.
+	 * @param Q Second vector.
+	 * @return Whether points are the same within a threshold. Uses fast distance approximation (linear per-component distance).
+	 */
+	FORCEINLINE static bool PointsAreSame(const FFixedVector& P, const FFixedVector& Q)
+	{
+		FFixed64 Temp;
+		Temp = P.X - Q.X;
+		if ((Temp > -FixedPoint::Constants::Fixed64::ThreshPointsAreSame) && (Temp < FixedPoint::Constants::Fixed64::ThreshPointsAreSame))
+		{
+			Temp = P.Y - Q.Y;
+			if ((Temp > -FixedPoint::Constants::Fixed64::ThreshPointsAreSame) && (Temp < FixedPoint::Constants::Fixed64::ThreshPointsAreSame))
+			{
+				Temp = P.Z - Q.Z;
+				if ((Temp > -FixedPoint::Constants::Fixed64::ThreshPointsAreSame) && (Temp < FixedPoint::Constants::Fixed64::ThreshPointsAreSame))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Compare two points and see if they're within specified distance.
+	 *
+	 * @param Point1 First vector.
+	 * @param Point2 Second vector.
+	 * @param Dist Specified distance.
+	 * @return Whether two points are within the specified distance. Uses fast distance approximation (linear per-component distance).
+	 */
+	static bool PointsAreNear(const FFixedVector& Point1, const FFixedVector& Point2, FFixed64 Dist)
+	{
+		FFixed64 Temp;
+		Temp = (Point1.X - Point2.X); if (FFixedPointMath::Abs(Temp) >= Dist) return false;
+		Temp = (Point1.Y - Point2.Y); if (FFixedPointMath::Abs(Temp) >= Dist) return false;
+		Temp = (Point1.Z - Point2.Z); if (FFixedPointMath::Abs(Temp) >= Dist) return false;
+		return true;
+	}
+
+	/**
+	 * Calculate the signed distance (in the direction of the normal) between a point and a plane.
+	 *
+	 * @param Point The Point we are checking.
+	 * @param PlaneBase The Base Point in the plane.
+	 * @param PlaneNormal The Normal of the plane (assumed to be unit length).
+	 * @return Signed distance between point and plane.
+	 */
+	FORCEINLINE static FFixed64 PointPlaneDist(const FFixedVector& Point, const FFixedVector& PlaneBase, const FFixedVector& PlaneNormal)
+	{
+		return (Point - PlaneBase) | PlaneNormal;
+	}
+
+	/**
+	 * Compute pushout of a box from a plane.
+	 *
+	 * @param Normal The plane normal.
+	 * @param Size The size of the box.
+	 * @return Pushout required.
+	 */
+	static FORCEINLINE FFixed64 BoxPushOut(const FFixedVector& Normal, const FFixedVector& Size)
+	{
+		return FFixedPointMath::Abs(Normal.X * Size.X) + FFixedPointMath::Abs(Normal.Y * Size.Y) + FFixedPointMath::Abs(Normal.Z * Size.Z);
+	}
+
+	/**
+	 * Min, Max, Min3, Max3 like FMath
+	 */
+	static FORCEINLINE FFixedVector Min(const FFixedVector& A, const FFixedVector& B)
+	{
+		return FFixedVector(
+			FFixedPointMath::Min(A.X, B.X),
+			FFixedPointMath::Min(A.Y, B.Y),
+			FFixedPointMath::Min(A.Z, B.Z)
+			);
+	}
+
+	static FORCEINLINE FFixedVector Max(const FFixedVector& A, const FFixedVector& B)
+	{
+		return FFixedVector(
+			FFixedPointMath::Max(A.X, B.X),
+			FFixedPointMath::Max(A.Y, B.Y),
+			FFixedPointMath::Max(A.Z, B.Z)
+			);
+	}
+
+	static FORCEINLINE FFixedVector Min3(const FFixedVector& A, const FFixedVector& B, const FFixedVector& C)
+	{
+		return FFixedVector(
+			FFixedPointMath::Min3(A.X, B.X, C.X),
+			FFixedPointMath::Min3(A.Y, B.Y, C.Y),
+			FFixedPointMath::Min3(A.Z, B.Z, C.Z)
+			);
+	}
+
+	static FORCEINLINE FFixedVector Max3(const FFixedVector& A, const FFixedVector& B, const FFixedVector& C)
+	{
+		return FFixedVector(
+			FFixedPointMath::Max3(A.X, B.X, C.X),
+			FFixedPointMath::Max3(A.Y, B.Y, C.Y),
+			FFixedPointMath::Max3(A.Z, B.Z, C.Z)
+			);
+	}
+
+	/**
+	 * See if two normal vectors are nearly parallel, meaning the angle between them is close to 0 degrees.
+	 *
+	 * @param  Normal1 First normalized vector.
+	 * @param  Normal1 Second normalized vector.
+	 * @param  ParallelCosineThreshold Normals are parallel if absolute value of dot product (cosine of angle between them) is greater than or equal to this. For example: cos(1.0 degrees).
+	 * @return true if vectors are nearly parallel, false otherwise.
+	 */
+	FORCEINLINE static bool Parallel(const FFixedVector& Normal1, const FFixedVector& Normal2, FFixed64 ParallelCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreParallel)
+	{
+		const FFixed64 NormalDot = Normal1 | Normal2;
+		return FFixedPointMath::Abs(NormalDot) >= ParallelCosineThreshold;
+	}
+
+	/**
+	 * See if two normal vectors are coincident (nearly parallel and point in the same direction).
+	 *
+	 * @param  Normal1 First normalized vector.
+	 * @param  Normal2 Second normalized vector.
+	 * @param  ParallelCosineThreshold Normals are coincident if dot product (cosine of angle between them) is greater than or equal to this. For example: cos(1.0 degrees).
+	 * @return true if vectors are coincident (nearly parallel and point in the same direction), false otherwise.
+	 */
+	FORCEINLINE static bool Coincident(const FFixedVector& Normal1, const FFixedVector& Normal2, FFixed64 ParallelCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreParallel)
+	{
+		const FFixed64 NormalDot = Normal1 | Normal2;
+		return NormalDot >= ParallelCosineThreshold;
+	}
+
+	/**
+	 * See if two normal vectors are nearly orthogonal (perpendicular), meaning the angle between them is close to 90 degrees.
+	 *
+	 * @param  Normal1 First normalized vector.
+	 * @param  Normal2 Second normalized vector.
+	 * @param  OrthogonalCosineThreshold Normals are orthogonal if absolute value of dot product (cosine of angle between them) is less than or equal to this. For example: cos(89.0 degrees).
+	 * @return true if vectors are orthogonal (perpendicular), false otherwise.
+	 */
+	FORCEINLINE static bool Orthogonal(const FFixedVector& Normal1, const FFixedVector& Normal2, FFixed64 OrthogonalCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreOrthogonal)
+	{
+		const FFixed64 NormalDot = Normal1 | Normal2;
+		return FFixedPointMath::Abs(NormalDot) <= OrthogonalCosineThreshold;
+	}
+
+	/**
+	 * See if two planes are coplanar. They are coplanar if the normals are nearly parallel and the planes include the same set of points.
+	 *
+	 * @param Base1 The base point in the first plane.
+	 * @param Normal1 The normal of the first plane.
+	 * @param Base2 The base point in the second plane.
+	 * @param Normal2 The normal of the second plane.
+	 * @param ParallelCosineThreshold Normals are parallel if absolute value of dot product is greater than or equal to this.
+	 * @return true if the planes are coplanar, false otherwise.
+	 */
+	static bool Coplanar(const FFixedVector& Base1, const FFixedVector& Normal1, const FFixedVector& Base2, const FFixedVector& Normal2, FFixed64 ParallelCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreParallel)
+	{
+		if (!FFixedVector::Parallel(Normal1, Normal2, ParallelCosineThreshold)) return false;
+		else if (FFixedPointMath::Abs(FFixedVector::PointPlaneDist(Base2, Base1, Normal1)) > FixedPoint::Constants::Fixed64::ThreshPointOnPlane) return false;
+		else return true;
+	}
+
 	FORCEINLINE operator FVector() const
 	{
 		return FVector((double)X,(double)Y,(double)Z);
@@ -1431,4 +1660,13 @@ FORCEINLINE FFixedVector4d::FFixedVector4d(const FFixed64& inX, const FFixed64& 
 	Y = inY;
 	Z = inZ;
 	W = inW;
+}
+
+FORCEINLINE FFixedVector2d FFixedVector::UnitCartesianToSpherical() const
+{
+	checkSlow(IsUnit());
+	//not safe for deterministic sims
+	const FFixed64 Theta = FMath::Acos((double)Z / (double)Size());
+	const FFixed64 Phi = FMath::Atan2((double)Y, (double)X);
+	return FFixedVector2d(Theta, Phi);
 }

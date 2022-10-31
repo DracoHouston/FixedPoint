@@ -66,6 +66,9 @@ namespace FixedPoint
 			constexpr int64 ThreshNormalsAreOrthogonal = 18302;
 			constexpr int64 ThreshVectorNormalized = 10485;
 			constexpr int64 ThreshQuatNormalized = 10485;
+			constexpr int64 AcosMagicOne = -19639;
+			constexpr int64 AcosMagicTwo = 77868;
+			constexpr int64 AcosMagicThree = 222418;
 		}
 		namespace Raw32
 		{
@@ -82,7 +85,7 @@ namespace FixedPoint
 			constexpr double OneD = (double)One;
 
 			//The value 180.0 in our 32 bit fixed point numbers
-			constexpr int32 OneEighty = 1 * 180;
+			constexpr int32 OneEighty = One * 180;
 			//The value 360.0 in our 32 bit fixed point numbers
 			constexpr int32 ThreeSixty = One * 360;
 
@@ -118,6 +121,9 @@ namespace FixedPoint
 			constexpr int32 ThreshNormalsAreOrthogonal = 1143;
 			constexpr int32 ThreshVectorNormalized = 655;
 			constexpr int32 ThreshQuatNormalized = 655;
+			constexpr int32 AcosMagicOne = -1227;
+			constexpr int32 AcosMagicTwo = 4866;
+			constexpr int32 AcosMagicThree = 13901;
 		}
 	}
 }
