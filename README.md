@@ -1,4 +1,4 @@
 # FixedPoint
  Fixed point math plugin for UE5
 
- work in progree, sorry. check back later.
+ work in progress, sorry. check back later.
