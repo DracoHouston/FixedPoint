@@ -57,6 +57,85 @@ public:
 	 */
 	FORCEINLINE FFixedMatrix(const FFixedVector& InX, const FFixedVector& InY, const FFixedVector& InZ, const FFixedVector& InW);
 
+	static void Internal_MatrixInverse(FFixedMatrix& DstMatrix, const FFixedMatrix& SrcMatrix)
+	{
+		FFixed64 Det[4];
+		FFixedMatrix Tmp;
+
+		Tmp.M[0][0] = SrcMatrix.M[2][2] * SrcMatrix.M[3][3] - SrcMatrix.M[2][3] * SrcMatrix.M[3][2];
+		Tmp.M[0][1] = SrcMatrix.M[1][2] * SrcMatrix.M[3][3] - SrcMatrix.M[1][3] * SrcMatrix.M[3][2];
+		Tmp.M[0][2] = SrcMatrix.M[1][2] * SrcMatrix.M[2][3] - SrcMatrix.M[1][3] * SrcMatrix.M[2][2];
+
+		Tmp.M[1][0] = SrcMatrix.M[2][2] * SrcMatrix.M[3][3] - SrcMatrix.M[2][3] * SrcMatrix.M[3][2];
+		Tmp.M[1][1] = SrcMatrix.M[0][2] * SrcMatrix.M[3][3] - SrcMatrix.M[0][3] * SrcMatrix.M[3][2];
+		Tmp.M[1][2] = SrcMatrix.M[0][2] * SrcMatrix.M[2][3] - SrcMatrix.M[0][3] * SrcMatrix.M[2][2];
+
+		Tmp.M[2][0] = SrcMatrix.M[1][2] * SrcMatrix.M[3][3] - SrcMatrix.M[1][3] * SrcMatrix.M[3][2];
+		Tmp.M[2][1] = SrcMatrix.M[0][2] * SrcMatrix.M[3][3] - SrcMatrix.M[0][3] * SrcMatrix.M[3][2];
+		Tmp.M[2][2] = SrcMatrix.M[0][2] * SrcMatrix.M[1][3] - SrcMatrix.M[0][3] * SrcMatrix.M[1][2];
+
+		Tmp.M[3][0] = SrcMatrix.M[1][2] * SrcMatrix.M[2][3] - SrcMatrix.M[1][3] * SrcMatrix.M[2][2];
+		Tmp.M[3][1] = SrcMatrix.M[0][2] * SrcMatrix.M[2][3] - SrcMatrix.M[0][3] * SrcMatrix.M[2][2];
+		Tmp.M[3][2] = SrcMatrix.M[0][2] * SrcMatrix.M[1][3] - SrcMatrix.M[0][3] * SrcMatrix.M[1][2];
+
+		Det[0] = SrcMatrix.M[1][1] * Tmp.M[0][0] - SrcMatrix.M[2][1] * Tmp.M[0][1] + SrcMatrix.M[3][1] * Tmp.M[0][2];
+		Det[1] = SrcMatrix.M[0][1] * Tmp.M[1][0] - SrcMatrix.M[2][1] * Tmp.M[1][1] + SrcMatrix.M[3][1] * Tmp.M[1][2];
+		Det[2] = SrcMatrix.M[0][1] * Tmp.M[2][0] - SrcMatrix.M[1][1] * Tmp.M[2][1] + SrcMatrix.M[3][1] * Tmp.M[2][2];
+		Det[3] = SrcMatrix.M[0][1] * Tmp.M[3][0] - SrcMatrix.M[1][1] * Tmp.M[3][1] + SrcMatrix.M[2][1] * Tmp.M[3][2];
+
+		const FFixed64 Determinant = SrcMatrix.M[0][0] * Det[0] - SrcMatrix.M[1][0] * Det[1] + SrcMatrix.M[2][0] * Det[2] - SrcMatrix.M[3][0] * Det[3];
+		const FFixed64	RDet = FixedPoint::Constants::Fixed64::One / Determinant;
+
+		DstMatrix.M[0][0] = RDet * Det[0];
+		DstMatrix.M[0][1] = -RDet * Det[1];
+		DstMatrix.M[0][2] = RDet * Det[2];
+		DstMatrix.M[0][3] = -RDet * Det[3];
+		DstMatrix.M[1][0] = -RDet * (SrcMatrix.M[1][0] * Tmp.M[0][0] - SrcMatrix.M[2][0] * Tmp.M[0][1] + SrcMatrix.M[3][0] * Tmp.M[0][2]);
+		DstMatrix.M[1][1] = RDet * (SrcMatrix.M[0][0] * Tmp.M[1][0] - SrcMatrix.M[2][0] * Tmp.M[1][1] + SrcMatrix.M[3][0] * Tmp.M[1][2]);
+		DstMatrix.M[1][2] = -RDet * (SrcMatrix.M[0][0] * Tmp.M[2][0] - SrcMatrix.M[1][0] * Tmp.M[2][1] + SrcMatrix.M[3][0] * Tmp.M[2][2]);
+		DstMatrix.M[1][3] = RDet * (SrcMatrix.M[0][0] * Tmp.M[3][0] - SrcMatrix.M[1][0] * Tmp.M[3][1] + SrcMatrix.M[2][0] * Tmp.M[3][2]);
+		DstMatrix.M[2][0] = RDet * (
+			SrcMatrix.M[1][0] * (SrcMatrix.M[2][1] * SrcMatrix.M[3][3] - SrcMatrix.M[2][3] * SrcMatrix.M[3][1]) -
+			SrcMatrix.M[2][0] * (SrcMatrix.M[1][1] * SrcMatrix.M[3][3] - SrcMatrix.M[1][3] * SrcMatrix.M[3][1]) +
+			SrcMatrix.M[3][0] * (SrcMatrix.M[1][1] * SrcMatrix.M[2][3] - SrcMatrix.M[1][3] * SrcMatrix.M[2][1])
+			);
+		DstMatrix.M[2][1] = -RDet * (
+			SrcMatrix.M[0][0] * (SrcMatrix.M[2][1] * SrcMatrix.M[3][3] - SrcMatrix.M[2][3] * SrcMatrix.M[3][1]) -
+			SrcMatrix.M[2][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[3][3] - SrcMatrix.M[0][3] * SrcMatrix.M[3][1]) +
+			SrcMatrix.M[3][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[2][3] - SrcMatrix.M[0][3] * SrcMatrix.M[2][1])
+			);
+		DstMatrix.M[2][2] = RDet * (
+			SrcMatrix.M[0][0] * (SrcMatrix.M[1][1] * SrcMatrix.M[3][3] - SrcMatrix.M[1][3] * SrcMatrix.M[3][1]) -
+			SrcMatrix.M[1][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[3][3] - SrcMatrix.M[0][3] * SrcMatrix.M[3][1]) +
+			SrcMatrix.M[3][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[1][3] - SrcMatrix.M[0][3] * SrcMatrix.M[1][1])
+			);
+		DstMatrix.M[2][3] = -RDet * (
+			SrcMatrix.M[0][0] * (SrcMatrix.M[1][1] * SrcMatrix.M[2][3] - SrcMatrix.M[1][3] * SrcMatrix.M[2][1]) -
+			SrcMatrix.M[1][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[2][3] - SrcMatrix.M[0][3] * SrcMatrix.M[2][1]) +
+			SrcMatrix.M[2][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[1][3] - SrcMatrix.M[0][3] * SrcMatrix.M[1][1])
+			);
+		DstMatrix.M[3][0] = -RDet * (
+			SrcMatrix.M[1][0] * (SrcMatrix.M[2][1] * SrcMatrix.M[3][2] - SrcMatrix.M[2][2] * SrcMatrix.M[3][1]) -
+			SrcMatrix.M[2][0] * (SrcMatrix.M[1][1] * SrcMatrix.M[3][2] - SrcMatrix.M[1][2] * SrcMatrix.M[3][1]) +
+			SrcMatrix.M[3][0] * (SrcMatrix.M[1][1] * SrcMatrix.M[2][2] - SrcMatrix.M[1][2] * SrcMatrix.M[2][1])
+			);
+		DstMatrix.M[3][1] = RDet * (
+			SrcMatrix.M[0][0] * (SrcMatrix.M[2][1] * SrcMatrix.M[3][2] - SrcMatrix.M[2][2] * SrcMatrix.M[3][1]) -
+			SrcMatrix.M[2][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[3][2] - SrcMatrix.M[0][2] * SrcMatrix.M[3][1]) +
+			SrcMatrix.M[3][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[2][2] - SrcMatrix.M[0][2] * SrcMatrix.M[2][1])
+			);
+		DstMatrix.M[3][2] = -RDet * (
+			SrcMatrix.M[0][0] * (SrcMatrix.M[1][1] * SrcMatrix.M[3][2] - SrcMatrix.M[1][2] * SrcMatrix.M[3][1]) -
+			SrcMatrix.M[1][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[3][2] - SrcMatrix.M[0][2] * SrcMatrix.M[3][1]) +
+			SrcMatrix.M[3][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[1][2] - SrcMatrix.M[0][2] * SrcMatrix.M[1][1])
+			);
+		DstMatrix.M[3][3] = RDet * (
+			SrcMatrix.M[0][0] * (SrcMatrix.M[1][1] * SrcMatrix.M[2][2] - SrcMatrix.M[1][2] * SrcMatrix.M[2][1]) -
+			SrcMatrix.M[1][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[2][2] - SrcMatrix.M[0][2] * SrcMatrix.M[2][1]) +
+			SrcMatrix.M[2][0] * (SrcMatrix.M[0][1] * SrcMatrix.M[1][2] - SrcMatrix.M[0][2] * SrcMatrix.M[1][1])
+			);
+	}
+
 	// Set this to the identity matrix
 	FORCEINLINE void SetIdentity();
 
@@ -467,7 +546,7 @@ FORCEINLINE FFixedMatrix FFixedMatrix::InverseFast() const
 	}
 #endif
 	FFixedMatrix Result;
-	//VectorMatrixInverse(&Result, this);
+	Internal_MatrixInverse(Result, *this);
 	return Result;
 }
 
@@ -493,7 +572,7 @@ FORCEINLINE FFixedMatrix FFixedMatrix::Inverse() const
 		}
 		else
 		{
-			//VectorMatrixInverse(&Result, this);
+			Internal_MatrixInverse(Result, *this);
 		}
 	}
 
