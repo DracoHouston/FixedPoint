@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FixedPointTypes.h"
 #include "FixedPointNumbers.h"
 
 struct FIXEDPOINT_API FFixedPointMath : public FMath

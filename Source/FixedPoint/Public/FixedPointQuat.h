@@ -2,10 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "FixedPointTypes.h"
-#include "FixedPointMath.h"
-#include "FixedPointNumbers.h"
 #include "FixedPointQuat.generated.h"
 
 USTRUCT(BlueprintType)

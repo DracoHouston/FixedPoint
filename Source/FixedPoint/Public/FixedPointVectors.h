@@ -2,9 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "FixedPointTypes.h"
-#include "FixedPointNumbers.h"
 #include "FixedPointVectors.generated.h"
 
 USTRUCT(BlueprintType)

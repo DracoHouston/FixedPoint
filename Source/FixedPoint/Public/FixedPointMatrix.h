@@ -2,11 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "FixedPointTypes.h"
-#include "FixedPointMath.h"
-#include "FixedPointNumbers.h"
-#include "FixedPointVectors.h"
 #include "FixedPointMatrix.generated.h"
 
 USTRUCT(BlueprintType)
@@ -14,6 +10,8 @@ struct FIXEDPOINT_API FFixedMatrix
 {
 public:
 	GENERATED_BODY()
+
+		FORCEINLINE void DiagnosticCheckNaN() const {}
 
 	/**
 	* Default constructor
@@ -37,6 +35,8 @@ public:
 
 	FFixed64 M[4][4];
 
+	static const FFixedMatrix Identity;
+
 	/**
 	 * Constructor.
 	 *
@@ -45,7 +45,7 @@ public:
 	 * @param InZ Z plane
 	 * @param InW W plane
 	 */
-	//FORCEINLINE FFixedMatrix(const TPlane<T>& InX, const TPlane<T>& InY, const TPlane<T>& InZ, const TPlane<T>& InW);
+	FORCEINLINE FFixedMatrix(const FFixedPlane& InX, const FFixedPlane& InY, const FFixedPlane& InZ, const FFixedPlane& InW);
 
 	/**
 	 * Constructor.
@@ -167,30 +167,69 @@ public:
 
 	/** Fast path, and handles nil matrices. */
 	FORCEINLINE FFixedMatrix Inverse() const;
+
+	FORCEINLINE FFixedMatrix TransposeAdjoint() const
+	{
+		FFixedMatrix TA;
+
+		TA.M[0][0] = this->M[1][1] * this->M[2][2] - this->M[1][2] * this->M[2][1];
+		TA.M[0][1] = this->M[1][2] * this->M[2][0] - this->M[1][0] * this->M[2][2];
+		TA.M[0][2] = this->M[1][0] * this->M[2][1] - this->M[1][1] * this->M[2][0];
+		TA.M[0][3] = FixedPoint::Constants::Fixed64::Zero;
+
+		TA.M[1][0] = this->M[2][1] * this->M[0][2] - this->M[2][2] * this->M[0][1];
+		TA.M[1][1] = this->M[2][2] * this->M[0][0] - this->M[2][0] * this->M[0][2];
+		TA.M[1][2] = this->M[2][0] * this->M[0][1] - this->M[2][1] * this->M[0][0];
+		TA.M[1][3] = FixedPoint::Constants::Fixed64::Zero;
+
+		TA.M[2][0] = this->M[0][1] * this->M[1][2] - this->M[0][2] * this->M[1][1];
+		TA.M[2][1] = this->M[0][2] * this->M[1][0] - this->M[0][0] * this->M[1][2];
+		TA.M[2][2] = this->M[0][0] * this->M[1][1] - this->M[0][1] * this->M[1][0];
+		TA.M[2][3] = FixedPoint::Constants::Fixed64::Zero;
+
+		TA.M[3][0] = FixedPoint::Constants::Fixed64::Zero;
+		TA.M[3][1] = FixedPoint::Constants::Fixed64::Zero;
+		TA.M[3][2] = FixedPoint::Constants::Fixed64::Zero;
+		TA.M[3][3] = FixedPoint::Constants::Fixed64::One;
+
+		return TA;
+	}
+
+	/**
+	 * get axis of this matrix scaled by the scale of the matrix
+	 *
+	 * @param i index into the axis of the matrix
+	 * @ return vector of the axis
+	 */
+	FORCEINLINE FFixedVector GetScaledAxis(EAxis::Type Axis) const;
+
+	private:
+		/**
+	 * Output an error message and trigger an ensure
+	 */
+		static void ErrorEnsure(const TCHAR* Message)
+		{
+			UE_LOG(LogUnrealMath, Error, TEXT("%s"), Message);
+			ensureMsgf(false, TEXT("%s"), Message);
+		}
 };
 
-//FORCEINLINE  FFixedMatrix::FFixedMatrix(const TPlane<T>& InX, const TPlane<T>& InY, const TPlane<T>& InZ, const TPlane<T>& InW)
-//{
-//	M[0][0] = InX.X; M[0][1] = InX.Y;  M[0][2] = InX.Z;  M[0][3] = InX.W;
-//	M[1][0] = InY.X; M[1][1] = InY.Y;  M[1][2] = InY.Z;  M[1][3] = InY.W;
-//	M[2][0] = InZ.X; M[2][1] = InZ.Y;  M[2][2] = InZ.Z;  M[2][3] = InZ.W;
-//	M[3][0] = InW.X; M[3][1] = InW.Y;  M[3][2] = InW.Z;  M[3][3] = InW.W;
-//}
+
 
 FORCEINLINE  FFixedMatrix::FFixedMatrix(const FFixedVector& InX, const FFixedVector& InY, const FFixedVector& InZ, const FFixedVector& InW)
 {
-	M[0][0] = InX.X; M[0][1] = InX.Y;  M[0][2] = InX.Z;  M[0][3] = FFixed64();
-	M[1][0] = InY.X; M[1][1] = InY.Y;  M[1][2] = InY.Z;  M[1][3] = FFixed64();
-	M[2][0] = InZ.X; M[2][1] = InZ.Y;  M[2][2] = InZ.Z;  M[2][3] = FFixed64();
-	M[3][0] = InW.X; M[3][1] = InW.Y;  M[3][2] = InW.Z;  M[3][3] = FFixed64((int64)1);
+	M[0][0] = InX.X; M[0][1] = InX.Y;  M[0][2] = InX.Z;  M[0][3] = FixedPoint::Constants::Fixed64::Zero;
+	M[1][0] = InY.X; M[1][1] = InY.Y;  M[1][2] = InY.Z;  M[1][3] = FixedPoint::Constants::Fixed64::Zero;
+	M[2][0] = InZ.X; M[2][1] = InZ.Y;  M[2][2] = InZ.Z;  M[2][3] = FixedPoint::Constants::Fixed64::Zero;
+	M[3][0] = InW.X; M[3][1] = InW.Y;  M[3][2] = InW.Z;  M[3][3] = FixedPoint::Constants::Fixed64::One;
 }
 
 FORCEINLINE void  FFixedMatrix::SetIdentity()
 {
-	M[0][0] = FFixed64((int64)1);	M[0][1] = FFixed64();			M[0][2] = FFixed64();			M[0][3] = FFixed64();
-	M[1][0] = FFixed64();			M[1][1] = FFixed64((int64)1);	M[1][2] = FFixed64();			M[1][3] = FFixed64();
-	M[2][0] = FFixed64();			M[2][1] = FFixed64();			M[2][2] = FFixed64((int64)1);	M[2][3] = FFixed64();
-	M[3][0] = FFixed64();			M[3][1] = FFixed64();			M[3][2] = FFixed64();			M[3][3] = FFixed64((int64)1);
+	M[0][0] = FixedPoint::Constants::Fixed64::One;	M[0][1] = FixedPoint::Constants::Fixed64::Zero;	M[0][2] = FixedPoint::Constants::Fixed64::Zero;	M[0][3] = FixedPoint::Constants::Fixed64::Zero;
+	M[1][0] = FixedPoint::Constants::Fixed64::Zero;	M[1][1] = FixedPoint::Constants::Fixed64::One;	M[1][2] = FixedPoint::Constants::Fixed64::Zero;	M[1][3] = FixedPoint::Constants::Fixed64::Zero;
+	M[2][0] = FixedPoint::Constants::Fixed64::Zero;	M[2][1] = FixedPoint::Constants::Fixed64::Zero;	M[2][2] = FixedPoint::Constants::Fixed64::One;	M[2][3] = FixedPoint::Constants::Fixed64::Zero;
+	M[3][0] = FixedPoint::Constants::Fixed64::Zero;	M[3][1] = FixedPoint::Constants::Fixed64::Zero;	M[3][2] = FixedPoint::Constants::Fixed64::Zero;	M[3][3] = FixedPoint::Constants::Fixed64::One;
 }
 
 FORCEINLINE void FFixedMatrix::operator*=(const FFixedMatrix& Other)
@@ -408,27 +447,24 @@ FORCEINLINE FFixed64 FFixedMatrix::RotDeterminant() const
 
 FORCEINLINE FFixedMatrix FFixedMatrix::InverseFast() const
 {
-
-	//NEED TO DO VECTOR CLASS INTEROPERWHATSIT AS IN COPY THE EPIC CLASS VERBATIM IDIOT
-
 	// If we're in non final release, then make sure we're not creating NaNs
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
 	// Check for zero scale matrix to invert
-	/*if (GetScaledAxis(EAxis::X).IsNearlyZero(UE_SMALL_NUMBER) &&
-		GetScaledAxis(EAxis::Y).IsNearlyZero(UE_SMALL_NUMBER) &&
-		GetScaledAxis(EAxis::Z).IsNearlyZero(UE_SMALL_NUMBER))
+	if (GetScaledAxis(EAxis::X).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber) &&
+		GetScaledAxis(EAxis::Y).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber) &&
+		GetScaledAxis(EAxis::Z).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber))
 	{
-		ErrorEnsure(TEXT("FFixedMatrix::InverseFast(), trying to invert a NIL matrix, this results in NaNs! Use Inverse() instead."));
+		ErrorEnsure(TEXT("FFixedMatrix::InverseFast(), trying to invert a NIL matrix, garbage in, garbage out! Use Inverse() instead."));
 	}
 	else
 	{
 		const FFixed64	Det = Determinant();
 
-		if (Det == 0.0f || !FMath::IsFinite(Det))
+		if (Det == FixedPoint::Constants::Fixed64::Zero)
 		{
-			ErrorEnsure(TEXT("FFixedMatrix::InverseFast(), trying to invert a non-invertible matrix, this results in NaNs! Use Inverse() instead."));
+			ErrorEnsure(TEXT("FFixedMatrix::InverseFast(), trying to invert a non-invertible matrix, garbage in, garbage out! Use Inverse() instead."));
 		}
-	}*/
+	}
 #endif
 	FFixedMatrix Result;
 	//VectorMatrixInverse(&Result, this);
@@ -439,27 +475,27 @@ FORCEINLINE FFixedMatrix FFixedMatrix::Inverse() const
 {
 	FFixedMatrix Result;
 
-	// Check for zero scale matrix to invert
-	//if (GetScaledAxis(EAxis::X).IsNearlyZero(UE_SMALL_NUMBER) &&
-	//	GetScaledAxis(EAxis::Y).IsNearlyZero(UE_SMALL_NUMBER) &&
-	//	GetScaledAxis(EAxis::Z).IsNearlyZero(UE_SMALL_NUMBER))
-	//{
-	//	// just set to zero - avoids unsafe inverse of zero and duplicates what QNANs were resulting in before (scaling away all children)
-	//	Result = Identity;
-	//}
-	//else
-	//{
-	//	const FFixed64	Det = Determinant();
+	//Check for zero scale matrix to invert
+	if (GetScaledAxis(EAxis::X).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber) &&
+		GetScaledAxis(EAxis::Y).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber) &&
+		GetScaledAxis(EAxis::Z).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber))
+	{
+		// just set to zero - avoids unsafe inverse of zero and duplicates what QNANs were resulting in before (scaling away all children)
+		Result = Identity;
+	}
+	else
+	{
+		const FFixed64	Det = Determinant();
 
-	//	if (Det == 0.0f)
-	//	{
-	//		Result = Identity;
-	//	}
-	//	else
-	//	{
-	//		VectorMatrixInverse(&Result, this);
-	//	}
-	//}
+		if (Det == FixedPoint::Constants::Fixed64::Zero)
+		{
+			Result = Identity;
+		}
+		else
+		{
+			//VectorMatrixInverse(&Result, this);
+		}
+	}
 
 	return Result;
 }

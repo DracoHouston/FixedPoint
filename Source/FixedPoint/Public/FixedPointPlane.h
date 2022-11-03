@@ -2,12 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "FixedPointTypes.h"
-#include "FixedPointNumbers.h"
-#include "FixedPointVectors.h"
-#include "FixedPointMatrix.h"
-#include "FixedPointMath.h"
 #include "FixedPointPlane.generated.h"
 
 USTRUCT(BlueprintType)
@@ -158,7 +153,7 @@ public:
 	 * @param M The matrix to transform plane with.
 	 * @return The result of transform.
 	 */
-	FORCEINLINE FFixedPlane TransformBy(const FFixedMatrix& M) const { return FFixedPlane(); }
+	FORCEINLINE FFixedPlane TransformBy(const FFixedMatrix& M) const;
 
 	/**
 	 * You can optionally pass in the matrices transpose-adjoint, which save it recalculating it.
