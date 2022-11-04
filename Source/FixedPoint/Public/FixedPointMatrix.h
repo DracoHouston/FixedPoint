@@ -11,12 +11,12 @@ struct FIXEDPOINT_API FFixedMatrix
 public:
 	GENERATED_BODY()
 
-		FORCEINLINE void DiagnosticCheckNaN() const {}
+	FORCEINLINE void DiagnosticCheckNaN() const {}
 
 	/**
 	* Default constructor
 	*/
-		FFixedMatrix() {}
+	FORCEINLINE FFixedMatrix() {}
 
 	/**
 	 * Constructor.
@@ -31,11 +31,13 @@ public:
 	/**
 	* Constructor that casts FMatrix to FFixedMatrix
 	*/
-	FFixedMatrix(FMatrix inValue);
-
-	FFixed64 M[4][4];
-
-	static const FFixedMatrix Identity;
+	FORCEINLINE FFixedMatrix(FMatrix inValue)
+	{
+		M[0][0] = FFixed64(inValue.M[0][0]); M[0][1] = FFixed64(inValue.M[0][1]); M[0][2] = FFixed64(inValue.M[0][2]); M[0][3] = FFixed64(inValue.M[0][3]);
+		M[1][0] = FFixed64(inValue.M[1][0]); M[1][1] = FFixed64(inValue.M[1][1]); M[1][2] = FFixed64(inValue.M[1][2]); M[1][3] = FFixed64(inValue.M[1][3]);
+		M[2][0] = FFixed64(inValue.M[2][0]); M[2][1] = FFixed64(inValue.M[2][1]); M[2][2] = FFixed64(inValue.M[2][2]); M[2][3] = FFixed64(inValue.M[2][3]);
+		M[3][0] = FFixed64(inValue.M[3][0]); M[3][1] = FFixed64(inValue.M[3][1]); M[3][2] = FFixed64(inValue.M[3][2]); M[3][3] = FFixed64(inValue.M[3][3]);
+	}
 
 	/**
 	 * Constructor.
@@ -56,6 +58,10 @@ public:
 	 * @param InW W vector
 	 */
 	FORCEINLINE FFixedMatrix(const FFixedVector& InX, const FFixedVector& InY, const FFixedVector& InZ, const FFixedVector& InW);
+
+	FFixed64 M[4][4];
+
+	static const FFixedMatrix Identity;
 
 	static void Internal_MatrixInverse(FFixedMatrix& DstMatrix, const FFixedMatrix& SrcMatrix)
 	{
@@ -137,7 +143,13 @@ public:
 	}
 
 	// Set this to the identity matrix
-	FORCEINLINE void SetIdentity();
+	FORCEINLINE void SetIdentity()
+	{
+		M[0][0] = FixedPoint::Constants::Fixed64::One;	M[0][1] = FixedPoint::Constants::Fixed64::Zero;	M[0][2] = FixedPoint::Constants::Fixed64::Zero;	M[0][3] = FixedPoint::Constants::Fixed64::Zero;
+		M[1][0] = FixedPoint::Constants::Fixed64::Zero;	M[1][1] = FixedPoint::Constants::Fixed64::One;	M[1][2] = FixedPoint::Constants::Fixed64::Zero;	M[1][3] = FixedPoint::Constants::Fixed64::Zero;
+		M[2][0] = FixedPoint::Constants::Fixed64::Zero;	M[2][1] = FixedPoint::Constants::Fixed64::Zero;	M[2][2] = FixedPoint::Constants::Fixed64::One;	M[2][3] = FixedPoint::Constants::Fixed64::Zero;
+		M[3][0] = FixedPoint::Constants::Fixed64::Zero;	M[3][1] = FixedPoint::Constants::Fixed64::Zero;	M[3][2] = FixedPoint::Constants::Fixed64::Zero;	M[3][3] = FixedPoint::Constants::Fixed64::One;
+	}
 
 	/**
 	 * Gets the result of multiplying a Matrix to this.
@@ -145,7 +157,30 @@ public:
 	 * @param Other The matrix to multiply this by.
 	 * @return The result of multiplication.
 	 */
-	FORCEINLINE FFixedMatrix operator* (const FFixedMatrix& Other) const;
+	FORCEINLINE FFixedMatrix operator* (const FFixedMatrix& Other) const
+	{
+		FFixedMatrix Result;
+		Result.M[0][0] = M[0][0] * Other.M[0][0] + M[0][1] * Other.M[1][0] + M[0][2] * Other.M[2][0] + M[0][3] * Other.M[3][0];
+		Result.M[0][1] = M[0][0] * Other.M[0][1] + M[0][1] * Other.M[1][1] + M[0][2] * Other.M[2][1] + M[0][3] * Other.M[3][1];
+		Result.M[0][2] = M[0][0] * Other.M[0][2] + M[0][1] * Other.M[1][2] + M[0][2] * Other.M[2][2] + M[0][3] * Other.M[3][2];
+		Result.M[0][3] = M[0][0] * Other.M[0][3] + M[0][1] * Other.M[1][3] + M[0][2] * Other.M[2][3] + M[0][3] * Other.M[3][3];
+
+		Result.M[1][0] = M[1][0] * Other.M[0][0] + M[1][1] * Other.M[1][0] + M[1][2] * Other.M[2][0] + M[1][3] * Other.M[3][0];
+		Result.M[1][1] = M[1][0] * Other.M[0][1] + M[1][1] * Other.M[1][1] + M[1][2] * Other.M[2][1] + M[1][3] * Other.M[3][1];
+		Result.M[1][2] = M[1][0] * Other.M[0][2] + M[1][1] * Other.M[1][2] + M[1][2] * Other.M[2][2] + M[1][3] * Other.M[3][2];
+		Result.M[1][3] = M[1][0] * Other.M[0][3] + M[1][1] * Other.M[1][3] + M[1][2] * Other.M[2][3] + M[1][3] * Other.M[3][3];
+
+		Result.M[2][0] = M[2][0] * Other.M[0][0] + M[2][1] * Other.M[1][0] + M[2][2] * Other.M[2][0] + M[2][3] * Other.M[3][0];
+		Result.M[2][1] = M[2][0] * Other.M[0][1] + M[2][1] * Other.M[1][1] + M[2][2] * Other.M[2][1] + M[2][3] * Other.M[3][1];
+		Result.M[2][2] = M[2][0] * Other.M[0][2] + M[2][1] * Other.M[1][2] + M[2][2] * Other.M[2][2] + M[2][3] * Other.M[3][2];
+		Result.M[2][3] = M[2][0] * Other.M[0][3] + M[2][1] * Other.M[1][3] + M[2][2] * Other.M[2][3] + M[2][3] * Other.M[3][3];
+
+		Result.M[3][0] = M[3][0] * Other.M[0][0] + M[3][1] * Other.M[1][0] + M[3][2] * Other.M[2][0] + M[3][3] * Other.M[3][0];
+		Result.M[3][1] = M[3][0] * Other.M[0][1] + M[3][1] * Other.M[1][1] + M[3][2] * Other.M[2][1] + M[3][3] * Other.M[3][1];
+		Result.M[3][2] = M[3][0] * Other.M[0][2] + M[3][1] * Other.M[1][2] + M[3][2] * Other.M[2][2] + M[3][3] * Other.M[3][2];
+		Result.M[3][3] = M[3][0] * Other.M[0][3] + M[3][1] * Other.M[1][3] + M[3][2] * Other.M[2][3] + M[3][3] * Other.M[3][3];
+		return Result;
+	}
 
 	/**
 	 * Multiply this by a matrix.
@@ -153,7 +188,10 @@ public:
 	 * @param Other the matrix to multiply by this.
 	 * @return reference to this after multiply.
 	 */
-	FORCEINLINE void operator*=(const FFixedMatrix& Other);
+	FORCEINLINE void operator*=(const FFixedMatrix& Other)
+	{
+		*this = *this * Other;
+	}
 
 	/**
 	 * Gets the result of adding a matrix to this.
@@ -161,7 +199,20 @@ public:
 	 * @param Other The Matrix to add.
 	 * @return The result of addition.
 	 */
-	FORCEINLINE FFixedMatrix operator+ (const FFixedMatrix& Other) const;
+	FORCEINLINE FFixedMatrix operator+ (const FFixedMatrix& Other) const
+	{
+		FFixedMatrix ResultMat;
+
+		for (int32 X = 0; X < 4; X++)
+		{
+			ResultMat.M[X][0] = M[X][0] + Other.M[X][0];
+			ResultMat.M[X][1] = M[X][1] + Other.M[X][1];
+			ResultMat.M[X][2] = M[X][2] + Other.M[X][2];
+			ResultMat.M[X][3] = M[X][3] + Other.M[X][3];
+		}
+
+		return ResultMat;
+	}
 
 	/**
 	 * Adds to this matrix.
@@ -169,12 +220,28 @@ public:
 	 * @param Other The matrix to add to this.
 	 * @return Reference to this after addition.
 	 */
-	FORCEINLINE void operator+=(const FFixedMatrix& Other);
+	FORCEINLINE void operator+=(const FFixedMatrix& Other)
+	{
+		*this = *this + Other;
+	}
 
 	/**
 	  * This isn't applying SCALE, just multiplying the value to all members - i.e. weighting
 	  */
-	FORCEINLINE FFixedMatrix operator* (FFixed64 Other) const;
+	FORCEINLINE FFixedMatrix operator* (FFixed64 Other) const
+	{
+		FFixedMatrix ResultMat;
+
+		for (int32 X = 0; X < 4; X++)
+		{
+			ResultMat.M[X][0] = M[X][0] * Other;
+			ResultMat.M[X][1] = M[X][1] * Other;
+			ResultMat.M[X][2] = M[X][2] * Other;
+			ResultMat.M[X][3] = M[X][3] * Other;
+		}
+
+		return ResultMat;
+	}
 
 	/**
 	 * Multiply this matrix by a weighting factor.
@@ -182,7 +249,10 @@ public:
 	 * @param other The weight.
 	 * @return a reference to this after weighting.
 	 */
-	FORCEINLINE void operator*=(FFixed64 Other);
+	FORCEINLINE void operator*=(FFixed64 Other)
+	{
+		*this = *this * Other;
+	}
 
 	/**
 	 * Checks whether two matrix are identical.
@@ -190,7 +260,21 @@ public:
 	 * @param Other The other matrix.
 	 * @return true if two matrix are identical, otherwise false.
 	 */
-	FORCEINLINE bool operator==(const FFixedMatrix& Other) const;
+	FORCEINLINE bool operator==(const FFixedMatrix& Other) const
+	{
+		for (int32 X = 0; X < 4; X++)
+		{
+			for (int32 Y = 0; Y < 4; Y++)
+			{
+				if (M[X][Y] != Other.M[X][Y])
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
 
 	/**
 	 * Checks whether another Matrix is equal to this, within specified tolerance.
@@ -199,7 +283,21 @@ public:
 	 * @param Tolerance Error Tolerance.
 	 * @return true if two Matrix are equal, within specified tolerance, otherwise false.
 	 */
-	FORCEINLINE bool Equals(const FFixedMatrix& Other, FFixed64 Tolerance) const;
+	FORCEINLINE bool Equals(const FFixedMatrix& Other, FFixed64 Tolerance) const
+	{
+		for (int32 X = 0; X < 4; X++)
+		{
+			for (int32 Y = 0; Y < 4; Y++)
+			{
+				if (FFixedPointMath::Abs(M[X][Y] - Other.M[X][Y]) > Tolerance)
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
 
 	/**
 	 * Checks whether another Matrix is not equal to this, within specified tolerance.
@@ -207,7 +305,10 @@ public:
 	 * @param Other The other Matrix.
 	 * @return true if two Matrix are not equal, within specified tolerance, otherwise false.
 	 */
-	FORCEINLINE bool operator!=(const FFixedMatrix& Other) const;
+	FORCEINLINE bool operator!=(const FFixedMatrix& Other) const
+	{
+		return !(*this == Other);
+	}
 
 	// Homogeneous transform.
 	FORCEINLINE FFixedVector4d TransformFVector4(const FFixedVector4d& V) const;
@@ -232,14 +333,67 @@ public:
 
 	// Transpose.
 
-	FORCEINLINE FFixedMatrix GetTransposed() const;
+	FORCEINLINE FFixedMatrix GetTransposed() const
+	{
+		FFixedMatrix Result;
+
+		Result.M[0][0] = M[0][0];
+		Result.M[0][1] = M[1][0];
+		Result.M[0][2] = M[2][0];
+		Result.M[0][3] = M[3][0];
+
+		Result.M[1][0] = M[0][1];
+		Result.M[1][1] = M[1][1];
+		Result.M[1][2] = M[2][1];
+		Result.M[1][3] = M[3][1];
+
+		Result.M[2][0] = M[0][2];
+		Result.M[2][1] = M[1][2];
+		Result.M[2][2] = M[2][2];
+		Result.M[2][3] = M[3][2];
+
+		Result.M[3][0] = M[0][3];
+		Result.M[3][1] = M[1][3];
+		Result.M[3][2] = M[2][3];
+		Result.M[3][3] = M[3][3];
+
+		return Result;
+	}
 
 	// @return determinant of this matrix.
 
-	FORCEINLINE FFixed64 Determinant() const;
+	FORCEINLINE FFixed64 Determinant() const
+	{
+		return	M[0][0] * (
+			M[1][1] * (M[2][2] * M[3][3] - M[2][3] * M[3][2]) -
+			M[2][1] * (M[1][2] * M[3][3] - M[1][3] * M[3][2]) +
+			M[3][1] * (M[1][2] * M[2][3] - M[1][3] * M[2][2])
+			) -
+			M[1][0] * (
+				M[0][1] * (M[2][2] * M[3][3] - M[2][3] * M[3][2]) -
+				M[2][1] * (M[0][2] * M[3][3] - M[0][3] * M[3][2]) +
+				M[3][1] * (M[0][2] * M[2][3] - M[0][3] * M[2][2])
+				) +
+			M[2][0] * (
+				M[0][1] * (M[1][2] * M[3][3] - M[1][3] * M[3][2]) -
+				M[1][1] * (M[0][2] * M[3][3] - M[0][3] * M[3][2]) +
+				M[3][1] * (M[0][2] * M[1][3] - M[0][3] * M[1][2])
+				) -
+			M[3][0] * (
+				M[0][1] * (M[1][2] * M[2][3] - M[1][3] * M[2][2]) -
+				M[1][1] * (M[0][2] * M[2][3] - M[0][3] * M[2][2]) +
+				M[2][1] * (M[0][2] * M[1][3] - M[0][3] * M[1][2])
+				);
+	}
 
 	/** @return the determinant of rotation 3x3 matrix */
-	FORCEINLINE FFixed64 RotDeterminant() const;
+	FORCEINLINE FFixed64 RotDeterminant() const
+	{
+		return
+			M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]) -
+			M[1][0] * (M[0][1] * M[2][2] - M[0][2] * M[2][1]) +
+			M[2][0] * (M[0][1] * M[1][2] - M[0][2] * M[1][1]);
+	}
 
 	/** Fast path, doesn't check for nil matrices in final release builds */
 	FORCEINLINE FFixedMatrix InverseFast() const;
@@ -274,6 +428,96 @@ public:
 		return TA;
 	}
 
+	// NOTE: There is some compiler optimization issues with WIN64 that cause FORCEINLINE to cause a crash
+	// Remove any scaling from this matrix (ie magnitude of each row is 1) with error Tolerance
+	inline void RemoveScaling(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber)
+	{
+		// For each row, find magnitude, and if its non-zero re-scale so its unit length.
+		const FFixed64 SquareSum0 = (M[0][0] * M[0][0]) + (M[0][1] * M[0][1]) + (M[0][2] * M[0][2]);
+		const FFixed64 SquareSum1 = (M[1][0] * M[1][0]) + (M[1][1] * M[1][1]) + (M[1][2] * M[1][2]);
+		const FFixed64 SquareSum2 = (M[2][0] * M[2][0]) + (M[2][1] * M[2][1]) + (M[2][2] * M[2][2]);
+		const FFixed64 Scale0 = FFixedPointMath::FloatSelect(SquareSum0 - Tolerance, FFixedPointMath::InvSqrt(SquareSum0), FFixed64(1));
+		const FFixed64 Scale1 = FFixedPointMath::FloatSelect(SquareSum1 - Tolerance, FFixedPointMath::InvSqrt(SquareSum1), FFixed64(1));
+		const FFixed64 Scale2 = FFixedPointMath::FloatSelect(SquareSum2 - Tolerance, FFixedPointMath::InvSqrt(SquareSum2), FFixed64(1));
+		M[0][0] *= Scale0;
+		M[0][1] *= Scale0;
+		M[0][2] *= Scale0;
+		M[1][0] *= Scale1;
+		M[1][1] *= Scale1;
+		M[1][2] *= Scale1;
+		M[2][0] *= Scale2;
+		M[2][1] *= Scale2;
+		M[2][2] *= Scale2;
+	}
+
+	// Returns matrix after RemoveScaling with error Tolerance
+	inline FFixedMatrix GetMatrixWithoutScale(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber) const
+	{
+		FFixedMatrix Result = *this;
+		Result.RemoveScaling(Tolerance);
+		return Result;
+	}
+
+	/** Remove any scaling from this matrix (ie magnitude of each row is 1) and return the 3D scale vector that was initially present with error Tolerance */
+	inline FFixedVector ExtractScaling(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber);
+
+	/** return a 3D scale vector calculated from this matrix (where each component is the magnitude of a row vector) with error Tolerance. */
+	inline FFixedVector GetScaleVector(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber) const;
+
+	// Remove any translation from this matrix
+	inline FFixedMatrix RemoveTranslation() const
+	{
+		FFixedMatrix Result = *this;
+		Result.M[3][0] = 0.0f;
+		Result.M[3][1] = 0.0f;
+		Result.M[3][2] = 0.0f;
+		return Result;
+	}
+
+	/** Returns a matrix with an additional translation concatenated. */
+	inline FFixedMatrix ConcatTranslation(const FFixedVector& Translation) const;
+
+	/** Returns true if any element of this matrix is NaN */
+	inline bool ContainsNaN() const
+	{
+		return false;
+	}
+
+	/** Scale the translation part of the matrix by the supplied vector. */
+	inline void ScaleTranslation(const FFixedVector& Scale3D);
+
+	/** @return the minimum magnitude of any row of the matrix. */
+	inline FFixed64 GetMinimumAxisScale() const
+	{
+		const FFixed64 MaxRowScaleSquared = FFixedPointMath::Min(
+			GetScaledAxis(EAxis::X).SizeSquared(),
+			FFixedPointMath::Min(
+				GetScaledAxis(EAxis::Y).SizeSquared(),
+				GetScaledAxis(EAxis::Z).SizeSquared()
+			)
+		);
+		return FFixedPointMath::Sqrt(MaxRowScaleSquared);
+	}
+
+	/** @return the maximum magnitude of any row of the matrix. */
+	inline FFixed64 GetMaximumAxisScale() const
+	{
+		const FFixed64 MaxRowScaleSquared = FFixedPointMath::Max(
+			GetScaledAxis(EAxis::X).SizeSquared(),
+			FFixedPointMath::Max(
+				GetScaledAxis(EAxis::Y).SizeSquared(),
+				GetScaledAxis(EAxis::Z).SizeSquared()
+			)
+		);
+		return FFixedPointMath::Sqrt(MaxRowScaleSquared);
+	}
+
+	/** Apply Scale to this matrix **/
+	inline FFixedMatrix ApplyScale(FFixed64 Scale) const;
+
+	// @return the origin of the co-ordinate system
+	inline FFixedVector GetOrigin() const;
+
 	/**
 	 * get axis of this matrix scaled by the scale of the matrix
 	 *
@@ -281,6 +525,32 @@ public:
 	 * @ return vector of the axis
 	 */
 	FORCEINLINE FFixedVector GetScaledAxis(EAxis::Type Axis) const;
+
+	/**
+	 * get axes of this matrix scaled by the scale of the matrix
+	 *
+	 * @param X axes returned to this param
+	 * @param Y axes returned to this param
+	 * @param Z axes returned to this param
+	 */
+	inline void GetScaledAxes(FFixedVector& X, FFixedVector& Y, FFixedVector& Z) const;
+
+	/**
+	 * get unit length axis of this matrix
+	 *
+	 * @param i index into the axis of the matrix
+	 * @return vector of the axis
+	 */
+	inline FFixedVector GetUnitAxis(EAxis::Type Axis) const;
+
+	/**
+	 * get unit length axes of this matrix
+	 *
+	 * @param X axes returned to this param
+	 * @param Y axes returned to this param
+	 * @param Z axes returned to this param
+	 */
+	inline void GetUnitAxes(FFixedVector& X, FFixedVector& Y, FFixedVector& Z) const;
 
 	private:
 		/**
@@ -292,289 +562,3 @@ public:
 			ensureMsgf(false, TEXT("%s"), Message);
 		}
 };
-
-
-
-FORCEINLINE  FFixedMatrix::FFixedMatrix(const FFixedVector& InX, const FFixedVector& InY, const FFixedVector& InZ, const FFixedVector& InW)
-{
-	M[0][0] = InX.X; M[0][1] = InX.Y;  M[0][2] = InX.Z;  M[0][3] = FixedPoint::Constants::Fixed64::Zero;
-	M[1][0] = InY.X; M[1][1] = InY.Y;  M[1][2] = InY.Z;  M[1][3] = FixedPoint::Constants::Fixed64::Zero;
-	M[2][0] = InZ.X; M[2][1] = InZ.Y;  M[2][2] = InZ.Z;  M[2][3] = FixedPoint::Constants::Fixed64::Zero;
-	M[3][0] = InW.X; M[3][1] = InW.Y;  M[3][2] = InW.Z;  M[3][3] = FixedPoint::Constants::Fixed64::One;
-}
-
-FORCEINLINE void  FFixedMatrix::SetIdentity()
-{
-	M[0][0] = FixedPoint::Constants::Fixed64::One;	M[0][1] = FixedPoint::Constants::Fixed64::Zero;	M[0][2] = FixedPoint::Constants::Fixed64::Zero;	M[0][3] = FixedPoint::Constants::Fixed64::Zero;
-	M[1][0] = FixedPoint::Constants::Fixed64::Zero;	M[1][1] = FixedPoint::Constants::Fixed64::One;	M[1][2] = FixedPoint::Constants::Fixed64::Zero;	M[1][3] = FixedPoint::Constants::Fixed64::Zero;
-	M[2][0] = FixedPoint::Constants::Fixed64::Zero;	M[2][1] = FixedPoint::Constants::Fixed64::Zero;	M[2][2] = FixedPoint::Constants::Fixed64::One;	M[2][3] = FixedPoint::Constants::Fixed64::Zero;
-	M[3][0] = FixedPoint::Constants::Fixed64::Zero;	M[3][1] = FixedPoint::Constants::Fixed64::Zero;	M[3][2] = FixedPoint::Constants::Fixed64::Zero;	M[3][3] = FixedPoint::Constants::Fixed64::One;
-}
-
-FORCEINLINE void FFixedMatrix::operator*=(const FFixedMatrix& Other)
-{
-	*this = *this * Other;
-}
-
-
-FORCEINLINE FFixedMatrix FFixedMatrix::operator*(const FFixedMatrix& Other) const
-{
-	FFixedMatrix Result;
-	Result.M[0][0] = M[0][0] * Other.M[0][0] + M[0][1] * Other.M[1][0] + M[0][2] * Other.M[2][0] + M[0][3] * Other.M[3][0];
-	Result.M[0][1] = M[0][0] * Other.M[0][1] + M[0][1] * Other.M[1][1] + M[0][2] * Other.M[2][1] + M[0][3] * Other.M[3][1];
-	Result.M[0][2] = M[0][0] * Other.M[0][2] + M[0][1] * Other.M[1][2] + M[0][2] * Other.M[2][2] + M[0][3] * Other.M[3][2];
-	Result.M[0][3] = M[0][0] * Other.M[0][3] + M[0][1] * Other.M[1][3] + M[0][2] * Other.M[2][3] + M[0][3] * Other.M[3][3];
-	
-	Result.M[1][0] = M[1][0] * Other.M[0][0] + M[1][1] * Other.M[1][0] + M[1][2] * Other.M[2][0] + M[1][3] * Other.M[3][0];
-	Result.M[1][1] = M[1][0] * Other.M[0][1] + M[1][1] * Other.M[1][1] + M[1][2] * Other.M[2][1] + M[1][3] * Other.M[3][1];
-	Result.M[1][2] = M[1][0] * Other.M[0][2] + M[1][1] * Other.M[1][2] + M[1][2] * Other.M[2][2] + M[1][3] * Other.M[3][2];
-	Result.M[1][3] = M[1][0] * Other.M[0][3] + M[1][1] * Other.M[1][3] + M[1][2] * Other.M[2][3] + M[1][3] * Other.M[3][3];
-	
-	Result.M[2][0] = M[2][0] * Other.M[0][0] + M[2][1] * Other.M[1][0] + M[2][2] * Other.M[2][0] + M[2][3] * Other.M[3][0];
-	Result.M[2][1] = M[2][0] * Other.M[0][1] + M[2][1] * Other.M[1][1] + M[2][2] * Other.M[2][1] + M[2][3] * Other.M[3][1];
-	Result.M[2][2] = M[2][0] * Other.M[0][2] + M[2][1] * Other.M[1][2] + M[2][2] * Other.M[2][2] + M[2][3] * Other.M[3][2];
-	Result.M[2][3] = M[2][0] * Other.M[0][3] + M[2][1] * Other.M[1][3] + M[2][2] * Other.M[2][3] + M[2][3] * Other.M[3][3];
-		 
-	Result.M[3][0] = M[3][0] * Other.M[0][0] + M[3][1] * Other.M[1][0] + M[3][2] * Other.M[2][0] + M[3][3] * Other.M[3][0];
-	Result.M[3][1] = M[3][0] * Other.M[0][1] + M[3][1] * Other.M[1][1] + M[3][2] * Other.M[2][1] + M[3][3] * Other.M[3][1];
-	Result.M[3][2] = M[3][0] * Other.M[0][2] + M[3][1] * Other.M[1][2] + M[3][2] * Other.M[2][2] + M[3][3] * Other.M[3][2];
-	Result.M[3][3] = M[3][0] * Other.M[0][3] + M[3][1] * Other.M[1][3] + M[3][2] * Other.M[2][3] + M[3][3] * Other.M[3][3];
-	return Result;
-}
-
-FORCEINLINE FFixedMatrix FFixedMatrix::operator+(const FFixedMatrix& Other) const
-{
-	FFixedMatrix ResultMat;
-
-	for (int32 X = 0; X < 4; X++)
-	{
-		ResultMat.M[X][0] = M[X][0] + Other.M[X][0];
-		ResultMat.M[X][1] = M[X][1] + Other.M[X][1];
-		ResultMat.M[X][2] = M[X][2] + Other.M[X][2];
-		ResultMat.M[X][3] = M[X][3] + Other.M[X][3];
-	}
-
-	return ResultMat;
-}
-
-FORCEINLINE void FFixedMatrix::operator+=(const FFixedMatrix& Other)
-{
-	*this = *this + Other;
-}
-
-FORCEINLINE FFixedMatrix FFixedMatrix::operator*(FFixed64 Other) const
-{
-	FFixedMatrix ResultMat;
-
-	for (int32 X = 0; X < 4; X++)
-	{
-		ResultMat.M[X][0] = M[X][0] * Other;
-		ResultMat.M[X][1] = M[X][1] * Other;
-		ResultMat.M[X][2] = M[X][2] * Other;
-		ResultMat.M[X][3] = M[X][3] * Other;
-	}
-
-	return ResultMat;
-}
-
-FORCEINLINE void FFixedMatrix::operator*=(FFixed64 Other)
-{
-	*this = *this * Other;
-}
-
-// Comparison operators.
-
-FORCEINLINE bool FFixedMatrix::operator==(const FFixedMatrix& Other) const
-{
-	for (int32 X = 0; X < 4; X++)
-	{
-		for (int32 Y = 0; Y < 4; Y++)
-		{
-			if (M[X][Y] != Other.M[X][Y])
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
-
-inline bool FFixedMatrix::Equals(const FFixedMatrix& Other, FFixed64 Tolerance) const
-{
-	for (int32 X = 0; X < 4; X++)
-	{
-		for (int32 Y = 0; Y < 4; Y++)
-		{
-			if (FFixedPointMath::Abs(M[X][Y] - Other.M[X][Y]) > Tolerance)
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
-
-inline bool FFixedMatrix::operator!=(const FFixedMatrix& Other) const
-{
-	return !(*this == Other);
-}
-
-FORCEINLINE FFixedVector4d FFixedMatrix::TransformFVector4(const FFixedVector4d& P) const
-{
-	FFixedVector4d VOurX = FFixedVector4d(M[0][0], M[0][1], M[0][2], M[0][3]);
-	FFixedVector4d VOurY = FFixedVector4d(M[1][0], M[1][1], M[1][2], M[1][3]);
-	FFixedVector4d VOurZ = FFixedVector4d(M[2][0], M[2][1], M[2][2], M[2][3]);
-	FFixedVector4d VOurW = FFixedVector4d(M[3][0], M[3][1], M[3][2], M[3][3]);
-
-	FFixedVector4d VTempX = FFixedVector4d(P.X);
-	FFixedVector4d VTempY = FFixedVector4d(P.Y);
-	FFixedVector4d VTempZ = FFixedVector4d(P.Z);
-	FFixedVector4d VTempW = FFixedVector4d(P.W);
-
-	VTempX = VTempX * VOurX;
-	VTempX = (VTempY * VOurY) + VTempX;
-	VTempX = (VTempZ * VOurZ) + VTempX;
-	VTempX = (VTempW * VOurW) + VTempX;
-
-	return VTempX;
-}
-
-FORCEINLINE FFixedVector4d FFixedMatrix::TransformPosition(const FFixedVector& V) const
-{
-	return TransformFVector4(FFixedVector4d(V.X, V.Y, V.Z, FixedPoint::Constants::Fixed64::One));
-}
-
-FORCEINLINE FFixedVector FFixedMatrix::InverseTransformPosition(const FFixedVector& V) const
-{
-	FFixedMatrix InvSelf = this->InverseFast();
-	//return InvSelf.TransformPosition(V);
-	return FFixedVector();
-}
-
-FORCEINLINE FFixedVector4d FFixedMatrix::TransformVector(const FFixedVector& V) const
-{
-	return TransformFVector4(FFixedVector4d(V.X, V.Y, V.Z, FFixed64()));
-}
-
-FORCEINLINE FFixedVector FFixedMatrix::InverseTransformVector(const FFixedVector& V) const
-{
-	FFixedMatrix InvSelf = this->InverseFast();
-	//return InvSelf.TransformVector(V);
-	return FFixedVector();
-}
-
-FORCEINLINE FFixedMatrix FFixedMatrix::GetTransposed() const
-{
-	FFixedMatrix Result;
-
-	Result.M[0][0] = M[0][0];
-	Result.M[0][1] = M[1][0];
-	Result.M[0][2] = M[2][0];
-	Result.M[0][3] = M[3][0];
-
-	Result.M[1][0] = M[0][1];
-	Result.M[1][1] = M[1][1];
-	Result.M[1][2] = M[2][1];
-	Result.M[1][3] = M[3][1];
-
-	Result.M[2][0] = M[0][2];
-	Result.M[2][1] = M[1][2];
-	Result.M[2][2] = M[2][2];
-	Result.M[2][3] = M[3][2];
-
-	Result.M[3][0] = M[0][3];
-	Result.M[3][1] = M[1][3];
-	Result.M[3][2] = M[2][3];
-	Result.M[3][3] = M[3][3];
-
-	return Result;
-}
-
-FORCEINLINE FFixed64 FFixedMatrix::Determinant() const
-{
-	return	M[0][0] * (
-		M[1][1] * (M[2][2] * M[3][3] - M[2][3] * M[3][2]) -
-		M[2][1] * (M[1][2] * M[3][3] - M[1][3] * M[3][2]) +
-		M[3][1] * (M[1][2] * M[2][3] - M[1][3] * M[2][2])
-		) -
-		M[1][0] * (
-			M[0][1] * (M[2][2] * M[3][3] - M[2][3] * M[3][2]) -
-			M[2][1] * (M[0][2] * M[3][3] - M[0][3] * M[3][2]) +
-			M[3][1] * (M[0][2] * M[2][3] - M[0][3] * M[2][2])
-			) +
-		M[2][0] * (
-			M[0][1] * (M[1][2] * M[3][3] - M[1][3] * M[3][2]) -
-			M[1][1] * (M[0][2] * M[3][3] - M[0][3] * M[3][2]) +
-			M[3][1] * (M[0][2] * M[1][3] - M[0][3] * M[1][2])
-			) -
-		M[3][0] * (
-			M[0][1] * (M[1][2] * M[2][3] - M[1][3] * M[2][2]) -
-			M[1][1] * (M[0][2] * M[2][3] - M[0][3] * M[2][2]) +
-			M[2][1] * (M[0][2] * M[1][3] - M[0][3] * M[1][2])
-			);
-}
-
-FORCEINLINE FFixed64 FFixedMatrix::RotDeterminant() const
-{
-	return
-		M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]) -
-		M[1][0] * (M[0][1] * M[2][2] - M[0][2] * M[2][1]) +
-		M[2][0] * (M[0][1] * M[1][2] - M[0][2] * M[1][1]);
-}
-
-FORCEINLINE FFixedMatrix FFixedMatrix::InverseFast() const
-{
-	// If we're in non final release, then make sure we're not creating NaNs
-#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
-	// Check for zero scale matrix to invert
-	if (GetScaledAxis(EAxis::X).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber) &&
-		GetScaledAxis(EAxis::Y).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber) &&
-		GetScaledAxis(EAxis::Z).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber))
-	{
-		ErrorEnsure(TEXT("FFixedMatrix::InverseFast(), trying to invert a NIL matrix, garbage in, garbage out! Use Inverse() instead."));
-	}
-	else
-	{
-		const FFixed64	Det = Determinant();
-
-		if (Det == FixedPoint::Constants::Fixed64::Zero)
-		{
-			ErrorEnsure(TEXT("FFixedMatrix::InverseFast(), trying to invert a non-invertible matrix, garbage in, garbage out! Use Inverse() instead."));
-		}
-	}
-#endif
-	FFixedMatrix Result;
-	Internal_MatrixInverse(Result, *this);
-	return Result;
-}
-
-FORCEINLINE FFixedMatrix FFixedMatrix::Inverse() const
-{
-	FFixedMatrix Result;
-
-	//Check for zero scale matrix to invert
-	if (GetScaledAxis(EAxis::X).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber) &&
-		GetScaledAxis(EAxis::Y).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber) &&
-		GetScaledAxis(EAxis::Z).IsNearlyZero(FixedPoint::Constants::Fixed64::SmallNumber))
-	{
-		// just set to zero - avoids unsafe inverse of zero and duplicates what QNANs were resulting in before (scaling away all children)
-		Result = Identity;
-	}
-	else
-	{
-		const FFixed64	Det = Determinant();
-
-		if (Det == FixedPoint::Constants::Fixed64::Zero)
-		{
-			Result = Identity;
-		}
-		else
-		{
-			Internal_MatrixInverse(Result, *this);
-		}
-	}
-
-	return Result;
-}
