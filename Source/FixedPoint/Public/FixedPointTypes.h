@@ -12,6 +12,7 @@ struct FFixedVector4d;
 struct FFixedMatrix;
 struct FFixedQuat;
 struct FFixedPlane;
+struct FFixedRotator;
 
 #include "FixedPointNumbers.h"
 #include "FixedPointMath.h"
@@ -19,6 +20,7 @@ struct FFixedPlane;
 #include "FixedPointPlane.h"
 #include "FixedPointMatrix.h"
 #include "FixedPointQuat.h"
+#include "FixedPointRotator.h"
 
 FORCEINLINE FFixedMatrix::FFixedMatrix(const FFixedPlane& InX, const FFixedPlane& InY, const FFixedPlane& InZ, const FFixedPlane& InW)
 {
@@ -291,7 +293,7 @@ FORCEINLINE FFixedVector4d FFixedMatrix::TransformPosition(const FFixedVector& V
 FORCEINLINE FFixedVector FFixedMatrix::InverseTransformPosition(const FFixedVector& V) const
 {
 	FFixedMatrix InvSelf = this->InverseFast();
-	//return InvSelf.TransformPosition(V);
+	return InvSelf.TransformPosition(V);
 	return FFixedVector();
 }
 
@@ -303,6 +305,11 @@ FORCEINLINE FFixedVector4d FFixedMatrix::TransformVector(const FFixedVector& V) 
 FORCEINLINE FFixedVector FFixedMatrix::InverseTransformVector(const FFixedVector& V) const
 {
 	FFixedMatrix InvSelf = this->InverseFast();
-	//return InvSelf.TransformVector(V);
+	return InvSelf.TransformVector(V);
 	return FFixedVector();
+}
+
+FORCEINLINE FFixedRotator::FFixedRotator(const FFixedQuat& Quat)
+{
+	*this = Quat.Rotator();
 }

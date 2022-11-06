@@ -263,6 +263,8 @@ public:
 	 * @return The dot product.
 	 */
 	FFixed64 operator|(const FFixedQuat& Q) const;
+
+	FFixedRotator Rotator() const;
 };
 
 FORCEINLINE FFixedQuat::FFixedQuat(EForceInit ZeroOrNot)
