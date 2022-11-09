@@ -3,7 +3,7 @@
 
 #include "FixedPointMatrix.h"
 #include "FixedPointNumbers.h"
-#include "FixedPointVectors.h"
+#include "FixedPointPlane.h"
 
 const FFixedMatrix FFixedMatrix::Identity(
 	FFixedPlane(FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero),

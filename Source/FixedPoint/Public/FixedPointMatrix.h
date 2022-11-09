@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "FixedPointTypes.h"
+#include "CoreMinimal.h"
+#include "FixedPointFwd.h"
 #include "FixedPointMatrix.generated.h"
 
 USTRUCT(BlueprintType)

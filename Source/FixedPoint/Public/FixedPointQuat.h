@@ -3,6 +3,7 @@
 #pragma once
 
 #include "FixedPointTypes.h"
+#include "Misc/AssertionMacros.h"
 #include "FixedPointQuat.generated.h"
 
 USTRUCT(BlueprintType)
@@ -265,6 +266,43 @@ public:
 	FFixed64 operator|(const FFixedQuat& Q) const;
 
 	FFixedRotator Rotator() const;
+
+	// Return true if this quaternion is normalized
+	FORCEINLINE bool IsNormalized() const
+	{
+		return (FFixedPointMath::Abs(FixedPoint::Constants::Fixed64::One - SizeSquared()) < FixedPoint::Constants::Fixed64::ThreshQuatNormalized);
+	}
+
+	/**
+	 * Get the length of this quaternion.
+	 *
+	 * @return The length of this quaternion.
+	 */
+	FORCEINLINE FFixed64 Size() const
+	{
+		return FFixedPointMath::Sqrt(X * X + Y * Y + Z * Z + W * W);
+	}
+
+	/**
+	 * Get the length squared of this quaternion.
+	 *
+	 * @return The length of this quaternion.
+	 */
+	FORCEINLINE FFixed64 SizeSquared() const
+	{
+		return (X * X + Y * Y + Z * Z + W * W);
+	}
+
+	/**
+	 * @return inverse of this quaternion
+	 * @warning : Requires this quaternion to be normalized.
+	 */
+	FORCEINLINE FFixedQuat Inverse() const
+	{
+		checkSlow(IsNormalized());
+
+		return FFixedQuat(-X, -Y, -Z, W);
+	}
 };
 
 FORCEINLINE FFixedQuat::FFixedQuat(EForceInit ZeroOrNot)

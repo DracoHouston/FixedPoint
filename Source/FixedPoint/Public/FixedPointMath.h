@@ -5,6 +5,61 @@
 #include "CoreMinimal.h"
 #include "FixedPointNumbers.h"
 
+
+
+/*
+float FGenericPlatformMath::Atan2(float Y, float X)
+{
+	//return atan2f(Y,X);
+	// atan2f occasionally returns NaN with perfectly valid input (possibly due to a compiler or library bug).
+	// We are replacing it with a minimax approximation with a max relative error of 7.15255737e-007 compared to the C library function.
+	// On PC this has been measured to be 2x faster than the std C version.
+
+	const float absX = FMath::Abs(X);
+	const float absY = FMath::Abs(Y);
+	const bool yAbsBigger = (absY > absX);
+	float t0 = yAbsBigger ? absY : absX; // Max(absY, absX)
+	float t1 = yAbsBigger ? absX : absY; // Min(absX, absY)
+
+	if (t0 == 0.f)
+		return 0.f;
+
+	float t3 = t1 / t0;
+	float t4 = t3 * t3;
+
+	static const float c[7] = {
+		+7.2128853633444123e-03f,
+		-3.5059680836411644e-02f,
+		+8.1675882859940430e-02f,
+		-1.3374657325451267e-01f,
+		+1.9856563505717162e-01f,
+		-3.3324998579202170e-01f,
+		+1.0f
+	};
+
+	t0 = c[0];
+	t0 = t0 * t4 + c[1];
+	t0 = t0 * t4 + c[2];
+	t0 = t0 * t4 + c[3];
+	t0 = t0 * t4 + c[4];
+	t0 = t0 * t4 + c[5];
+	t0 = t0 * t4 + c[6];
+	t3 = t0 * t3;
+
+	t3 = yAbsBigger ? (0.5f * UE_PI) - t3 : t3;
+	t3 = (X < 0.0f) ? UE_PI - t3 : t3;
+	t3 = (Y < 0.0f) ? -t3 : t3;
+
+	return t3;
+}
+*/
+
+
+
+
+
+
+
 struct FIXEDPOINT_API FFixedPointMath : public FMath
 {
 	/**
@@ -146,16 +201,30 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 		//copied from nvidias cg language reference implementation, full of magic numbers, i'm scared too.
 		FFixed64 negate = FFixed64((int64)(x < FixedPoint::Constants::Fixed64::Zero));
 		x = Abs(x);
-		FFixed64 ret = FixedPoint::Constants::Fixed64::AcosMagicOne;
+		FFixed64 ret = FixedPoint::Constants::Fixed64::InvTrigMagicOne;
 		ret = ret * x;
-		ret = ret + FixedPoint::Constants::Fixed64::AcosMagicTwo;
+		ret = ret + FixedPoint::Constants::Fixed64::InvTrigMagicTwo;
 		ret = ret * x;
-		ret = ret - FixedPoint::Constants::Fixed64::AcosMagicThree;
+		ret = ret - FixedPoint::Constants::Fixed64::InvTrigMagicThree;
 		ret = ret * x;
 		ret = ret + FixedPoint::Constants::Fixed64::HalfPi;
 		ret = ret * Sqrt(FixedPoint::Constants::Fixed64::One - x);
 		ret = ret - FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2) * negate * ret;
 		return negate * FixedPoint::Constants::Fixed64::Pi + ret;
+	}
+
+	static FFixed64 Asin(FFixed64 x) {
+		FFixed64 negate = FFixed64((int64)(x < FixedPoint::Constants::Fixed64::Zero));
+		x = Abs(x);
+		FFixed64 ret = FixedPoint::Constants::Fixed64::InvTrigMagicOne;
+		ret *= x;
+		ret += FixedPoint::Constants::Fixed64::InvTrigMagicTwo;
+		ret *= x;
+		ret -= FixedPoint::Constants::Fixed64::InvTrigMagicThree;
+		ret *= x;
+		ret += FixedPoint::Constants::Fixed64::HalfPi;
+		ret = FixedPoint::Constants::Fixed64::Pi * FixedPoint::Constants::Fixed64::Half - Sqrt(FixedPoint::Constants::Fixed64::One - x) * ret;
+		return ret - FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2) * negate * ret;
 	}
 
 	/**
@@ -184,16 +253,30 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 		//copied from nvidias cg language reference implementation, full of magic numbers, i'm scared too.
 		FFixed32 negate = FFixed32((int32)(x < FixedPoint::Constants::Fixed32::Zero));
 		x = Abs(x);
-		FFixed32 ret = FixedPoint::Constants::Fixed32::AcosMagicOne;
+		FFixed32 ret = FixedPoint::Constants::Fixed32::InvTrigMagicOne;
 		ret = ret * x;
-		ret = ret + FixedPoint::Constants::Fixed32::AcosMagicTwo;
+		ret = ret + FixedPoint::Constants::Fixed32::InvTrigMagicTwo;
 		ret = ret * x;
-		ret = ret - FixedPoint::Constants::Fixed32::AcosMagicThree;
+		ret = ret - FixedPoint::Constants::Fixed32::InvTrigMagicThree;
 		ret = ret * x;
 		ret = ret + FixedPoint::Constants::Fixed32::HalfPi;
 		ret = ret * Sqrt(FixedPoint::Constants::Fixed32::One - x);
 		ret = ret - FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::One * 2) * negate * ret;
 		return negate * FixedPoint::Constants::Fixed32::Pi + ret;
+	}
+
+	static FFixed32 Asin(FFixed32 x) {
+		FFixed32 negate = FFixed32((int32)(x < FixedPoint::Constants::Fixed32::Zero));
+		x = Abs(x);
+		FFixed32 ret = FixedPoint::Constants::Fixed32::InvTrigMagicOne;
+		ret *= x;
+		ret += FixedPoint::Constants::Fixed32::InvTrigMagicTwo;
+		ret *= x;
+		ret -= FixedPoint::Constants::Fixed32::InvTrigMagicThree;
+		ret *= x;
+		ret += FixedPoint::Constants::Fixed32::HalfPi;
+		ret = FixedPoint::Constants::Fixed32::Pi * FixedPoint::Constants::Fixed32::Half - Sqrt(FixedPoint::Constants::Fixed32::One - x) * ret;
+		return ret - FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw32::One * 2) * negate * ret;
 	}
 
 	/**
@@ -293,4 +376,15 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	static FORCEINLINE bool IsNaN(FFixed64 A) { return false; }
 	static FORCEINLINE bool IsFinite(FFixed32 A) { return false; }
 	static FORCEINLINE bool IsFinite(FFixed64 A) { return false; }
+
+	/**
+	 * Returns the fixed-point remainder of X / Y
+	 * This is forced to *NOT* inline so that divisions by constant Y does not get optimized in to an inverse scalar multiply,
+	 * which is not consistent with the intent nor with the vectorized version.
+	 */
+	static FORCENOINLINE FFixed64 Fmod(FFixed64 X, FFixed64 Y);
+	static FORCENOINLINE FFixed32 Fmod(FFixed32 X, FFixed32 Y);
+
+	static void FmodReportError(FFixed64 X, FFixed64 Y);
+	static void FmodReportError(FFixed32 X, FFixed32 Y);
 };

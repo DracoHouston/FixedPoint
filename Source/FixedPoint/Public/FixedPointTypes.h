@@ -4,23 +4,40 @@
 
 #include "CoreMinimal.h"
 
-struct FFixed64;
-struct FFixed32;
-struct FFixedVector;
-struct FFixedVector2d;
-struct FFixedVector4d;
-struct FFixedMatrix;
-struct FFixedQuat;
-struct FFixedPlane;
-struct FFixedRotator;
+#include "FixedPointFwd.h"
 
 #include "FixedPointNumbers.h"
 #include "FixedPointMath.h"
-#include "FixedPointVectors.h"
+#include "FixedPointVector.h"
+#include "FixedPointVector2D.h"
+#include "FixedPointVector4.h"
 #include "FixedPointPlane.h"
 #include "FixedPointMatrix.h"
 #include "FixedPointQuat.h"
 #include "FixedPointRotator.h"
+
+FORCEINLINE FFixedVector::FFixedVector(const FFixedVector2d& V, const FFixed64& InZ)
+{
+	X = V.X;
+	Y = V.Y;
+	Z = InZ;
+}
+
+FORCEINLINE FFixedVector::FFixedVector(const FFixedVector4d& V)
+{
+	X = V.X;
+	Y = V.Y;
+	Z = V.Z;
+}
+
+FORCEINLINE FFixedVector2d FFixedVector::UnitCartesianToSpherical() const
+{
+	checkSlow(IsUnit());
+	//not safe for deterministic sims
+	const FFixed64 Theta = FMath::Acos((double)Z / (double)Size());
+	const FFixed64 Phi = FMath::Atan2((double)Y, (double)X);
+	return FFixedVector2d(Theta, Phi);
+}
 
 FORCEINLINE FFixedMatrix::FFixedMatrix(const FFixedPlane& InX, const FFixedPlane& InY, const FFixedPlane& InZ, const FFixedPlane& InW)
 {
@@ -312,4 +329,33 @@ FORCEINLINE FFixedVector FFixedMatrix::InverseTransformVector(const FFixedVector
 FORCEINLINE FFixedRotator::FFixedRotator(const FFixedQuat& Quat)
 {
 	*this = Quat.Rotator();
+}
+
+FORCEINLINE FFixedRotator FFixedRotator::GetInverse() const
+{
+	return Quaternion().Inverse().Rotator();
+}
+
+FORCEINLINE FFixedQuat FFixedRotator::Quaternion() const
+{
+	const FFixed64 DEG_TO_RAD = FixedPoint::Constants::Fixed64::Pi / (FixedPoint::Constants::Fixed64::OneEighty);
+	const FFixed64 RADS_DIVIDED_BY_2 = DEG_TO_RAD / FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2);
+	FFixed64 SP, SY, SR;
+	FFixed64 CP, CY, CR;
+
+	const FFixed64 PitchNoWinding = FFixedPointMath::Fmod(Pitch, FixedPoint::Constants::Fixed64::ThreeSixty);
+	const FFixed64 YawNoWinding = FFixedPointMath::Fmod(Yaw, FixedPoint::Constants::Fixed64::ThreeSixty);
+	const FFixed64 RollNoWinding = FFixedPointMath::Fmod(Roll, FixedPoint::Constants::Fixed64::ThreeSixty);
+
+	FFixedPointMath::SinCos(&SP, &CP, PitchNoWinding * RADS_DIVIDED_BY_2);
+	FFixedPointMath::SinCos(&SY, &CY, YawNoWinding * RADS_DIVIDED_BY_2);
+	FFixedPointMath::SinCos(&SR, &CR, RollNoWinding * RADS_DIVIDED_BY_2);
+
+	FFixedQuat RotationQuat;
+	RotationQuat.X = CR * SP * SY - SR * CP * CY;
+	RotationQuat.Y = -CR * SP * CY - SR * CP * SY;
+	RotationQuat.Z = CR * CP * SY - SR * SP * CY;
+	RotationQuat.W = CR * CP * CY + SR * SP * SY;
+
+	return RotationQuat;
 }

@@ -2,7 +2,7 @@
 
 
 #include "FixedPointMath.h"
-
+#include "Misc/AssertionMacros.h"
 
 FFixed64 FFixedPointMath::Sqrt(const FFixed64& inValue)
 {
@@ -297,4 +297,44 @@ double FFixedPointMath::CeilToDouble(const FFixed32& inValue)
 double FFixedPointMath::CeilToDouble(const FFixed64& inValue)
 {
 	return (double)FFixed64::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw64::One - 1) >> FixedPoint::Constants::BinaryPoint64) << FixedPoint::Constants::BinaryPoint64);
+}
+
+FFixed64 FFixedPointMath::Fmod(FFixed64 X, FFixed64 Y)
+{
+	const FFixed64 AbsY = Abs(Y);
+	if (AbsY <= FixedPoint::Constants::Fixed64::SmallNumber) // Note: this constant should match that used by VectorMod() implementations
+	{
+		FmodReportError(X, Y);
+		return 0.0;
+	}
+
+	return FFixed64::MakeFromRawInt(((X / Y).Value << (63 - FixedPoint::Constants::BinaryPoint64)) >> (63 - FixedPoint::Constants::BinaryPoint64));
+}
+
+FFixed32 FFixedPointMath::Fmod(FFixed32 X, FFixed32 Y)
+{
+	const FFixed32 AbsY = Abs(Y);
+	if (AbsY <= FixedPoint::Constants::Fixed32::SmallNumber) // Note: this constant should match that used by VectorMod() implementations
+	{
+		FmodReportError(X, Y);
+		return 0.0;
+	}
+
+	return FFixed32::MakeFromRawInt(((X / Y).Value << (31 - FixedPoint::Constants::BinaryPoint32)) >> (31 - FixedPoint::Constants::BinaryPoint32));
+}
+
+void FFixedPointMath::FmodReportError(FFixed64 X, FFixed64 Y)
+{
+	if (Y == FixedPoint::Constants::Fixed64::Zero)
+	{
+		ensureMsgf(Y != FixedPoint::Constants::Fixed64::Zero, TEXT("FFixedPointMath::FMod(X=%f, Y=%f) : Y is zero, this is invalid and would result in NaN!"), (double)X, (double)Y);
+	}
+}
+
+void FFixedPointMath::FmodReportError(FFixed32 X, FFixed32 Y)
+{
+	if (Y == FixedPoint::Constants::Fixed32::Zero)
+	{
+		ensureMsgf(Y != FixedPoint::Constants::Fixed32::Zero, TEXT("FFixedPointMath::FMod(X=%f, Y=%f) : Y is zero, this is invalid and would result in NaN!"), (double)X, (double)Y);
+	}
 }

@@ -67,9 +67,6 @@ namespace FixedPoint
 			constexpr int64 ThreshNormalsAreOrthogonal = 18302;
 			constexpr int64 ThreshVectorNormalized = 10485;
 			constexpr int64 ThreshQuatNormalized = 10485;
-			constexpr int64 AcosMagicOne = -19639;
-			constexpr int64 AcosMagicTwo = 77868;
-			constexpr int64 AcosMagicThree = 222418;
 		}
 		namespace Raw32
 		{
@@ -122,9 +119,6 @@ namespace FixedPoint
 			constexpr int32 ThreshNormalsAreOrthogonal = 1143;
 			constexpr int32 ThreshVectorNormalized = 655;
 			constexpr int32 ThreshQuatNormalized = 655;
-			constexpr int32 AcosMagicOne = -1227;
-			constexpr int32 AcosMagicTwo = 4866;
-			constexpr int32 AcosMagicThree = 13901;
 		}
 	}
 }
@@ -608,9 +602,9 @@ namespace FixedPoint
 			constexpr FFixed64 ThreshVectorNormalized =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::ThreshVectorNormalized);
 			constexpr FFixed64 ThreshQuatNormalized =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::ThreshQuatNormalized);
 
-			constexpr FFixed64 AcosMagicOne = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::AcosMagicOne);
-			constexpr FFixed64 AcosMagicTwo = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::AcosMagicTwo);
-			constexpr FFixed64 AcosMagicThree = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::AcosMagicThree);
+			constexpr FFixed64 InvTrigMagicOne = FFixed64::MakeFromRawInt(-19639);
+			constexpr FFixed64 InvTrigMagicTwo = FFixed64::MakeFromRawInt(77868);
+			constexpr FFixed64 InvTrigMagicThree = FFixed64::MakeFromRawInt(222418);
 		}
 		namespace Fixed32
 		{
@@ -653,9 +647,9 @@ namespace FixedPoint
 			constexpr FFixed32 ThreshNormalsAreOrthogonal = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshNormalsAreOrthogonal);
 			constexpr FFixed32 ThreshVectorNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshVectorNormalized);
 			constexpr FFixed32 ThreshQuatNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshQuatNormalized);
-			constexpr FFixed32 AcosMagicOne = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::AcosMagicOne);
-			constexpr FFixed32 AcosMagicTwo = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::AcosMagicTwo);
-			constexpr FFixed32 AcosMagicThree = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::AcosMagicThree);
+			constexpr FFixed32 InvTrigMagicOne = FFixed32::MakeFromRawInt(-1227);
+			constexpr FFixed32 InvTrigMagicTwo = FFixed32::MakeFromRawInt(4866);
+			constexpr FFixed32 InvTrigMagicThree = FFixed32::MakeFromRawInt(13901);
 		}
 	}
 }

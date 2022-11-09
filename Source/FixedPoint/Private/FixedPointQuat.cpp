@@ -3,7 +3,7 @@
 
 #include "FixedPointQuat.h"
 #include "FixedPointNumbers.h"
-#include "FixedPointVectors.h"
+#include "FixedPointVector.h"
 
 
 const FFixedQuat FFixedQuat::Identity = FFixedQuat(FFixed64(), FFixed64(), FFixed64(), FFixed64((int64)1));
