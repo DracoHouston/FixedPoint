@@ -222,7 +222,28 @@ public:
 	 */
 	FORCEINLINE FFixedRotator GetInverse() const;
 
+	/**
+	 * Get the rotation, snapped to specified degree segments.
+	 *
+	 * @param RotGrid A Rotator specifying how to snap each component.
+	 * @return Snapped version of rotation.
+	 */
+	FORCEINLINE FFixedRotator GridSnap(const FFixedRotator& RotGrid) const
+	{
+		return FFixedRotator
+		(
+			FFixedPointMath::GridSnap(Pitch, RotGrid.Pitch),
+			FFixedPointMath::GridSnap(Yaw, RotGrid.Yaw),
+			FFixedPointMath::GridSnap(Roll, RotGrid.Roll)
+		);
+	}
 
+	/**
+	 * Convert a rotation into a unit vector facing in its direction.
+	 *
+	 * @return Rotation as a unit direction vector.
+	 */
+	FORCEINLINE FFixedVector Vector() const;
 
 	/**
 	 * Get Rotation as a quaternion.
@@ -231,6 +252,28 @@ public:
 	 */
 	FORCEINLINE FFixedQuat Quaternion() const;
 
+	/**
+	 * Convert a Rotator into floating-point Euler angles (in degrees). Rotator now stored in degrees.
+	 *
+	 * @return Rotation as a Euler angle vector.
+	 */
+	FORCEINLINE FFixedVector Euler() const;
+
+	/**
+	 * Rotate a vector rotated by this rotator.
+	 *
+	 * @param V The vector to rotate.
+	 * @return The rotated vector.
+	 */
+	//FORCEINLINE FFixedVector RotateVector(const FFixedVector& V) const;
+
+	/**
+	 * Returns the vector rotated by the inverse of this rotator.
+	 *
+	 * @param V The vector to rotate.
+	 * @return The rotated vector.
+	 */
+	//FORCEINLINE FFixedVector UnrotateVector(const FFixedVector& V) const;
 
 
 

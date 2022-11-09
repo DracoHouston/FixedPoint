@@ -602,9 +602,15 @@ namespace FixedPoint
 			constexpr FFixed64 ThreshVectorNormalized =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::ThreshVectorNormalized);
 			constexpr FFixed64 ThreshQuatNormalized =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::ThreshQuatNormalized);
 
-			constexpr FFixed64 InvTrigMagicOne = FFixed64::MakeFromRawInt(-19639);
-			constexpr FFixed64 InvTrigMagicTwo = FFixed64::MakeFromRawInt(77868);
-			constexpr FFixed64 InvTrigMagicThree = FFixed64::MakeFromRawInt(222418);
+			constexpr FFixed64 InvTrigMagicOne = FFixed64::MakeFromRawInt(-19639);		//-0.0187293
+			constexpr FFixed64 InvTrigMagicTwo = FFixed64::MakeFromRawInt(77868);		//0.0742610
+			constexpr FFixed64 InvTrigMagicThree = FFixed64::MakeFromRawInt(222418);	//0.2121144
+			constexpr FFixed64 AtanMagicOne = FFixed64::MakeFromRawInt(7563);			//+7.2128853633444123e-03f
+			constexpr FFixed64 AtanMagicTwo = FFixed64::MakeFromRawInt(-36762);			//-3.5059680836411644e-02f
+			constexpr FFixed64 AtanMagicThree = FFixed64::MakeFromRawInt(85643);		//+8.1675882859940430e-02f
+			constexpr FFixed64 AtanMagicFour = FFixed64::MakeFromRawInt(-140243);		//-1.3374657325451267e-01f
+			constexpr FFixed64 AtanMagicFive = FFixed64::MakeFromRawInt(208211);		//+1.9856563505717162e-01f
+			constexpr FFixed64 AtanMagicSix = FFixed64::MakeFromRawInt(-349437);		//-3.3324998579202170e-01f
 		}
 		namespace Fixed32
 		{
@@ -647,9 +653,15 @@ namespace FixedPoint
 			constexpr FFixed32 ThreshNormalsAreOrthogonal = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshNormalsAreOrthogonal);
 			constexpr FFixed32 ThreshVectorNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshVectorNormalized);
 			constexpr FFixed32 ThreshQuatNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshQuatNormalized);
-			constexpr FFixed32 InvTrigMagicOne = FFixed32::MakeFromRawInt(-1227);
-			constexpr FFixed32 InvTrigMagicTwo = FFixed32::MakeFromRawInt(4866);
-			constexpr FFixed32 InvTrigMagicThree = FFixed32::MakeFromRawInt(13901);
+			constexpr FFixed32 InvTrigMagicOne = FFixed32::MakeFromRawInt(-1227);	//-0.0187293
+			constexpr FFixed32 InvTrigMagicTwo = FFixed32::MakeFromRawInt(4866);	//0.0742610
+			constexpr FFixed32 InvTrigMagicThree = FFixed32::MakeFromRawInt(13901);	//0.2121144
+			constexpr FFixed32 AtanMagicOne = FFixed32::MakeFromRawInt(472);		//+7.2128853633444123e-03f
+			constexpr FFixed32 AtanMagicTwo = FFixed32::MakeFromRawInt(-2297);		//-3.5059680836411644e-02f
+			constexpr FFixed32 AtanMagicThree = FFixed32::MakeFromRawInt(5352);		//+8.1675882859940430e-02f
+			constexpr FFixed32 AtanMagicFour = FFixed32::MakeFromRawInt(-8765);		//-1.3374657325451267e-01f
+			constexpr FFixed32 AtanMagicFive = FFixed32::MakeFromRawInt(13013);		//+1.9856563505717162e-01f
+			constexpr FFixed32 AtanMagicSix = FFixed32::MakeFromRawInt(-21839);		//-3.3324998579202170e-01f
 		}
 	}
 }

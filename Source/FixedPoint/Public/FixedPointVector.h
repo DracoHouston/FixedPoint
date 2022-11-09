@@ -1189,7 +1189,6 @@ public:
 	/**
 	 * Converts a Cartesian unit vector into spherical coordinates on the unit sphere.
 	 * @return Output Theta will be in the range [0, PI], and output Phi will be in the range [-PI, PI].
-	 * NOTE: uses floating point atan2 and acos, beware crossplatform desyncs
 	 */
 	FFixedVector2d UnitCartesianToSpherical() const;
 

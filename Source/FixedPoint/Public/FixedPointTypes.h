@@ -34,8 +34,8 @@ FORCEINLINE FFixedVector2d FFixedVector::UnitCartesianToSpherical() const
 {
 	checkSlow(IsUnit());
 	//not safe for deterministic sims
-	const FFixed64 Theta = FMath::Acos((double)Z / (double)Size());
-	const FFixed64 Phi = FMath::Atan2((double)Y, (double)X);
+	const FFixed64 Theta = FFixedPointMath::Acos(Z / Size());
+	const FFixed64 Phi = FFixedPointMath::Atan2(Y, X);
 	return FFixedVector2d(Theta, Phi);
 }
 
@@ -359,3 +359,32 @@ FORCEINLINE FFixedQuat FFixedRotator::Quaternion() const
 
 	return RotationQuat;
 }
+
+FORCEINLINE FFixedVector FFixedRotator::Vector() const
+{
+	// Remove winding and clamp to [-360, 360]
+	const FFixed64 PitchNoWinding = FFixedPointMath::Fmod(Pitch, FixedPoint::Constants::Fixed64::ThreeSixty);
+	const FFixed64 YawNoWinding = FFixedPointMath::Fmod(Yaw, FixedPoint::Constants::Fixed64::ThreeSixty);
+
+	FFixed64 CP, SP, CY, SY;
+	FFixedPointMath::SinCos(&SP, &CP, FFixedPointMath::DegreesToRadians(PitchNoWinding));
+	FFixedPointMath::SinCos(&SY, &CY, FFixedPointMath::DegreesToRadians(YawNoWinding));
+	FFixedVector V = FFixedVector(CP * CY, CP * SY, SP);
+
+	return V;
+}
+
+FFixedVector FFixedRotator::Euler() const
+{
+	return FFixedVector(Roll, Pitch, Yaw);
+}
+
+//FFixedVector FFixedRotator::RotateVector(const FFixedVector& V) const
+//{
+//	return FFixedRotationMatrix(*this).TransformVector(V);
+//}
+
+//FFixedVector FFixedRotator::UnrotateVector(const FFixedVector& V) const
+//{
+//	FFixedRotationMatrix(*this).GetTransposed().TransformVector( V );
+//}

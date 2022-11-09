@@ -5,61 +5,6 @@
 #include "CoreMinimal.h"
 #include "FixedPointNumbers.h"
 
-
-
-/*
-float FGenericPlatformMath::Atan2(float Y, float X)
-{
-	//return atan2f(Y,X);
-	// atan2f occasionally returns NaN with perfectly valid input (possibly due to a compiler or library bug).
-	// We are replacing it with a minimax approximation with a max relative error of 7.15255737e-007 compared to the C library function.
-	// On PC this has been measured to be 2x faster than the std C version.
-
-	const float absX = FMath::Abs(X);
-	const float absY = FMath::Abs(Y);
-	const bool yAbsBigger = (absY > absX);
-	float t0 = yAbsBigger ? absY : absX; // Max(absY, absX)
-	float t1 = yAbsBigger ? absX : absY; // Min(absX, absY)
-
-	if (t0 == 0.f)
-		return 0.f;
-
-	float t3 = t1 / t0;
-	float t4 = t3 * t3;
-
-	static const float c[7] = {
-		+7.2128853633444123e-03f,
-		-3.5059680836411644e-02f,
-		+8.1675882859940430e-02f,
-		-1.3374657325451267e-01f,
-		+1.9856563505717162e-01f,
-		-3.3324998579202170e-01f,
-		+1.0f
-	};
-
-	t0 = c[0];
-	t0 = t0 * t4 + c[1];
-	t0 = t0 * t4 + c[2];
-	t0 = t0 * t4 + c[3];
-	t0 = t0 * t4 + c[4];
-	t0 = t0 * t4 + c[5];
-	t0 = t0 * t4 + c[6];
-	t3 = t0 * t3;
-
-	t3 = yAbsBigger ? (0.5f * UE_PI) - t3 : t3;
-	t3 = (X < 0.0f) ? UE_PI - t3 : t3;
-	t3 = (Y < 0.0f) ? -t3 : t3;
-
-	return t3;
-}
-*/
-
-
-
-
-
-
-
 struct FIXEDPOINT_API FFixedPointMath : public FMath
 {
 	/**
@@ -227,6 +172,51 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 		return ret - FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2) * negate * ret;
 	}
 
+	static FFixed64 Atan(FFixed64 X)
+	{
+		return Atan2(X, FixedPoint::Constants::Fixed64::One);
+	}
+
+	static FFixed64 Atan2(FFixed64 Y, FFixed64 X)
+	{
+		const FFixed64 absX = Abs(X);
+		const FFixed64 absY = Abs(Y);
+		const bool yAbsBigger = (absY > absX);
+		FFixed64 t0 = yAbsBigger ? absY : absX; // Max(absY, absX)
+		FFixed64 t1 = yAbsBigger ? absX : absY; // Min(absX, absY)
+
+		if (t0 == FixedPoint::Constants::Fixed64::Zero)
+			return FixedPoint::Constants::Fixed64::Zero;
+
+		FFixed64 t3 = t1 / t0;
+		FFixed64 t4 = t3 * t3;
+
+		static const FFixed64 c[7] = {
+			FixedPoint::Constants::Fixed64::AtanMagicOne,
+			FixedPoint::Constants::Fixed64::AtanMagicTwo,
+			FixedPoint::Constants::Fixed64::AtanMagicThree,
+			FixedPoint::Constants::Fixed64::AtanMagicFour,
+			FixedPoint::Constants::Fixed64::AtanMagicFive,
+			FixedPoint::Constants::Fixed64::AtanMagicSix,
+			FixedPoint::Constants::Fixed64::One
+		};
+
+		t0 = c[0];
+		t0 = t0 * t4 + c[1];
+		t0 = t0 * t4 + c[2];
+		t0 = t0 * t4 + c[3];
+		t0 = t0 * t4 + c[4];
+		t0 = t0 * t4 + c[5];
+		t0 = t0 * t4 + c[6];
+		t3 = t0 * t3;
+
+		t3 = yAbsBigger ? FixedPoint::Constants::Fixed64::HalfPi - t3 : t3;
+		t3 = (X < FixedPoint::Constants::Fixed64::Zero) ? FixedPoint::Constants::Fixed64::Pi - t3 : t3;
+		t3 = (Y < FixedPoint::Constants::Fixed64::Zero) ? -t3 : t3;
+
+		return t3;
+	}
+
 	/**
 	* Sin, returns the sine of a FFixed32 angle in radians
 	*/
@@ -277,6 +267,51 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 		ret += FixedPoint::Constants::Fixed32::HalfPi;
 		ret = FixedPoint::Constants::Fixed32::Pi * FixedPoint::Constants::Fixed32::Half - Sqrt(FixedPoint::Constants::Fixed32::One - x) * ret;
 		return ret - FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw32::One * 2) * negate * ret;
+	}
+
+	static FFixed32 Atan(FFixed32 X)
+	{
+		return Atan2(X, FixedPoint::Constants::Fixed32::One);
+	}
+
+	static FFixed32 Atan2(FFixed32 Y, FFixed32 X)
+	{
+		const FFixed32 absX = Abs(X);
+		const FFixed32 absY = Abs(Y);
+		const bool yAbsBigger = (absY > absX);
+		FFixed32 t0 = yAbsBigger ? absY : absX; // Max(absY, absX)
+		FFixed32 t1 = yAbsBigger ? absX : absY; // Min(absX, absY)
+
+		if (t0 == FixedPoint::Constants::Fixed32::Zero)
+			return FixedPoint::Constants::Fixed32::Zero;
+
+		FFixed32 t3 = t1 / t0;
+		FFixed32 t4 = t3 * t3;
+
+		static const FFixed32 c[7] = {
+			FixedPoint::Constants::Fixed32::AtanMagicOne,
+			FixedPoint::Constants::Fixed32::AtanMagicTwo,
+			FixedPoint::Constants::Fixed32::AtanMagicThree,
+			FixedPoint::Constants::Fixed32::AtanMagicFour,
+			FixedPoint::Constants::Fixed32::AtanMagicFive,
+			FixedPoint::Constants::Fixed32::AtanMagicSix,
+			FixedPoint::Constants::Fixed32::One
+		};
+
+		t0 = c[0];
+		t0 = t0 * t4 + c[1];
+		t0 = t0 * t4 + c[2];
+		t0 = t0 * t4 + c[3];
+		t0 = t0 * t4 + c[4];
+		t0 = t0 * t4 + c[5];
+		t0 = t0 * t4 + c[6];
+		t3 = t0 * t3;
+
+		t3 = yAbsBigger ? FixedPoint::Constants::Fixed32::HalfPi - t3 : t3;
+		t3 = (X < FixedPoint::Constants::Fixed32::Zero) ? FixedPoint::Constants::Fixed32::Pi - t3 : t3;
+		t3 = (Y < FixedPoint::Constants::Fixed32::Zero) ? -t3 : t3;
+
+		return t3;
 	}
 
 	/**
