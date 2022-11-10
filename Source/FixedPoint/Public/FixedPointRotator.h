@@ -275,7 +275,129 @@ public:
 	 */
 	//FORCEINLINE FFixedVector UnrotateVector(const FFixedVector& V) const;
 
+	/**
+	 * Gets the rotation values so they fall within the range [0,360]
+	 *
+	 * @return Clamped version of rotator.
+	 */
+	FORCEINLINE FFixedRotator Clamp() const
+	{
+		return FFixedRotator(ClampAxis(Pitch), ClampAxis(Yaw), ClampAxis(Roll));
+	}
 
+	/**
+	 * Create a copy of this rotator and normalize, removes all winding and creates the "shortest route" rotation.
+	 *
+	 * @return Normalized copy of this rotator
+	 */
+	FORCEINLINE FFixedRotator GetNormalized() const
+	{
+		FFixedRotator Rot = *this;
+		Rot.Normalize();
+		return Rot;
+	}
+
+	/**
+	 * Create a copy of this rotator and denormalize, clamping each axis to 0 - 360.
+	 *
+	 * @return Denormalized copy of this rotator
+	 */
+	FORCEINLINE FFixedRotator GetDenormalized() const
+	{
+		FFixedRotator Rot = *this;
+		Rot.Pitch = ClampAxis(Rot.Pitch);
+		Rot.Yaw = ClampAxis(Rot.Yaw);
+		Rot.Roll = ClampAxis(Rot.Roll);
+		return Rot;
+	}
+
+	/** Get a specific component of the vector, given a specific axis by enum */
+	FORCEINLINE FFixed64 GetComponentForAxis(EAxis::Type Axis) const
+	{
+		switch (Axis)
+		{
+		case EAxis::X:
+			return Roll;
+		case EAxis::Y:
+			return Pitch;
+		case EAxis::Z:
+			return Yaw;
+		default:
+			return FixedPoint::Constants::Fixed64::Zero;
+		}
+	}
+
+	/** Set a specified componet of the vector, given a specific axis by enum */
+	FORCEINLINE void SetComponentForAxis(EAxis::Type Axis, FFixed64 Component)
+	{
+		switch (Axis)
+		{
+		case EAxis::X:
+			Roll = Component;
+			break;
+		case EAxis::Y:
+			Pitch = Component;
+			break;
+		case EAxis::Z:
+			Yaw = Component;
+			break;
+		}
+	}
+
+	/**
+	 * In-place normalize, removes all winding and creates the "shortest route" rotation.
+	 */
+	void Normalize()
+	{
+		Pitch = NormalizeAxis(Pitch);
+		Yaw = NormalizeAxis(Yaw);
+		Roll = NormalizeAxis(Roll);
+	}
+
+	/**
+	 * Decompose this Rotator into a Winding part (multiples of 360) and a Remainder part.
+	 * Remainder will always be in [-180, 180] range.
+	 *
+	 * @param Winding[Out] the Winding part of this Rotator
+	 * @param Remainder[Out] the Remainder
+	 */
+	void GetWindingAndRemainder(FFixedRotator& Winding, FFixedRotator& Remainder) const;
+
+	/**
+	* Return the manhattan distance in degrees between this Rotator and the passed in one.
+	* @param Rotator[In] the Rotator we are comparing with.
+	* @return Distance(Manhattan) between the two rotators.
+	*/
+	FORCEINLINE FFixed64 GetManhattanDistance(const FFixedRotator& Rotator) const
+	{
+		return FFixedPointMath::Abs(Yaw - Rotator.Yaw) + FFixedPointMath::Abs(Pitch - Rotator.Pitch) + FFixedPointMath::Abs(Roll - Rotator.Roll);
+	}
+
+	/**
+	* Return a Rotator that has the same rotation but has different degree values for Yaw, Pitch, and Roll.
+	* This rotator should be within -180,180 range,
+	* @return A Rotator with the same rotation but different degrees.
+	*/
+	FORCEINLINE FFixedRotator GetEquivalentRotator() const
+	{
+		return FFixedRotator(FixedPoint::Constants::Fixed64::OneEighty - Pitch, Yaw + FixedPoint::Constants::Fixed64::OneEighty, Roll + FixedPoint::Constants::Fixed64::OneEighty);
+	}
+
+	/**
+	* Modify if necessary the passed in rotator to be the closest rotator to it based upon it's equivalent.
+	* This Rotator should be within (-180, 180], usually just constructed from a Matrix or a Quaternion.
+	*
+	* @param MakeClosest[In/Out] the Rotator we want to make closest to us. Should be between
+	* (-180, 180]. This Rotator may change if we need to use different degree values to make it closer.
+	*/
+	FORCEINLINE void SetClosestToMe(FFixedRotator& MakeClosest) const
+	{
+		FFixedRotator OtherChoice = MakeClosest.GetEquivalentRotator();
+		FFixed64 FirstDiff = GetManhattanDistance(MakeClosest);
+		FFixed64 SecondDiff = GetManhattanDistance(OtherChoice);
+		if (SecondDiff < FirstDiff)
+			MakeClosest = OtherChoice;
+	}
 
 	/**
 	 * Clamps an angle to the range of [0, 360).
