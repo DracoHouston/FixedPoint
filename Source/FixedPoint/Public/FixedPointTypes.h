@@ -379,6 +379,49 @@ FFixedVector FFixedRotator::Euler() const
 	return FFixedVector(Roll, Pitch, Yaw);
 }
 
+inline void FFixedMatrix::SetAxis(int32 i, const FFixedVector& Axis)
+{
+	checkSlow(i >= 0 && i <= 2);
+	M[i][0] = Axis.X;
+	M[i][1] = Axis.Y;
+	M[i][2] = Axis.Z;
+}
+
+inline void FFixedMatrix::SetOrigin(const FFixedVector& NewOrigin)
+{
+	M[3][0] = NewOrigin.X;
+	M[3][1] = NewOrigin.Y;
+	M[3][2] = NewOrigin.Z;
+}
+
+inline void FFixedMatrix::SetAxes(const FFixedVector* Axis0 /*= NULL*/, const FFixedVector* Axis1 /*= NULL*/, const FFixedVector* Axis2 /*= NULL*/, const FFixedVector* Origin /*= NULL*/)
+{
+	if (Axis0 != NULL)
+	{
+		M[0][0] = Axis0->X;
+		M[0][1] = Axis0->Y;
+		M[0][2] = Axis0->Z;
+	}
+	if (Axis1 != NULL)
+	{
+		M[1][0] = Axis1->X;
+		M[1][1] = Axis1->Y;
+		M[1][2] = Axis1->Z;
+	}
+	if (Axis2 != NULL)
+	{
+		M[2][0] = Axis2->X;
+		M[2][1] = Axis2->Y;
+		M[2][2] = Axis2->Z;
+	}
+	if (Origin != NULL)
+	{
+		M[3][0] = Origin->X;
+		M[3][1] = Origin->Y;
+		M[3][2] = Origin->Z;
+	}
+}
+
 //FFixedVector FFixedRotator::RotateVector(const FFixedVector& V) const
 //{
 //	return FFixedRotationMatrix(*this).TransformVector(V);

@@ -553,6 +553,27 @@ public:
 	 */
 	inline void GetUnitAxes(FFixedVector& X, FFixedVector& Y, FFixedVector& Z) const;
 
+	/**
+	 * set an axis of this matrix
+	 *
+	 * @param i index into the axis of the matrix
+	 * @param Axis vector of the axis
+	 */
+	inline void SetAxis(int32 i, const FFixedVector& Axis);
+
+	// Set the origin of the coordinate system to the given vector
+	inline void SetOrigin(const FFixedVector& NewOrigin);
+
+	/**
+	 * Update the axes of the matrix if any value is NULL do not update that axis
+	 *
+	 * @param Axis0 set matrix row 0
+	 * @param Axis1 set matrix row 1
+	 * @param Axis2 set matrix row 2
+	 * @param Origin set matrix row 3
+	 */
+	inline void SetAxes(const FFixedVector* Axis0 = NULL, const FFixedVector* Axis1 = NULL, const FFixedVector* Axis2 = NULL, const FFixedVector* Origin = NULL);
+
 	private:
 		/**
 	 * Output an error message and trigger an ensure
