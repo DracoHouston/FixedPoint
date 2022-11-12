@@ -107,6 +107,16 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	*/
 	static bool IsEqual(const FFixed32& A, const FFixed32& B, const FFixed32& inTolerance = FixedPoint::Constants::Fixed32::KindaSmallNumber);
 
+	UE_NODISCARD static FORCEINLINE bool IsNearlyEqual(FFixed32 A, FFixed32 B, FFixed32 ErrorTolerance = FixedPoint::Constants::Fixed32::KindaSmallNumber)
+	{
+		return Abs(A - B) <= ErrorTolerance;
+	}
+
+	UE_NODISCARD static FORCEINLINE bool IsNearlyEqual(FFixed64 A, FFixed64 B, FFixed64 ErrorTolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
+	{
+		return Abs(A - B) <= ErrorTolerance;
+	}
+
 	/**
 	* Square Root
 	*/

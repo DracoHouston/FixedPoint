@@ -15,6 +15,9 @@
 #include "FixedPointMatrix.h"
 #include "FixedPointQuat.h"
 #include "FixedPointRotator.h"
+#include "FixedPointRotationTranslationMatrix.h"
+#include "FixedPointRotationMatrix.h"
+#include "FixedPointQuatRotationTranslationMatrix.h"
 
 FORCEINLINE FFixedVector::FFixedVector(const FFixedVector2d& V, const FFixed64& InZ)
 {
@@ -420,6 +423,20 @@ inline void FFixedMatrix::SetAxes(const FFixedVector* Axis0 /*= NULL*/, const FF
 		M[3][1] = Origin->Y;
 		M[3][2] = Origin->Z;
 	}
+}
+
+inline FFixedVector FFixedMatrix::GetColumn(int32 i) const
+{
+	checkSlow(i >= 0 && i <= 3);
+	return FFixedVector(M[0][i], M[1][i], M[2][i]);
+}
+
+inline void FFixedMatrix::SetColumn(int32 i, FFixedVector Value)
+{
+	checkSlow(i >= 0 && i <= 3);
+	M[0][i] = Value.X;
+	M[1][i] = Value.Y;
+	M[2][i] = Value.Z;
 }
 
 //FFixedVector FFixedRotator::RotateVector(const FFixedVector& V) const

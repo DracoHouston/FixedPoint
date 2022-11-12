@@ -574,6 +574,25 @@ public:
 	 */
 	inline void SetAxes(const FFixedVector* Axis0 = NULL, const FFixedVector* Axis1 = NULL, const FFixedVector* Axis2 = NULL, const FFixedVector* Origin = NULL);
 
+	/**
+	 * get a column of this matrix
+	 *
+	 * @param i index into the column of the matrix
+	 * @return vector of the column
+	 */
+	inline FFixedVector GetColumn(int32 i) const;
+
+	/**
+	 * Set a column of this matrix
+	 *
+	 * @param i index of the matrix column
+	 * @param Value new value of the column
+	 */
+	inline void SetColumn(int32 i, FFixedVector Value);
+
+	/** @return rotator representation of this matrix */
+	FFixedRotator Rotator() const;
+
 	private:
 		/**
 	 * Output an error message and trigger an ensure
