@@ -62,6 +62,13 @@ public:
 	 */
 	explicit FORCEINLINE FFixedRotator(const FFixedQuat& Quat);
 
+	FORCEINLINE FFixedRotator(const FRotator& Rot)
+	{
+		Pitch = Rot.Pitch;
+		Yaw = Rot.Yaw;
+		Roll = Rot.Roll;
+	}
+
 	// Binary arithmetic operators.
 
 	/**

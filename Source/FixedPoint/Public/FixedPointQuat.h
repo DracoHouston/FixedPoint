@@ -35,6 +35,13 @@ public:
 	 *
 	 * @param R The rotator to initialize from.
 	 */
+	explicit FFixedQuat(const FFixedRotator& R);
+
+	/**
+	 * Creates and initializes a new quaternion from the given rotator.
+	 *
+	 * @param R The rotator to initialize from.
+	 */
 	//explicit FFixedQuat(const FFixedRotator& R);
 	//NEED ROTATOR CLASS!
 
@@ -106,7 +113,7 @@ public:
 	 * @param Tolerance Error tolerance for comparison with other Quaternion.
 	 * @return true if two Quaternions are equal, within specified tolerance, otherwise false.
 	 */
-	FORCEINLINE bool Equals(const FFixedQuat& Q, FFixed64 Tolerance) const;
+	FORCEINLINE bool Equals(const FFixedQuat& Q, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const;
 
 	/**
 	 * Checks whether this Quaternion is an Identity Quaternion.
@@ -115,23 +122,7 @@ public:
 	 * @param Tolerance Error tolerance for comparison with Identity Quaternion.
 	 * @return true if Quaternion is a normalized Identity Quaternion.
 	 */
-	FORCEINLINE bool IsIdentity(FFixed64 Tolerance) const;
-
-	/**
-	 * Checks whether another Quaternion is equal to this, within specified tolerance.
-	 *
-	 * @param Q The other Quaternion.
-	 * @return true if two Quaternions are equal, within default tolerance, otherwise false.
-	 */
-	FORCEINLINE bool Equals(const FFixedQuat& Q) const;
-
-	/**
-	 * Checks whether this Quaternion is an Identity Quaternion.
-	 * Assumes Quaternion tested is normalized.
-	 *
-	 * @return true if Quaternion is a normalized Identity Quaternion, within default tolerance.
-	 */
-	FORCEINLINE bool IsIdentity() const;
+	FORCEINLINE bool IsIdentity(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber) const;
 
 	/**
 	 * Subtracts another quaternion from this.
@@ -302,6 +293,41 @@ public:
 		checkSlow(IsNormalized());
 
 		return FFixedQuat(-X, -Y, -Z, W);
+	}
+
+	/**
+	 * Normalize this quaternion if it is large enough.
+	 * If it is too small, returns an identity quaternion.
+	 *
+	 * @param Tolerance Minimum squared length of quaternion for normalization.
+	 */
+	FORCEINLINE void Normalize(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber)
+	{
+		const FFixed64 SquareSum = X * X + Y * Y + Z * Z + W * W;
+
+		if (SquareSum >= Tolerance)
+		{
+			const FFixed64 Scale = FFixedPointMath::InvSqrt(SquareSum);
+
+			X *= Scale;
+			Y *= Scale;
+			Z *= Scale;
+			W *= Scale;
+		}
+		else
+		{
+			*this = FFixedQuat::Identity;
+		}
+	}
+
+	/**
+	 * Get a textual representation of the vector.
+	 *
+	 * @return Text describing the vector.
+	 */
+	FString ToString() const
+	{
+		return FString::Printf(TEXT("X=%.9f Y=%.9f Z=%.9f W=%.9f"), (double)X, (double)Y, (double)Z, (double)W);
 	}
 };
 

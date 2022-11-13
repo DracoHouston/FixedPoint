@@ -334,6 +334,11 @@ FORCEINLINE FFixedRotator::FFixedRotator(const FFixedQuat& Quat)
 	*this = Quat.Rotator();
 }
 
+FORCEINLINE FFixedQuat::FFixedQuat(const FFixedRotator& R)
+{
+	*this = R.Quaternion();
+}
+
 FORCEINLINE FFixedRotator FFixedRotator::GetInverse() const
 {
 	return Quaternion().Inverse().Rotator();
