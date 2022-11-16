@@ -601,6 +601,7 @@ namespace FixedPoint
 			constexpr FFixed64 ThreshNormalsAreOrthogonal =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::ThreshNormalsAreOrthogonal);
 			constexpr FFixed64 ThreshVectorNormalized =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::ThreshVectorNormalized);
 			constexpr FFixed64 ThreshQuatNormalized =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::ThreshQuatNormalized);
+			constexpr FFixed64 ZeroAnimWeightThresh = FFixed64::MakeFromRawInt(10);		//0.00001f
 
 			constexpr FFixed64 InvTrigMagicOne = FFixed64::MakeFromRawInt(-19639);		//-0.0187293
 			constexpr FFixed64 InvTrigMagicTwo = FFixed64::MakeFromRawInt(77868);		//0.0742610
@@ -653,6 +654,7 @@ namespace FixedPoint
 			constexpr FFixed32 ThreshNormalsAreOrthogonal = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshNormalsAreOrthogonal);
 			constexpr FFixed32 ThreshVectorNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshVectorNormalized);
 			constexpr FFixed32 ThreshQuatNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshQuatNormalized);
+			constexpr FFixed64 ZeroAnimWeightThresh = FFixed64::MakeFromRawInt(1);  //too small for precision, so just Small Number
 			constexpr FFixed32 InvTrigMagicOne = FFixed32::MakeFromRawInt(-1227);	//-0.0187293
 			constexpr FFixed32 InvTrigMagicTwo = FFixed32::MakeFromRawInt(4866);	//0.0742610
 			constexpr FFixed32 InvTrigMagicThree = FFixed32::MakeFromRawInt(13901);	//0.2121144
@@ -675,3 +677,25 @@ FORCEINLINE FFixed32::FFixed32(FFixed64 Other)
 {
 	Value = (int32)((Other.Value) >> FixedPoint::Constants::BinaryPointDifference);
 }
+
+template<>
+struct TCustomLerp<FFixed64>
+{
+	enum { Value = true };
+
+	static FORCEINLINE_DEBUGGABLE FFixed64 Lerp(const FFixed64& A, const FFixed64& B, const FFixed64& Alpha)
+	{
+		return A + Alpha * (B - A);
+	}
+};
+
+template<>
+struct TCustomLerp<FFixed32>
+{
+	enum { Value = true };
+
+	static FORCEINLINE_DEBUGGABLE FFixed32 Lerp(const FFixed32& A, const FFixed32& B, const FFixed32& Alpha)
+	{
+		return A + Alpha * (B - A);
+	}
+};

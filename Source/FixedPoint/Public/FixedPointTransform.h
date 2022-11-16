@@ -164,6 +164,172 @@ public:
 	bool InitFromString(const FString& InSourceString);
 
 	/**
+	* Convert this Transform to a transformation matrix with scaling.
+	*/
+	FORCEINLINE FFixedMatrix ToMatrixWithScale() const
+	{
+		FFixedMatrix OutMatrix;
+
+#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST) && WITH_EDITORONLY_DATA
+		// Make sure Rotation is normalized when we turn it into a matrix.
+		check(IsRotationNormalized());
+#endif
+		OutMatrix.M[3][0] = Translation.X;
+		OutMatrix.M[3][1] = Translation.Y;
+		OutMatrix.M[3][2] = Translation.Z;
+
+		const FFixed64 x2 = Rotation.X + Rotation.X;
+		const FFixed64 y2 = Rotation.Y + Rotation.Y;
+		const FFixed64 z2 = Rotation.Z + Rotation.Z;
+		{
+			const FFixed64 xx2 = Rotation.X * x2;
+			const FFixed64 yy2 = Rotation.Y * y2;
+			const FFixed64 zz2 = Rotation.Z * z2;
+
+			OutMatrix.M[0][0] = (FixedPoint::Constants::Fixed64::One - (yy2 + zz2)) * Scale3D.X;
+			OutMatrix.M[1][1] = (FixedPoint::Constants::Fixed64::One - (xx2 + zz2)) * Scale3D.Y;
+			OutMatrix.M[2][2] = (FixedPoint::Constants::Fixed64::One - (xx2 + yy2)) * Scale3D.Z;
+		}
+		{
+			const FFixed64 yz2 = Rotation.Y * z2;
+			const FFixed64 wx2 = Rotation.W * x2;
+
+			OutMatrix.M[2][1] = (yz2 - wx2) * Scale3D.Z;
+			OutMatrix.M[1][2] = (yz2 + wx2) * Scale3D.Y;
+		}
+		{
+			const FFixed64 xy2 = Rotation.X * y2;
+			const FFixed64 wz2 = Rotation.W * z2;
+
+			OutMatrix.M[1][0] = (xy2 - wz2) * Scale3D.Y;
+			OutMatrix.M[0][1] = (xy2 + wz2) * Scale3D.X;
+		}
+		{
+			const FFixed64 xz2 = Rotation.X * z2;
+			const FFixed64 wy2 = Rotation.W * y2;
+
+			OutMatrix.M[2][0] = (xz2 + wy2) * Scale3D.Z;
+			OutMatrix.M[0][2] = (xz2 - wy2) * Scale3D.X;
+		}
+
+		OutMatrix.M[0][3] = FixedPoint::Constants::Fixed64::Zero;
+		OutMatrix.M[1][3] = FixedPoint::Constants::Fixed64::Zero;
+		OutMatrix.M[2][3] = FixedPoint::Constants::Fixed64::Zero;
+		OutMatrix.M[3][3] = FixedPoint::Constants::Fixed64::One;
+
+		return OutMatrix;
+	}
+
+	/**
+	* Convert this Transform to matrix with scaling and compute the inverse of that.
+	*/
+	FORCEINLINE FFixedMatrix ToInverseMatrixWithScale() const
+	{
+		// todo: optimize
+		return ToMatrixWithScale().Inverse();
+	}
+
+	/**
+	* Convert this Transform to inverse.
+	*/
+	FORCEINLINE FFixedTransform Inverse() const
+	{
+		FFixedQuat   InvRotation = Rotation.Inverse();
+		// this used to cause NaN if Scale contained 0 
+		FFixedVector InvScale3D = GetSafeScaleReciprocal(Scale3D);
+		FFixedVector InvTranslation = InvRotation * (InvScale3D * -Translation);
+
+		return FFixedTransform(InvRotation, InvTranslation, InvScale3D);
+	}
+
+	/**
+	* Convert this Transform to a transformation matrix, ignoring its scaling
+	*/
+	FORCEINLINE FFixedMatrix ToMatrixNoScale() const
+	{
+		FFixedMatrix OutMatrix;
+
+#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST) && WITH_EDITORONLY_DATA
+		// Make sure Rotation is normalized when we turn it into a matrix.
+		check(IsRotationNormalized());
+#endif
+		OutMatrix.M[3][0] = Translation.X;
+		OutMatrix.M[3][1] = Translation.Y;
+		OutMatrix.M[3][2] = Translation.Z;
+
+		const FFixed64 x2 = Rotation.X + Rotation.X;
+		const FFixed64 y2 = Rotation.Y + Rotation.Y;
+		const FFixed64 z2 = Rotation.Z + Rotation.Z;
+		{
+			const FFixed64 xx2 = Rotation.X * x2;
+			const FFixed64 yy2 = Rotation.Y * y2;
+			const FFixed64 zz2 = Rotation.Z * z2;
+
+			OutMatrix.M[0][0] = (FixedPoint::Constants::Fixed64::One - (yy2 + zz2));
+			OutMatrix.M[1][1] = (FixedPoint::Constants::Fixed64::One - (xx2 + zz2));
+			OutMatrix.M[2][2] = (FixedPoint::Constants::Fixed64::One - (xx2 + yy2));
+		}
+		{
+			const FFixed64 yz2 = Rotation.Y * z2;
+			const FFixed64 wx2 = Rotation.W * x2;
+
+			OutMatrix.M[2][1] = (yz2 - wx2);
+			OutMatrix.M[1][2] = (yz2 + wx2);
+		}
+		{
+			const FFixed64 xy2 = Rotation.X * y2;
+			const FFixed64 wz2 = Rotation.W * z2;
+
+			OutMatrix.M[1][0] = (xy2 - wz2);
+			OutMatrix.M[0][1] = (xy2 + wz2);
+		}
+		{
+			const FFixed64 xz2 = Rotation.X * z2;
+			const FFixed64 wy2 = Rotation.W * y2;
+
+			OutMatrix.M[2][0] = (xz2 + wy2);
+			OutMatrix.M[0][2] = (xz2 - wy2);
+		}
+
+		OutMatrix.M[0][3] = FixedPoint::Constants::Fixed64::Zero;
+		OutMatrix.M[1][3] = FixedPoint::Constants::Fixed64::Zero;
+		OutMatrix.M[2][3] = FixedPoint::Constants::Fixed64::Zero;
+		OutMatrix.M[3][3] = FixedPoint::Constants::Fixed64::One;
+
+		return OutMatrix;
+	}
+
+	/** Set this transform to the weighted blend of the supplied two transforms. */
+	FORCEINLINE void Blend(const FFixedTransform& Atom1, const FFixedTransform& Atom2, FFixed64 Alpha)
+	{
+#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST) && WITH_EDITORONLY_DATA
+		// Check that all bone atoms coming from animation are normalized
+		check(Atom1.IsRotationNormalized());
+		check(Atom2.IsRotationNormalized());
+#endif
+		if (Alpha <= FixedPoint::Constants::Fixed64::ZeroAnimWeightThresh)
+		{
+			// if blend is all the way for child1, then just copy its bone atoms
+			(*this) = Atom1;
+		}
+		else if (Alpha >= FixedPoint::Constants::Fixed64::One - FixedPoint::Constants::Fixed64::ZeroAnimWeightThresh)
+		{
+			// if blend is all the way for child2, then just copy its bone atoms
+			(*this) = Atom2;
+		}
+		else
+		{
+			// Simple linear interpolation for translation and scale.
+			Translation = FFixedPointMath::Lerp(Atom1.Translation, Atom2.Translation, Alpha);
+			Scale3D = FFixedPointMath::Lerp(Atom1.Scale3D, Atom2.Scale3D, Alpha);
+			Rotation = FFixedQuat::FastLerp(Atom1.Rotation, Atom2.Rotation, Alpha);
+
+			// ..and renormalize
+			Rotation.Normalize();
+		}
+	}
+
+	/**
 	* Returns the rotation component
 	*
 	* @return The rotation component
@@ -275,5 +441,56 @@ public:
 		Rotation = InRotation;
 		Translation = InTranslation;
 		Scale3D = InScale3D;
+	}
+
+	/**
+	* Normalize the rotation component of this transformation
+	*/
+	FORCEINLINE void NormalizeRotation()
+	{
+		Rotation.Normalize();
+	}
+
+	/**
+	* Checks whether the rotation component is normalized or not
+	*
+	* @return true if the rotation component is normalized, and false otherwise.
+	*/
+	FORCEINLINE bool IsRotationNormalized() const
+	{
+		return Rotation.IsNormalized();
+	}
+
+	FORCEINLINE static FFixedVector GetSafeScaleReciprocal(const FFixedVector& InScale, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber)
+	{
+		FFixedVector SafeReciprocalScale;
+		if (FFixedPointMath::Abs(InScale.X) <= Tolerance)
+		{
+			SafeReciprocalScale.X = FixedPoint::Constants::Fixed64::Zero;
+		}
+		else
+		{
+			SafeReciprocalScale.X = FixedPoint::Constants::Fixed64::One / InScale.X;
+		}
+
+		if (FFixedPointMath::Abs(InScale.Y) <= Tolerance)
+		{
+			SafeReciprocalScale.Y = FixedPoint::Constants::Fixed64::Zero;
+		}
+		else
+		{
+			SafeReciprocalScale.Y = FixedPoint::Constants::Fixed64::One / InScale.Y;
+		}
+
+		if (FFixedPointMath::Abs(InScale.Z) <= Tolerance)
+		{
+			SafeReciprocalScale.Z = FixedPoint::Constants::Fixed64::Zero;
+		}
+		else
+		{
+			SafeReciprocalScale.Z = FixedPoint::Constants::Fixed64::One / InScale.Z;
+		}
+
+		return SafeReciprocalScale;
 	}
 };

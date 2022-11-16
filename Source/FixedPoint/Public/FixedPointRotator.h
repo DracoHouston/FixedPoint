@@ -451,3 +451,14 @@ FORCEINLINE FFixedRotator operator*(FFixed64 Scale, const FFixedRotator& R)
 {
 	return R.operator*(Scale);
 }
+
+template<>
+struct TCustomLerp<FFixedRotator>
+{
+	enum { Value = true };
+
+	static FORCEINLINE_DEBUGGABLE FFixedRotator Lerp(const FFixedRotator& A, const FFixedRotator& B, const FFixed64& Alpha)
+	{
+		return A + (B - A).GetNormalized() * Alpha;
+	}
+};

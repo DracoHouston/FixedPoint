@@ -162,7 +162,10 @@ public:
 	 * @return vector after rotation
 	 * @see RotateVector
 	 */
-	FFixedVector operator*(const FFixedVector& V) const;
+	FFixedVector operator*(const FFixedVector& V) const
+	{
+		return RotateVector(V);
+	}
 
 	/**
 	 * Multiply this by a matrix.
@@ -328,6 +331,39 @@ public:
 	FString ToString() const
 	{
 		return FString::Printf(TEXT("X=%.9f Y=%.9f Z=%.9f W=%.9f"), (double)X, (double)Y, (double)Z, (double)W);
+	}
+
+	/**
+	 * Rotate a vector by this quaternion.
+	 *
+	 * @param V the vector to be rotated
+	 * @return vector after rotation
+	 */
+	FFixedVector RotateVector(FFixedVector V) const
+	{
+		// http://people.csail.mit.edu/bkph/articles/Quaternions.pdf
+		// V' = V + 2w(Q x V) + (2Q x (Q x V))
+		// refactor:
+		// V' = V + w(2(Q x V)) + (Q x (2(Q x V)))
+		// T = 2(Q x V);
+		// V' = V + w*(T) + (Q x T)
+
+		const FFixedVector Q(X, Y, Z);
+		const FFixedVector TT = FFixedVector::CrossProduct(Q, V) * FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2);
+		const FFixedVector Result = V + (TT * W) + FFixedVector::CrossProduct(Q, TT);
+		return Result;
+	}
+
+	/**
+	 * Fast Linear Quaternion Interpolation.
+	 * Result is NOT normalized.
+	 */
+	static FORCEINLINE FFixedQuat FastLerp(const FFixedQuat& A, const FFixedQuat& B, const FFixed64 Alpha)
+	{
+		// To ensure the 'shortest route', we make sure the dot product between the both rotations is positive.
+		const FFixed64 DotResult = (A | B);
+		const FFixed64 Bias = FFixedPointMath::FloatSelect(DotResult, FixedPoint::Constants::Fixed64::One, -FixedPoint::Constants::Fixed64::One);
+		return (B * Alpha) + (A * (Bias * (FixedPoint::Constants::Fixed64::One - Alpha)));
 	}
 };
 

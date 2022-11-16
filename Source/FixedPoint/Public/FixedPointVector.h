@@ -1419,3 +1419,19 @@ public:
 		return FVector((double)X,(double)Y,(double)Z);
 	}
 };
+
+FORCEINLINE FFixedVector operator*(FFixed64 Scale, const FFixedVector& V)
+{
+	return V.operator*(Scale);
+}
+
+template<>
+struct TCustomLerp<FFixedVector>
+{
+	enum { Value = true };
+
+	static FORCEINLINE_DEBUGGABLE FFixedVector Lerp(const FFixedVector& A, const FFixedVector& B, const FFixed64& Alpha)
+	{
+		return A + Alpha * (B - A);
+	}
+};
