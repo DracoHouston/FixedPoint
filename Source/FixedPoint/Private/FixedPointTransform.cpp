@@ -103,3 +103,15 @@ bool FFixedTransform::InitFromString(const FString& Source)
 
 	return true;
 }
+
+void FFixedTransform::GetRelativeTransformUsingMatrixWithScale(FFixedTransform* OutTransform, const FFixedTransform* Base, const FFixedTransform* Relative)
+{
+	// the goal of using M is to get the correct orientation
+	// but for translation, we still need scale
+	FFixedMatrix AM = Base->ToMatrixWithScale();
+	FFixedMatrix BM = Relative->ToMatrixWithScale();
+	// get combined scale
+	FFixedVector SafeRecipScale3D = GetSafeScaleReciprocal(Relative->Scale3D, FixedPoint::Constants::Fixed64::SmallNumber);
+	FFixedVector DesiredScale3D = Base->Scale3D * SafeRecipScale3D;
+	ConstructTransformFromMatrixWithDesiredScale(AM, BM.Inverse(), DesiredScale3D, *OutTransform);
+}

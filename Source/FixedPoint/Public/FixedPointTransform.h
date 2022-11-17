@@ -329,6 +329,132 @@ public:
 		}
 	}
 
+	/** Set this Transform to the weighted blend of it and the supplied Transform. */
+	FORCEINLINE void BlendWith(const FFixedTransform& OtherAtom, FFixed64 Alpha)
+	{
+#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST) && WITH_EDITORONLY_DATA
+		// Check that all bone atoms coming from animation are normalized
+		check(IsRotationNormalized());
+		check(OtherAtom.IsRotationNormalized());
+#endif
+		if (Alpha > FixedPoint::Constants::Fixed64::ZeroAnimWeightThresh)
+		{
+			if (Alpha >= FixedPoint::Constants::Fixed64::One - FixedPoint::Constants::Fixed64::ZeroAnimWeightThresh)
+			{
+				// if blend is all the way for child2, then just copy its bone atoms
+				(*this) = OtherAtom;
+			}
+			else
+			{
+				// Simple linear interpolation for translation and scale.
+				Translation = FFixedPointMath::Lerp(Translation, OtherAtom.Translation, Alpha);
+				Scale3D = FFixedPointMath::Lerp(Scale3D, OtherAtom.Scale3D, Alpha);
+				Rotation = FFixedQuat::FastLerp(Rotation, OtherAtom.Rotation, Alpha);
+
+				// ..and renormalize
+				Rotation.Normalize();
+			}
+		}
+	}
+
+	/**
+	* Quaternion addition is wrong here. This is just a special case for linear interpolation.
+	* Use only within blends!!
+	* Rotation part is NOT normalized!!
+	*/
+	FORCEINLINE FFixedTransform operator+(const FFixedTransform& Atom) const
+	{
+		return FFixedTransform(Rotation + Atom.Rotation, Translation + Atom.Translation, Scale3D + Atom.Scale3D);
+	}
+
+	FORCEINLINE FFixedTransform& operator+=(const FFixedTransform& Atom)
+	{
+		Translation += Atom.Translation;
+
+		Rotation.X += Atom.Rotation.X;
+		Rotation.Y += Atom.Rotation.Y;
+		Rotation.Z += Atom.Rotation.Z;
+		Rotation.W += Atom.Rotation.W;
+
+		Scale3D += Atom.Scale3D;
+
+		return *this;
+	}
+
+	FORCEINLINE FFixedTransform operator*(FFixed64 Mult) const
+	{
+		return FFixedTransform(Rotation * Mult, Translation * Mult, Scale3D * Mult);
+	}
+
+	FORCEINLINE FFixedTransform& operator*=(FFixed64 Mult)
+	{
+		Translation *= Mult;
+		Rotation.X *= Mult;
+		Rotation.Y *= Mult;
+		Rotation.Z *= Mult;
+		Rotation.W *= Mult;
+		Scale3D *= Mult;
+
+		return *this;
+	}
+
+	/**
+	* Return a transform that is the result of this multiplied by another transform.
+	* Order matters when composing transforms : C = A * B will yield a transform C that logically first applies A then B to any subsequent transformation.
+	*
+	* @param  Other other transform by which to multiply.
+	* @return new transform: this * Other
+	*/
+	FORCEINLINE FFixedTransform operator*(const FFixedTransform& Other) const
+	{
+		FFixedTransform Output;
+		Multiply(&Output, this, &Other);
+		return Output;
+	}
+
+	/**
+	* Sets this transform to the result of this multiplied by another transform.
+	* Order matters when composing transforms : C = A * B will yield a transform C that logically first applies A then B to any subsequent transformation.
+	*
+	* @param  Other other transform by which to multiply.
+	*/
+	FORCEINLINE void operator*=(const FFixedTransform& Other)
+	{
+		Multiply(this, this, &Other);
+	}
+
+	/**
+	* Return a transform that is the result of this multiplied by another transform (made only from a rotation).
+	* Order matters when composing transforms : C = A * B will yield a transform C that logically first applies A then B to any subsequent transformation.
+	*
+	* @param  Other other quaternion rotation by which to multiply.
+	* @return new transform: this * TTransform(Other)
+	*/
+	FORCEINLINE FFixedTransform operator*(const FFixedQuat& Other) const
+	{
+		FFixedTransform Output, OtherTransform(Other, FFixedVector::ZeroVector, FFixedVector::OneVector);
+		Multiply(&Output, this, &OtherTransform);
+		return Output;
+	}
+
+	/**
+	* Sets this transform to the result of this multiplied by another transform (made only from a rotation).
+	* Order matters when composing transforms : C = A * B will yield a transform C that logically first applies A then B to any subsequent transformation.
+	*
+	* @param  Other other quaternion rotation by which to multiply.
+	*/
+	FORCEINLINE void operator*=(const FFixedQuat& Other)
+	{
+		FFixedTransform OtherTransform(Other, FFixedVector::ZeroVector, FFixedVector::OneVector);
+		Multiply(this, this, &OtherTransform);
+	}
+
+	FORCEINLINE static bool AnyHasNegativeScale(const FFixedVector& InScale3D, const FFixedVector& InOtherScale3D)
+	{
+		return  (InScale3D.X < FixedPoint::Constants::Fixed64::Zero || InScale3D.Y < FixedPoint::Constants::Fixed64::Zero || InScale3D.Z < FixedPoint::Constants::Fixed64::Zero
+			|| InOtherScale3D.X < FixedPoint::Constants::Fixed64::Zero || InOtherScale3D.Y < FixedPoint::Constants::Fixed64::Zero || InOtherScale3D.Z < FixedPoint::Constants::Fixed64::Zero);
+	}
+
 	/**
 	* Returns the rotation component
 	*
@@ -431,6 +557,51 @@ public:
 	}
 
 	/**
+	* Create a new transform: OutTransform = A * B.
+	*
+	* Order matters when composing transforms : A * B will yield a transform that logically first applies A then B to any subsequent transformation.
+	*
+	* @param  OutTransform pointer to transform that will store the result of A * B.
+	* @param  A Transform A.
+	* @param  B Transform B.
+	*/
+	FORCEINLINE static void Multiply(FFixedTransform* OutTransform, const FFixedTransform* A, const FFixedTransform* B)
+	{
+		checkSlow(A->IsRotationNormalized());
+		checkSlow(B->IsRotationNormalized());
+
+		//	When Q = quaternion, S = single scalar scale, and T = translation
+		//	QST(A) = Q(A), S(A), T(A), and QST(B) = Q(B), S(B), T(B)
+
+		//	QST (AxB) 
+
+		// QST(A) = Q(A)*S(A)*P*-Q(A) + T(A)
+		// QST(AxB) = Q(B)*S(B)*QST(A)*-Q(B) + T(B)
+		// QST(AxB) = Q(B)*S(B)*[Q(A)*S(A)*P*-Q(A) + T(A)]*-Q(B) + T(B)
+		// QST(AxB) = Q(B)*S(B)*Q(A)*S(A)*P*-Q(A)*-Q(B) + Q(B)*S(B)*T(A)*-Q(B) + T(B)
+		// QST(AxB) = [Q(B)*Q(A)]*[S(B)*S(A)]*P*-[Q(B)*Q(A)] + Q(B)*S(B)*T(A)*-Q(B) + T(B)
+
+		//	Q(AxB) = Q(B)*Q(A)
+		//	S(AxB) = S(A)*S(B)
+		//	T(AxB) = Q(B)*S(B)*T(A)*-Q(B) + T(B)
+
+		if (AnyHasNegativeScale(A->Scale3D, B->Scale3D))
+		{
+			// @note, if you have 0 scale with negative, you're going to lose rotation as it can't convert back to quat
+			MultiplyUsingMatrixWithScale(OutTransform, A, B);
+		}
+		else
+		{
+			OutTransform->Rotation = B->Rotation * A->Rotation;
+			OutTransform->Scale3D = A->Scale3D * B->Scale3D;
+			OutTransform->Translation = B->Rotation * (B->Scale3D * A->Translation) + B->Translation;
+		}
+
+		// we do not support matrix transform when non-uniform
+		// that was removed at rev 21 with UE4
+	}
+
+	/**
 	* Sets the components
 	* @param InRotation The new value for the Rotation component
 	* @param InTranslation The new value for the Translation component
@@ -493,4 +664,71 @@ public:
 
 		return SafeReciprocalScale;
 	}
+private:
+	/**
+	* Create a new transform: OutTransform = A * B using the matrix while keeping the scale that's given by A and B
+	* Please note that this operation is a lot more expensive than normal Multiply
+	*
+	* Order matters when composing transforms : A * B will yield a transform that logically first applies A then B to any subsequent transformation.
+	*
+	* @param  OutTransform pointer to transform that will store the result of A * B.
+	* @param  A Transform A.
+	* @param  B Transform B.
+	*/
+	FORCEINLINE static void MultiplyUsingMatrixWithScale(FFixedTransform* OutTransform, const FFixedTransform* A, const FFixedTransform* B)
+	{
+		// the goal of using M is to get the correct orientation
+		// but for translation, we still need scale
+		ConstructTransformFromMatrixWithDesiredScale(A->ToMatrixWithScale(), B->ToMatrixWithScale(), A->Scale3D * B->Scale3D, *OutTransform);
+	}
+
+	/**
+	* Create a new transform from multiplications of given to matrices (AMatrix*BMatrix) using desired scale
+	* This is used by MultiplyUsingMatrixWithScale and GetRelativeTransformUsingMatrixWithScale
+	* This is only used to handle negative scale
+	*
+	* @param	AMatrix first Matrix of operation
+	* @param	BMatrix second Matrix of operation
+	* @param	DesiredScale - there is no check on if the magnitude is correct here. It assumes that is correct.
+	* @param	OutTransform the constructed transform
+	*/
+
+	FORCEINLINE static void ConstructTransformFromMatrixWithDesiredScale(const FFixedMatrix& AMatrix, const FFixedMatrix& BMatrix, const FFixedVector& DesiredScale, FFixedTransform& OutTransform)
+	{
+		// the goal of using M is to get the correct orientation
+		// but for translation, we still need scale
+		FFixedMatrix M = AMatrix * BMatrix;
+		M.RemoveScaling();
+
+		// apply negative scale back to axes
+		FFixedVector SignedScale = DesiredScale.GetSignVector();
+
+		M.SetAxis(0, SignedScale.X * M.GetScaledAxis(EAxis::X));
+		M.SetAxis(1, SignedScale.Y * M.GetScaledAxis(EAxis::Y));
+		M.SetAxis(2, SignedScale.Z * M.GetScaledAxis(EAxis::Z));
+
+		// @note: if you have negative with 0 scale, this will return rotation that is identity
+		// since matrix loses that axes
+		FFixedQuat Rotation = FFixedQuat(M);
+		Rotation.Normalize();
+
+		// set values back to output
+		OutTransform.Scale3D = DesiredScale;
+		OutTransform.Rotation = Rotation;
+
+		// technically I could calculate this using TTransform<T> but then it does more quat multiplication 
+		// instead of using Scale in matrix multiplication
+		// it's a question of between RemoveScaling vs using TTransform<T> to move translation
+		OutTransform.Translation = M.GetOrigin();
+	}
+
+	/**
+	* Create a new transform: OutTransform = Base * Relative(-1) using the matrix while keeping the scale that's given by Base and Relative
+	* Please note that this operation is a lot more expensive than normal GetRelativeTrnasform
+	*
+	* @param  OutTransform pointer to transform that will store the result of Base * Relative(-1).
+	* @param  BAse Transform Base.
+	* @param  Relative Transform Relative.
+	*/
+	static void GetRelativeTransformUsingMatrixWithScale(FFixedTransform* OutTransform, const FFixedTransform* Base, const FFixedTransform* Relative);
 };
