@@ -115,3 +115,78 @@ void FFixedTransform::GetRelativeTransformUsingMatrixWithScale(FFixedTransform* 
 	FFixedVector DesiredScale3D = Base->Scale3D * SafeRecipScale3D;
 	ConstructTransformFromMatrixWithDesiredScale(AM, BM.Inverse(), DesiredScale3D, *OutTransform);
 }
+
+FFixedTransform FFixedTransform::GetRelativeTransform(const FFixedTransform& Other) const
+{
+	// A * B(-1) = VQS(B)(-1) (VQS (A))
+	// 
+	// Scale = S(A)/S(B)
+	// Rotation = Q(B)(-1) * Q(A)
+	// Translation = 1/S(B) *[Q(B)(-1)*(T(A)-T(B))*Q(B)]
+	// where A = this, B = Other
+	FFixedTransform Result;
+
+	if (AnyHasNegativeScale(Scale3D, Other.GetScale3D()))
+	{
+		// @note, if you have 0 scale with negative, you're going to lose rotation as it can't convert back to quat
+		GetRelativeTransformUsingMatrixWithScale(&Result, this, &Other);
+	}
+	else
+	{
+		FFixedVector SafeRecipScale3D = GetSafeScaleReciprocal(Other.Scale3D, FixedPoint::Constants::Fixed64::SmallNumber);
+		Result.Scale3D = Scale3D * SafeRecipScale3D;
+
+		if (Other.Rotation.IsNormalized() == false)
+		{
+			return FFixedTransform::Identity;
+		}
+
+		FFixedQuat Inverse = Other.Rotation.Inverse();
+		Result.Rotation = Inverse * Rotation;
+
+		Result.Translation = (Inverse * (Translation - Other.Translation)) * (SafeRecipScale3D);
+	}
+
+	return Result;
+}
+
+FFixedTransform FFixedTransform::GetRelativeTransformReverse(const FFixedTransform& Other) const
+{
+	// A (-1) * B = VQS(B)(VQS (A)(-1))
+	// 
+	// Scale = S(B)/S(A)
+	// Rotation = Q(B) * Q(A)(-1)
+	// Translation = T(B)-S(B)/S(A) *[Q(B)*Q(A)(-1)*T(A)*Q(A)*Q(B)(-1)]
+	// where A = this, and B = Other
+	FFixedTransform Result;
+
+	FFixedVector SafeRecipScale3D = GetSafeScaleReciprocal(Scale3D);
+	Result.Scale3D = Other.Scale3D * SafeRecipScale3D;
+
+	Result.Rotation = Other.Rotation * Rotation.Inverse();
+
+	Result.Translation = Other.Translation - Result.Scale3D * (Result.Rotation * Translation);
+
+	return Result;
+}
+
+/**
+ * Set current transform and the relative to ParentTransform.
+ * Equates to This = This->GetRelativeTransform(Parent), but saves the intermediate TTransform<T> storage and copy.
+ */
+void FFixedTransform::SetToRelativeTransform(const FFixedTransform& ParentTransform)
+{
+	// A * B(-1) = VQS(B)(-1) (VQS (A))
+	// 
+	// Scale = S(A)/S(B)
+	// Rotation = Q(B)(-1) * Q(A)
+	// Translation = 1/S(B) *[Q(B)(-1)*(T(A)-T(B))*Q(B)]
+	// where A = this, B = Other
+
+	const FFixedVector SafeRecipScale3D = GetSafeScaleReciprocal(ParentTransform.Scale3D, FixedPoint::Constants::Fixed64::SmallNumber);
+	const FFixedQuat InverseRot = ParentTransform.Rotation.Inverse();
+
+	Scale3D *= SafeRecipScale3D;
+	Translation = (InverseRot * (Translation - ParentTransform.Translation)) * SafeRecipScale3D;
+	Rotation = InverseRot * Rotation;
+}

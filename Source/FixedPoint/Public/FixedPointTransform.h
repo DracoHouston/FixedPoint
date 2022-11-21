@@ -455,6 +455,50 @@ public:
 			|| InOtherScale3D.X < FixedPoint::Constants::Fixed64::Zero || InOtherScale3D.Y < FixedPoint::Constants::Fixed64::Zero || InOtherScale3D.Z < FixedPoint::Constants::Fixed64::Zero);
 	}
 
+	FORCEINLINE void ScaleTranslation(const FFixedVector& InScale3D)
+	{
+		Translation *= InScale3D;
+	}
+
+	FORCEINLINE void ScaleTranslation(const FFixed64& Scale)
+	{
+		Translation *= Scale;
+	}
+
+	FORCEINLINE void RemoveScaling(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber)
+	{
+		Scale3D = FFixedVector::OneVector;
+		Rotation.Normalize();
+	}
+
+	FORCEINLINE FFixed64 GetMaximumAxisScale() const
+	{
+		return Scale3D.GetAbsMax();
+	}
+
+	FORCEINLINE FFixed64 GetMinimumAxisScale() const
+	{
+		return Scale3D.GetAbsMin();
+	}
+
+	// Inverse does not work well with VQS format(in particular non-uniform), so removing it, but made two below functions to be used instead. 
+
+	/*******************************************************************************************
+	* The below 2 functions are the ones to get delta transform and return TTransform<T> format that can be concatenated
+	* Inverse itself can't concatenate with VQS format(since VQS always transform from S->Q->T, where inverse happens from T(-1)->Q(-1)->S(-1))
+	* So these 2 provides ways to fix this
+	* GetRelativeTransform returns this*Other(-1) and parameter is Other(not Other(-1))
+	* GetRelativeTransformReverse returns this(-1)*Other, and parameter is Other.
+	*******************************************************************************************/
+	FFixedTransform GetRelativeTransform(const FFixedTransform& Other) const;
+	FFixedTransform GetRelativeTransformReverse(const FFixedTransform& Other) const;
+
+	/**
+	* Set current transform and the relative to ParentTransform.
+	* Equates to This = This->GetRelativeTransform(Parent), but saves the intermediate TTransform<T> storage and copy.
+	*/
+	void SetToRelativeTransform(const FFixedTransform& ParentTransform);
+
 	/**
 	* Returns the rotation component
 	*
