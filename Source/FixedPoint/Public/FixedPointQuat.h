@@ -355,6 +355,20 @@ public:
 	}
 
 	/**
+	 * Rotate a vector by the inverse of this quaternion.
+	 *
+	 * @param V the vector to be rotated
+	 * @return vector after rotation by the inverse of this quaternion.
+	 */
+	FFixedVector UnrotateVector(FFixedVector V) const
+	{
+		const FFixedVector Q(-X, -Y, -Z); // Inverse
+		const FFixedVector TT = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2) * FFixedVector::CrossProduct(Q, V);
+		const FFixedVector Result = V + (W * TT) + FFixedVector::CrossProduct(Q, TT);
+		return Result;
+	}
+
+	/**
 	 * Fast Linear Quaternion Interpolation.
 	 * Result is NOT normalized.
 	 */

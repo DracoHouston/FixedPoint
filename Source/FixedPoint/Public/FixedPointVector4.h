@@ -57,6 +57,33 @@ public:
 		W = inW;
 	}
 
+	/**
+	 * Constructor from 3D TVector. W is set to 1.
+	 *
+	 * @param InVector 3D Vector to set first three components.
+	 */
+	FORCEINLINE FFixedVector4d(const FFixedVector& InVector)
+		: X(InVector.X)
+		, Y(InVector.Y)
+		, Z(InVector.Z)
+		, W(FixedPoint::Constants::Fixed64::One)
+	{
+	}
+
+	/**
+	 * Constructor.
+	 *
+	 * @param InVector 3D Vector to set first three components.
+	 * @param InW W Coordinate.
+	 */
+	FORCEINLINE FFixedVector4d(const FFixedVector& InVector, FFixed64 InW)
+		: X(InVector.X)
+		, Y(InVector.Y)
+		, Z(InVector.Z)
+		, W(InW)
+	{
+	}
+
 	UPROPERTY(EditAnywhere)
 	FFixed64 X;
 

@@ -9,6 +9,7 @@
 #include "FixedPointVector.h"
 #include "FixedPointQuat.h"
 #include "FixedPointRotator.h"
+#include "FixedPointVector4.h"
 #include "FixedPointMath.h"
 #include "FixedPointTransform.generated.h"
 
@@ -498,6 +499,76 @@ public:
 	* Equates to This = This->GetRelativeTransform(Parent), but saves the intermediate TTransform<T> storage and copy.
 	*/
 	void SetToRelativeTransform(const FFixedTransform& ParentTransform);
+
+	FORCEINLINE FFixedVector4d TransformFVector4(const FFixedVector4d& V) const
+	{
+		DiagnosticCheckNaN_All();
+
+		// if not, this won't work
+		checkSlow(V.W == FixedPoint::Constants::Fixed64::Zero || V.W == FixedPoint::Constants::Fixed64::One);
+
+		//Transform using QST is following
+		//QST(P) = Q*S*P*-Q + T where Q = quaternion, S = scale, T = translation
+
+		FFixedVector4d Transform = FFixedVector4d(Rotation.RotateVector(Scale3D * FFixedVector(V)), FixedPoint::Constants::Fixed64::Zero);
+		if (V.W == FixedPoint::Constants::Fixed64::One)
+		{
+			Transform += FFixedVector4d(Translation, FixedPoint::Constants::Fixed64::One);
+		}
+
+		return Transform;
+	}
+
+	FORCEINLINE FFixedVector4d TransformFVector4NoScale(const FFixedVector4d& V) const
+	{
+		DiagnosticCheckNaN_All();
+
+		// if not, this won't work
+		checkSlow(V.W == 0.f || V.W == 1.f);
+
+		//Transform using QST is following
+		//QST(P) = Q*S*P*-Q + T where Q = quaternion, S = scale, T = translation
+		FFixedVector4d Transform = FFixedVector4d(Rotation.RotateVector(FFixedVector(V)), FixedPoint::Constants::Fixed64::Zero);
+		if (V.W == FixedPoint::Constants::Fixed64::One)
+		{
+			Transform += FFixedVector4d(Translation, FixedPoint::Constants::Fixed64::One);
+		}
+
+		return Transform;
+	}
+
+	FORCEINLINE FFixedVector TransformPosition(const FFixedVector& V) const
+	{
+		return Rotation.RotateVector(Scale3D * V) + Translation;
+	}
+
+	FORCEINLINE FFixedVector TransformPositionNoScale(const FFixedVector& V) const
+	{
+		return Rotation.RotateVector(V) + Translation;
+	}
+
+	/** Inverts the transform and then transforms V - correctly handles scaling in this transform. */
+	FORCEINLINE FFixedVector InverseTransformPosition(const FFixedVector& V) const
+	{
+		return (Rotation.UnrotateVector(V - Translation)) * GetSafeScaleReciprocal(Scale3D);
+	}
+
+
+	FORCEINLINE FFixedVector InverseTransformPositionNoScale(const FFixedVector& V) const
+	{
+		return (Rotation.UnrotateVector(V - Translation));
+	}
+
+
+	FORCEINLINE FFixedVector TransformVector(const FFixedVector& V) const
+	{
+		return Rotation.RotateVector(Scale3D * V);
+	}
+
+	FORCEINLINE FFixedVector TransformVectorNoScale(const FFixedVector& V) const
+	{
+		return Rotation.RotateVector(V);
+	}
 
 	/**
 	* Returns the rotation component
