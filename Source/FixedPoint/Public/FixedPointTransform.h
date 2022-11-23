@@ -571,6 +571,166 @@ public:
 	}
 
 	/**
+	*	Transform a direction vector by the inverse of this transform - will not take into account translation part.
+	*	If you want to transform a surface normal (or plane) and correctly account for non-uniform scaling you should use TransformByUsingAdjointT with adjoint of matrix inverse.
+	*/
+	FORCEINLINE FFixedVector InverseTransformVector(const FFixedVector& V) const
+	{
+		return (Rotation.UnrotateVector(V)) * GetSafeScaleReciprocal(Scale3D);
+	}
+
+	FORCEINLINE FFixedVector InverseTransformVectorNoScale(const FFixedVector& V) const
+	{
+		return (Rotation.UnrotateVector(V));
+	}
+
+	/**
+	 * Transform a rotation.
+	 * For example if this is a LocalToWorld transform, TransformRotation(Q) would transform Q from local to world space.
+	 */
+	FORCEINLINE FFixedQuat TransformRotation(const FFixedQuat& Q) const
+	{
+		return GetRotation() * Q;
+	}
+
+	/**
+	* Inverse transform a rotation.
+	* For example if this is a LocalToWorld transform, InverseTransformRotation(Q) would transform Q from world to local space.
+	*/
+	FORCEINLINE FFixedQuat InverseTransformRotation(const FFixedQuat& Q) const
+	{
+		return GetRotation().Inverse() * Q;
+	}
+
+	FORCEINLINE FFixedTransform GetScaled(FFixed64 InScale) const
+	{
+		FFixedTransform A(*this);
+		A.Scale3D *= InScale;
+
+		return A;
+	}
+
+	FORCEINLINE FFixedTransform GetScaled(FFixedVector InScale) const
+	{
+		FFixedTransform A(*this);
+		A.Scale3D *= InScale;
+
+		return A;
+	}
+
+	FORCEINLINE FFixedVector GetScaledAxis(EAxis::Type InAxis) const
+	{
+		if (InAxis == EAxis::X)
+		{
+			return TransformVector(FFixedVector(FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero));
+		}
+		else if (InAxis == EAxis::Y)
+		{
+			return TransformVector(FFixedVector(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero));
+		}
+
+		return TransformVector(FFixedVector(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One));
+	}
+
+	FORCEINLINE FFixedVector GetUnitAxis(EAxis::Type InAxis) const
+	{
+		if (InAxis == EAxis::X)
+		{
+			return TransformVectorNoScale(FFixedVector(FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero));
+		}
+		else if (InAxis == EAxis::Y)
+		{
+			return TransformVectorNoScale(FFixedVector(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero));
+		}
+
+		return TransformVectorNoScale(FFixedVector(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One));
+	}
+
+	FORCEINLINE void Mirror(EAxis::Type MirrorAxis, EAxis::Type FlipAxis)
+	{
+		// We do convert to Matrix for mirroring. 
+		FFixedMatrix M = ToMatrixWithScale();
+		M.Mirror(MirrorAxis, FlipAxis);
+		SetFromMatrix(M);
+	}
+
+	FORCEINLINE static FFixedVector GetSafeScaleReciprocal(const FFixedVector& InScale, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber)
+	{
+		FFixedVector SafeReciprocalScale;
+		if (FFixedPointMath::Abs(InScale.X) <= Tolerance)
+		{
+			SafeReciprocalScale.X = FixedPoint::Constants::Fixed64::Zero;
+		}
+		else
+		{
+			SafeReciprocalScale.X = FixedPoint::Constants::Fixed64::One / InScale.X;
+		}
+
+		if (FFixedPointMath::Abs(InScale.Y) <= Tolerance)
+		{
+			SafeReciprocalScale.Y = FixedPoint::Constants::Fixed64::Zero;
+		}
+		else
+		{
+			SafeReciprocalScale.Y = FixedPoint::Constants::Fixed64::One / InScale.Y;
+		}
+
+		if (FFixedPointMath::Abs(InScale.Z) <= Tolerance)
+		{
+			SafeReciprocalScale.Z = FixedPoint::Constants::Fixed64::Zero;
+		}
+		else
+		{
+			SafeReciprocalScale.Z = FixedPoint::Constants::Fixed64::One / InScale.Z;
+		}
+
+		return SafeReciprocalScale;
+	}
+
+	// temp function for easy conversion
+	FORCEINLINE FFixedVector GetLocation() const
+	{
+		return GetTranslation();
+	}
+
+	FORCEINLINE FFixedRotator Rotator() const
+	{
+		return Rotation.Rotator();
+	}
+
+	/** Calculate the determinant of this transformation */
+	FORCEINLINE FFixed64 GetDeterminant() const
+	{
+		return Scale3D.X * Scale3D.Y * Scale3D.Z;
+	}
+
+	/** Set the translation of this transformation */
+	FORCEINLINE void SetLocation(const FFixedVector& Origin)
+	{
+		Translation = Origin;
+	}
+
+	/**
+	* Checks the components for non-finite values (NaN or Inf).
+	* @return Returns true if any component (rotation, translation, or scale) is not finite.
+	* Fixed point numbers can't be NaN
+	*/
+	bool ContainsNaN() const
+	{
+		return false;
+	}
+
+	inline bool IsValid() const
+	{
+		if (!Rotation.IsNormalized())
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	* Returns the rotation component
 	*
 	* @return The rotation component
@@ -745,39 +905,6 @@ public:
 	FORCEINLINE bool IsRotationNormalized() const
 	{
 		return Rotation.IsNormalized();
-	}
-
-	FORCEINLINE static FFixedVector GetSafeScaleReciprocal(const FFixedVector& InScale, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber)
-	{
-		FFixedVector SafeReciprocalScale;
-		if (FFixedPointMath::Abs(InScale.X) <= Tolerance)
-		{
-			SafeReciprocalScale.X = FixedPoint::Constants::Fixed64::Zero;
-		}
-		else
-		{
-			SafeReciprocalScale.X = FixedPoint::Constants::Fixed64::One / InScale.X;
-		}
-
-		if (FFixedPointMath::Abs(InScale.Y) <= Tolerance)
-		{
-			SafeReciprocalScale.Y = FixedPoint::Constants::Fixed64::Zero;
-		}
-		else
-		{
-			SafeReciprocalScale.Y = FixedPoint::Constants::Fixed64::One / InScale.Y;
-		}
-
-		if (FFixedPointMath::Abs(InScale.Z) <= Tolerance)
-		{
-			SafeReciprocalScale.Z = FixedPoint::Constants::Fixed64::Zero;
-		}
-		else
-		{
-			SafeReciprocalScale.Z = FixedPoint::Constants::Fixed64::One / InScale.Z;
-		}
-
-		return SafeReciprocalScale;
 	}
 private:
 	/**

@@ -593,6 +593,56 @@ public:
 	/** @return rotator representation of this matrix */
 	FFixedRotator Rotator() const;
 
+	/**
+	 * Utility for mirroring this transform across a certain plane, and flipping one of the axis as well.
+	 */
+	inline void Mirror(EAxis::Type MirrorAxis, EAxis::Type FlipAxis)
+	{
+		if (MirrorAxis == EAxis::X)
+		{
+			M[0][0] *= -FixedPoint::Constants::Fixed64::One;
+			M[1][0] *= -FixedPoint::Constants::Fixed64::One;
+			M[2][0] *= -FixedPoint::Constants::Fixed64::One;
+
+			M[3][0] *= -FixedPoint::Constants::Fixed64::One;
+		}
+		else if (MirrorAxis == EAxis::Y)
+		{
+			M[0][1] *= -FixedPoint::Constants::Fixed64::One;
+			M[1][1] *= -FixedPoint::Constants::Fixed64::One;
+			M[2][1] *= -FixedPoint::Constants::Fixed64::One;
+
+			M[3][1] *= -FixedPoint::Constants::Fixed64::One;
+		}
+		else if (MirrorAxis == EAxis::Z)
+		{
+			M[0][2] *= -FixedPoint::Constants::Fixed64::One;
+			M[1][2] *= -FixedPoint::Constants::Fixed64::One;
+			M[2][2] *= -FixedPoint::Constants::Fixed64::One;
+
+			M[3][2] *= -FixedPoint::Constants::Fixed64::One;
+		}
+
+		if (FlipAxis == EAxis::X)
+		{
+			M[0][0] *= -FixedPoint::Constants::Fixed64::One;
+			M[0][1] *= -FixedPoint::Constants::Fixed64::One;
+			M[0][2] *= -FixedPoint::Constants::Fixed64::One;
+		}
+		else if (FlipAxis == EAxis::Y)
+		{
+			M[1][0] *= -FixedPoint::Constants::Fixed64::One;
+			M[1][1] *= -FixedPoint::Constants::Fixed64::One;
+			M[1][2] *= -FixedPoint::Constants::Fixed64::One;
+		}
+		else if (FlipAxis == EAxis::Z)
+		{
+			M[2][0] *= -FixedPoint::Constants::Fixed64::One;
+			M[2][1] *= -FixedPoint::Constants::Fixed64::One;
+			M[2][2] *= -FixedPoint::Constants::Fixed64::One;
+		}
+	}
+
 	private:
 		/**
 	 * Output an error message and trigger an ensure
