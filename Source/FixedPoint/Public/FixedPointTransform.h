@@ -111,29 +111,6 @@ public:
 	{
 	}
 
-	void SetFromMatrix(const FFixedMatrix& InMatrix)
-	{
-		FFixedMatrix M = InMatrix;
-
-		// Get the 3D scale from the matrix
-		Scale3D = M.ExtractScaling();
-
-		// If there is negative scaling going on, we handle that here
-		if (InMatrix.Determinant() < FixedPoint::Constants::Fixed64::Zero)
-		{
-			// Assume it is along X and modify transform accordingly. 
-			// It doesn't actually matter which axis we choose, the 'appearance' will be the same
-			Scale3D.X *= -FixedPoint::Constants::Fixed64::One;
-			M.SetAxis(FixedPoint::Constants::Fixed64::Zero, -M.GetScaledAxis(EAxis::X));
-		}
-
-		Rotation = FFixedQuat(M);
-		Translation = InMatrix.GetOrigin();
-
-		// Normalize rotation
-		Rotation.Normalize();
-	}
-
 	/**
 	* Constructor for converting a Matrix (including scale) into a FFixedTransform.
 	*/
@@ -526,7 +503,7 @@ public:
 		DiagnosticCheckNaN_All();
 
 		// if not, this won't work
-		checkSlow(V.W == 0.f || V.W == 1.f);
+		checkSlow(V.W == FixedPoint::Constants::Fixed64::Zero || V.W == FixedPoint::Constants::Fixed64::One);
 
 		//Transform using QST is following
 		//QST(P) = Q*S*P*-Q + T where Q = quaternion, S = scale, T = translation
@@ -1015,6 +992,144 @@ public:
 	}
 
 	/**
+	* Accumulates another transform with this one
+	*
+	* Rotation is accumulated multiplicatively (Rotation = SourceAtom.Rotation * Rotation)
+	* Translation is accumulated additively (Translation += SourceAtom.Translation)
+	* Scale3D is accumulated multiplicatively (Scale3D *= SourceAtom.Scale3D)
+	*
+	* @param SourceAtom The other transform to accumulate into this one
+	*/
+	FORCEINLINE void Accumulate(const FFixedTransform& SourceAtom)
+	{
+		// Add ref pose relative animation to base animation, only if rotation is significant.
+		if (FFixedPointMath::Square(SourceAtom.Rotation.W) < FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One - 1))
+		{
+			Rotation = SourceAtom.Rotation * Rotation;
+		}
+
+		Translation += SourceAtom.Translation;
+		Scale3D *= SourceAtom.Scale3D;
+
+		DiagnosticCheckNaN_All();
+
+		checkSlow(IsRotationNormalized());
+	}
+
+	/** Accumulates another transform with this one, with a blending weight
+	*
+	* Let SourceAtom = Atom * BlendWeight
+	* Rotation is accumulated multiplicatively (Rotation = SourceAtom.Rotation * Rotation).
+	* Translation is accumulated additively (Translation += SourceAtom.Translation)
+	* Scale3D is accumulated multiplicatively (Scale3D *= SourceAtom.Scale3D)
+	*
+	* Note: Rotation will not be normalized! Will have to be done manually.
+	*
+	* @param Atom The other transform to accumulate into this one
+	* @param BlendWeight The weight to multiply Atom by before it is accumulated.
+	*/
+	FORCEINLINE void Accumulate(const FFixedTransform& Atom, FFixed64 BlendWeight/* default param doesn't work since vectorized version takes ref param */)
+	{
+		FFixedTransform SourceAtom(Atom * BlendWeight);
+
+		// Add ref pose relative animation to base animation, only if rotation is significant.
+		if (FFixedPointMath::Square(SourceAtom.Rotation.W) < FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One - 1))
+		{
+			Rotation = SourceAtom.Rotation * Rotation;
+		}
+
+		Translation += SourceAtom.Translation;
+		Scale3D *= SourceAtom.Scale3D;
+
+		DiagnosticCheckNaN_All();
+	}
+
+	/**
+	* Accumulates another transform with this one, with an optional blending weight
+	*
+	* Rotation is accumulated additively, in the shortest direction (Rotation = Rotation +/- DeltaAtom.Rotation * Weight)
+	* Translation is accumulated additively (Translation += DeltaAtom.Translation * Weight)
+	* Scale3D is accumulated additively (Scale3D += DeltaAtom.Scale3D * Weight)
+	*
+	* @param DeltaAtom The other transform to accumulate into this one
+	* @param Weight The weight to multiply DeltaAtom by before it is accumulated.
+	*/
+	FORCEINLINE void AccumulateWithShortestRotation(const FFixedTransform& DeltaAtom, FFixed64 BlendWeight/* default param doesn't work since vectorized version takes ref param */)
+	{
+		FFixedTransform Atom(DeltaAtom * BlendWeight);
+
+		// To ensure the 'shortest route', we make sure the dot product between the accumulator and the incoming child atom is positive.
+		if ((Atom.Rotation | Rotation) < FixedPoint::Constants::Fixed64::Zero)
+		{
+			Rotation.X -= Atom.Rotation.X;
+			Rotation.Y -= Atom.Rotation.Y;
+			Rotation.Z -= Atom.Rotation.Z;
+			Rotation.W -= Atom.Rotation.W;
+		}
+		else
+		{
+			Rotation.X += Atom.Rotation.X;
+			Rotation.Y += Atom.Rotation.Y;
+			Rotation.Z += Atom.Rotation.Z;
+			Rotation.W += Atom.Rotation.W;
+		}
+
+		Translation += Atom.Translation;
+		Scale3D += Atom.Scale3D;
+
+		DiagnosticCheckNaN_All();
+	}
+
+	/** Accumulates another transform with this one, with a blending weight
+	*
+	* Let SourceAtom = Atom * BlendWeight
+	* Rotation is accumulated multiplicatively (Rotation = SourceAtom.Rotation * Rotation).
+	* Translation is accumulated additively (Translation += SourceAtom.Translation)
+	* Scale3D is accumulated assuming incoming scale is additive scale (Scale3D *= (1 + SourceAtom.Scale3D))
+	*
+	* When we create additive, we create additive scale based on [TargetScale/SourceScale -1]
+	* because that way when you apply weight of 0.3, you don't shrink. We only saves the % of grow/shrink
+	* when we apply that back to it, we add back the 1, so that it goes back to it.
+	* This solves issue where you blend two additives with 0.3, you don't come back to 0.6 scale, but 1 scale at the end
+	* because [1 + [1-1]*0.3 + [1-1]*0.3] becomes 1, so you don't shrink by applying additive scale
+	*
+	* Note: Rotation will not be normalized! Will have to be done manually.
+	*
+	* @param Atom The other transform to accumulate into this one
+	* @param BlendWeight The weight to multiply Atom by before it is accumulated.
+	*/
+	FORCEINLINE void AccumulateWithAdditiveScale(const FFixedTransform& Atom, FFixed64 BlendWeight/* default param doesn't work since vectorized version takes ref param */)
+	{
+		const FFixedVector DefaultScale(FFixedVector::OneVector);
+
+		FFixedTransform SourceAtom(Atom * BlendWeight);
+
+		// Add ref pose relative animation to base animation, only if rotation is significant.
+		if (FFixedPointMath::Square(SourceAtom.Rotation.W) < FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One - 1))
+		{
+			Rotation = SourceAtom.Rotation * Rotation;
+		}
+
+		Translation += SourceAtom.Translation;
+		Scale3D *= (DefaultScale + SourceAtom.Scale3D);
+	}
+	/**
+	* Set the translation and Scale3D components of this transform to a linearly interpolated combination of two other transforms
+	*
+	* Translation = FFixedPointMath::Lerp(SourceAtom1.Translation, SourceAtom2.Translation, Alpha)
+	* Scale3D = FFixedPointMath::Lerp(SourceAtom1.Scale3D, SourceAtom2.Scale3D, Alpha)
+	*
+	* @param SourceAtom1 The starting point source atom (used 100% if Alpha is 0)
+	* @param SourceAtom2 The ending point source atom (used 100% if Alpha is 1)
+	* @param Alpha The blending weight between SourceAtom1 and SourceAtom2
+	*/
+	FORCEINLINE void LerpTranslationScale3D(const FFixedTransform& SourceAtom1, const FFixedTransform& SourceAtom2, FFixed64 Alpha)
+	{
+		Translation = FFixedPointMath::Lerp(SourceAtom1.Translation, SourceAtom2.Translation, Alpha);
+		Scale3D = FFixedPointMath::Lerp(SourceAtom1.Scale3D, SourceAtom2.Scale3D, Alpha);
+	}
+
+	/**
 	* Normalize the rotation component of this transformation
 	*/
 	FORCEINLINE void NormalizeRotation()
@@ -1030,6 +1145,42 @@ public:
 	FORCEINLINE bool IsRotationNormalized() const
 	{
 		return Rotation.IsNormalized();
+	}
+
+	/**
+	* Blends the Identity transform with a weighted source transform and accumulates that into a destination transform
+	*
+	* DeltaAtom = Blend(Identity, SourceAtom, BlendWeight)
+	* FinalAtom.Rotation = DeltaAtom.Rotation * FinalAtom.Rotation
+	* FinalAtom.Translation += DeltaAtom.Translation
+	* FinalAtom.Scale3D *= DeltaAtom.Scale3D
+	*
+	* @param FinalAtom [in/out] The atom to accumulate the blended source atom into
+	* @param SourceAtom The target transformation (used when BlendWeight = 1); this is modified during the process
+	* @param BlendWeight The blend weight between Identity and SourceAtom
+	*/
+	FORCEINLINE static void BlendFromIdentityAndAccumulate(FFixedTransform& FinalAtom, const FFixedTransform& SourceAtom, FFixed64 BlendWeight)
+	{
+		const FFixedTransform AdditiveIdentity(FFixedQuat::Identity, FFixedVector::ZeroVector, FFixedVector::ZeroVector);
+		const FFixedVector DefaultScale(FFixedVector::OneVector);
+		FFixedTransform DeltaAtom = SourceAtom;
+
+		// Scale delta by weight
+		if (BlendWeight < (FixedPoint::Constants::Fixed64::One - FixedPoint::Constants::Fixed64::ZeroAnimWeightThresh))
+		{
+			DeltaAtom.Blend(AdditiveIdentity, DeltaAtom, BlendWeight);
+		}
+
+		// Add ref pose relative animation to base animation, only if rotation is significant.
+		if (FMath::Square(DeltaAtom.Rotation.W) < FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One - 1))
+		{
+			FinalAtom.Rotation = DeltaAtom.Rotation * FinalAtom.Rotation;
+		}
+
+		FinalAtom.Translation += DeltaAtom.Translation;
+		FinalAtom.Scale3D *= (DefaultScale + DeltaAtom.Scale3D);
+
+		checkSlow(FinalAtom.IsRotationNormalized());
 	}
 
 	/**
@@ -1060,6 +1211,51 @@ public:
 	FORCEINLINE FFixedVector GetScale3D() const
 	{
 		return Scale3D;
+	}
+
+	/**
+	* Sets the Rotation and Scale3D of this transformation from another transform
+	*
+	* @param SrcBA The transform to copy rotation and Scale3D from
+	*/
+	FORCEINLINE void CopyRotationPart(const FFixedTransform& SrcBA)
+	{
+		Rotation = SrcBA.Rotation;
+		Scale3D = SrcBA.Scale3D;
+	}
+
+	/**
+	* Sets the Translation and Scale3D of this transformation from another transform
+	*
+	* @param SrcBA The transform to copy translation and Scale3D from
+	*/
+	FORCEINLINE void CopyTranslationAndScale3D(const FFixedTransform& SrcBA)
+	{
+		Translation = SrcBA.Translation;
+		Scale3D = SrcBA.Scale3D;
+	}
+
+	void SetFromMatrix(const FFixedMatrix& InMatrix)
+	{
+		FFixedMatrix M = InMatrix;
+
+		// Get the 3D scale from the matrix
+		Scale3D = M.ExtractScaling();
+
+		// If there is negative scaling going on, we handle that here
+		if (InMatrix.Determinant() < FixedPoint::Constants::Fixed64::Zero)
+		{
+			// Assume it is along X and modify transform accordingly. 
+			// It doesn't actually matter which axis we choose, the 'appearance' will be the same
+			Scale3D.X *= -FixedPoint::Constants::Fixed64::One;
+			M.SetAxis(FixedPoint::Constants::Fixed64::Zero, -M.GetScaledAxis(EAxis::X));
+		}
+
+		Rotation = FFixedQuat(M);
+		Translation = InMatrix.GetOrigin();
+
+		// Normalize rotation
+		Rotation.Normalize();
 	}
 private:
 	/**
