@@ -18,6 +18,17 @@ public:
 	FORCEINLINE FFixedQuat() {}
 
 	/**
+	* Constructor that casts from FQuat to FFixedQuat
+	*/
+	FORCEINLINE FFixedQuat(FQuat Other)
+	{
+		X = (FFixed64)Other.X;
+		Y = (FFixed64)Other.Y;
+		Z = (FFixed64)Other.Z;
+		W = (FFixed64)Other.W;
+	}
+
+	/**
 	 * Creates and initializes a new quaternion, with the W component either 0 or 1.
 	 *
 	 * @param EForceInit Force init enum: if equal to ForceInitToZero then W is 0, otherwise W = 1 (creating an identity transform)
@@ -379,6 +390,11 @@ public:
 		const FFixed64 Bias = FFixedPointMath::FloatSelect(DotResult, FixedPoint::Constants::Fixed64::One, -FixedPoint::Constants::Fixed64::One);
 		return (B * Alpha) + (A * (Bias * (FixedPoint::Constants::Fixed64::One - Alpha)));
 	}
+
+	FORCEINLINE operator FQuat() const
+	{
+		return FQuat((double)X, (double)Y, (double)Z, (double)W);
+	}
 };
 
 FORCEINLINE FFixedQuat::FFixedQuat(EForceInit ZeroOrNot)
@@ -422,20 +438,20 @@ inline FFixedQuat::FFixedQuat(const FFixedMatrix& M)
 	// If Matrix is NULL, return Identity quaternion. If any of them is 0, you won't be able to construct rotation
 	// if you have two plane at least, we can reconstruct the frame using cross product, but that's a bit expensive op to do here
 	// for now, if you convert to matrix from 0 scale and convert back, you'll lose rotation. Don't do that. 
-	/*if (M.GetScaledAxis(EAxis::X).IsNearlyZero() || M.GetScaledAxis(EAxis::Y).IsNearlyZero() || M.GetScaledAxis(EAxis::Z).IsNearlyZero())
+	if (M.GetScaledAxis(EAxis::X).IsNearlyZero() || M.GetScaledAxis(EAxis::Y).IsNearlyZero() || M.GetScaledAxis(EAxis::Z).IsNearlyZero())
 	{
 		*this = FFixedQuat::Identity;
 		return;
-	}*/
+	}
 
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
 	// Make sure the Rotation part of the Matrix is unit length.
 	// Changed to this (same as RemoveScaling) from RotDeterminant as using two different ways of checking unit length matrix caused inconsistency. 
-	/*if (!ensure((FMath::Abs(1.f - M.GetScaledAxis(EAxis::X).SizeSquared()) <= UE_KINDA_SMALL_NUMBER) && (FMath::Abs(1.f - M.GetScaledAxis(EAxis::Y).SizeSquared()) <= UE_KINDA_SMALL_NUMBER) && (FMath::Abs(1.f - M.GetScaledAxis(EAxis::Z).SizeSquared()) <= UE_KINDA_SMALL_NUMBER)))
+	if (!ensure((FFixedPointMath::Abs(FixedPoint::Constants::Fixed64::One - M.GetScaledAxis(EAxis::X).SizeSquared()) <= FixedPoint::Constants::Fixed64::KindaSmallNumber) && (FFixedPointMath::Abs(FixedPoint::Constants::Fixed64::One - M.GetScaledAxis(EAxis::Y).SizeSquared()) <= FixedPoint::Constants::Fixed64::KindaSmallNumber) && (FFixedPointMath::Abs(FixedPoint::Constants::Fixed64::One - M.GetScaledAxis(EAxis::Z).SizeSquared()) <= FixedPoint::Constants::Fixed64::KindaSmallNumber)))
 	{
-		*this = TQuat<T>::Identity;
+		*this = FFixedQuat::Identity;
 		return;
-	}*/
+	}
 #endif
 
 	//const MeReal *const t = (MeReal *) tm;
@@ -575,16 +591,14 @@ FORCEINLINE FFixed64 FFixedQuat::operator|(const FFixedQuat& Q) const
 {
 	return X * Q.X + Y * Q.Y + Z * Q.Z + W * Q.W;
 }
-// Global operator for (float * Quat)
-//template<typename T>
-//FORCEINLINE TQuat<T> operator*(const float Scale, const TQuat<T>& Q)
-//{
-//	return Q.operator*(Scale);
-//}
-//
-//// Global operator for (double * Quat)
-//template<typename T>
-//FORCEINLINE TQuat<T> operator*(const double Scale, const TQuat<T>& Q)
-//{
-//	return Q.operator*(Scale);
-//}
+// Global operator for (fixed32 * Quat)
+FORCEINLINE FFixedQuat operator*(const FFixed32 Scale, const FFixedQuat& Q)
+{
+	return Q.operator*(Scale);
+}
+
+// Global operator for (double * Quat)
+FORCEINLINE FFixedQuat operator*(const FFixed64 Scale, const FFixedQuat& Q)
+{
+	return Q.operator*(Scale);
+}

@@ -11,6 +11,8 @@
 #include "FixedPointRotator.h"
 #include "FixedPointVector4.h"
 #include "FixedPointMath.h"
+#include "Math/VectorRegister.h"
+#include "Math/ScalarRegister.h"
 #include "FixedPointTransform.generated.h"
 
 USTRUCT(BlueprintType)
@@ -485,7 +487,7 @@ public:
 	// Inverse does not work well with VQS format(in particular non-uniform), so removing it, but made two below functions to be used instead. 
 
 	/*******************************************************************************************
-	* The below 2 functions are the ones to get delta transform and return TTransform<T> format that can be concatenated
+	* The below 2 functions are the ones to get delta transform and return FFixedTransform format that can be concatenated
 	* Inverse itself can't concatenate with VQS format(since VQS always transform from S->Q->T, where inverse happens from T(-1)->Q(-1)->S(-1))
 	* So these 2 provides ways to fix this
 	* GetRelativeTransform returns this*Other(-1) and parameter is Other(not Other(-1))
@@ -496,7 +498,7 @@ public:
 
 	/**
 	* Set current transform and the relative to ParentTransform.
-	* Equates to This = This->GetRelativeTransform(Parent), but saves the intermediate TTransform<T> storage and copy.
+	* Equates to This = This->GetRelativeTransform(Parent), but saves the intermediate FFixedTransform storage and copy.
 	*/
 	void SetToRelativeTransform(const FFixedTransform& ParentTransform);
 
@@ -730,36 +732,6 @@ public:
 		return true;
 	}
 
-	/**
-	* Returns the rotation component
-	*
-	* @return The rotation component
-	*/
-	FORCEINLINE FFixedQuat GetRotation() const
-	{
-		return Rotation;
-	}
-
-	/**
-	* Returns the translation component
-	*
-	* @return The translation component
-	*/
-	FORCEINLINE FFixedVector GetTranslation() const
-	{
-		return Translation;
-	}
-
-	/**
-	* Returns the Scale3D component
-	*
-	* @return The Scale3D component
-	*/
-	FORCEINLINE FFixedVector GetScale3D() const
-	{
-		return Scale3D;
-	}
-
 private:
 	FORCEINLINE bool Private_RotationEquals(const FFixedQuat& InRotation, const FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
@@ -890,6 +862,159 @@ public:
 	}
 
 	/**
+	* Sets the components to the identity transform:
+	*   Rotation = (0,0,0,1)
+	*   Translation = (0,0,0)
+	*   Scale3D = (1,1,1)
+	*/
+	FORCEINLINE void SetIdentity()
+	{
+		Rotation = FFixedQuat::Identity;
+		Translation = FFixedVector::ZeroVector;
+		Scale3D = FFixedVector(1, 1, 1);
+	}
+
+	/**
+	* Sets the components to the 'additive' identity transform:
+	*   Rotation = (0,0,0,1)
+	*   Translation = (0,0,0)
+	*   Scale3D = (0,0,0)
+	*/
+	FORCEINLINE void SetIdentityZeroScale()
+	{
+		Rotation = FFixedQuat::Identity;
+		Translation = FFixedVector::ZeroVector;
+		Scale3D = FFixedVector::ZeroVector;
+	}
+
+	/**
+	* Scales the Scale3D component by a new factor
+	* @param Scale3DMultiplier The value to multiply Scale3D with
+	*/
+	FORCEINLINE void MultiplyScale3D(const FFixedVector& Scale3DMultiplier)
+	{
+		Scale3D *= Scale3DMultiplier;
+	}
+
+	/**
+	* Sets the translation component
+	* @param NewTranslation The new value for the translation component
+	*/
+	FORCEINLINE void SetTranslation(const FFixedVector& NewTranslation)
+	{
+		Translation = NewTranslation;
+	}
+
+	/** Copy translation from another FFixedTransform. */
+	FORCEINLINE void CopyTranslation(const FFixedTransform& Other)
+	{
+		Translation = Other.Translation;
+	}
+
+	/**
+	* Concatenates another rotation to this transformation
+	* @param DeltaRotation The rotation to concatenate in the following fashion: Rotation = Rotation * DeltaRotation
+	*/
+	FORCEINLINE void ConcatenateRotation(const FFixedQuat& DeltaRotation)
+	{
+		Rotation = Rotation * DeltaRotation;
+	}
+
+	/**
+	* Adjusts the translation component of this transformation
+	* @param DeltaTranslation The translation to add in the following fashion: Translation += DeltaTranslation
+	*/
+	FORCEINLINE void AddToTranslation(const FFixedVector& DeltaTranslation)
+	{
+		Translation += DeltaTranslation;
+	}
+
+	/**
+	* Add the translations from two FFixedTransforms and return the result.
+	* @return A.Translation + B.Translation
+	*/
+	FORCEINLINE static FFixedVector AddTranslations(const FFixedTransform& A, const FFixedTransform& B)
+	{
+		return A.Translation + B.Translation;
+	}
+
+	/**
+	* Subtract translations from two FFixedTransforms and return the difference.
+	* @return A.Translation - B.Translation.
+	*/
+	FORCEINLINE static FFixedVector SubtractTranslations(const FFixedTransform& A, const FFixedTransform& B)
+	{
+		return A.Translation - B.Translation;
+	}
+
+	/**
+	* Sets the rotation component
+	* @param NewRotation The new value for the rotation component
+	*/
+	FORCEINLINE void SetRotation(const FFixedQuat& NewRotation)
+	{
+		Rotation = NewRotation;
+	}
+
+	/** Copy rotation from another FFixedTransform. */
+	FORCEINLINE void CopyRotation(const FFixedTransform& Other)
+	{
+		Rotation = Other.Rotation;
+	}
+
+	/**
+	* Sets the Scale3D component
+	* @param NewScale3D The new value for the Scale3D component
+	*/
+	FORCEINLINE void SetScale3D(const FFixedVector& NewScale3D)
+	{
+		Scale3D = NewScale3D;
+	}
+
+	/** Copy scale from another FFixedTransform. */
+	FORCEINLINE void CopyScale3D(const FFixedTransform& Other)
+	{
+		Scale3D = Other.Scale3D;
+	}
+
+	/**
+	* Sets both the translation and Scale3D components at the same time
+	* @param NewTranslation The new value for the translation component
+	* @param NewScale3D The new value for the Scale3D component
+	*/
+	FORCEINLINE void SetTranslationAndScale3D(const FFixedVector& NewTranslation, const FFixedVector& NewScale3D)
+	{
+		Translation = NewTranslation;
+		Scale3D = NewScale3D;
+	}
+
+	// For low-level VectorRegister programming
+	//NOTE: here so this type and epics type can be typedef'd interchangibly.
+	//NOT a good idea to use these on code that uses this type, as it requires a lot of casting from fixed 64 to double!
+	TVectorRegisterType<double> GetTranslationRegister() const 
+	{
+		FVector floattranslation = (FVector)Translation;
+		return VectorLoadFloat3_W0(&floattranslation); 
+	}
+	TVectorRegisterType<double> GetRotationRegister() const 
+	{ 
+		FQuat floatrotation = (FQuat)Rotation;
+		return VectorLoad(&floatrotation); 
+	}
+	void SetTranslationRegister(TVectorRegisterType<double> InTranslation) 
+	{ 
+		FVector newval;
+		VectorStoreFloat3(InTranslation, &newval);
+		Translation = (FFixedVector)newval;
+	}
+	void SetRotationRegister(TVectorRegisterType<double> InRotation) 
+	{
+		FQuat newval;
+		VectorStore(InRotation, &newval);
+		Rotation = (FFixedQuat)newval;
+	}
+
+	/**
 	* Normalize the rotation component of this transformation
 	*/
 	FORCEINLINE void NormalizeRotation()
@@ -905,6 +1030,36 @@ public:
 	FORCEINLINE bool IsRotationNormalized() const
 	{
 		return Rotation.IsNormalized();
+	}
+
+	/**
+	* Returns the rotation component
+	*
+	* @return The rotation component
+	*/
+	FORCEINLINE FFixedQuat GetRotation() const
+	{
+		return Rotation;
+	}
+
+	/**
+	* Returns the translation component
+	*
+	* @return The translation component
+	*/
+	FORCEINLINE FFixedVector GetTranslation() const
+	{
+		return Translation;
+	}
+
+	/**
+	* Returns the Scale3D component
+	*
+	* @return The Scale3D component
+	*/
+	FORCEINLINE FFixedVector GetScale3D() const
+	{
+		return Scale3D;
 	}
 private:
 	/**
@@ -958,9 +1113,9 @@ private:
 		OutTransform.Scale3D = DesiredScale;
 		OutTransform.Rotation = Rotation;
 
-		// technically I could calculate this using TTransform<T> but then it does more quat multiplication 
+		// technically I could calculate this using FFixedTransform but then it does more quat multiplication 
 		// instead of using Scale in matrix multiplication
-		// it's a question of between RemoveScaling vs using TTransform<T> to move translation
+		// it's a question of between RemoveScaling vs using FFixedTransform to move translation
 		OutTransform.Translation = M.GetOrigin();
 	}
 
