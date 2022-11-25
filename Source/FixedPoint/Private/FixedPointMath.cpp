@@ -249,56 +249,6 @@ FFixed64 FFixedPointMath::Pow(const FFixed64& inValue, int32 inPower)
 	return retval;
 }
 
-FFixed64 FFixedPointMath::Floor(const FFixed64& inValue)
-{
-	return FFixed64::MakeFromRawInt((inValue.Value >> FixedPoint::Constants::BinaryPoint64) << FixedPoint::Constants::BinaryPoint64);
-}
-
-FFixed32 FFixedPointMath::Floor(const FFixed32& inValue)
-{
-	return FFixed32::MakeFromRawInt((inValue.Value >> FixedPoint::Constants::BinaryPoint32) << FixedPoint::Constants::BinaryPoint32);
-}
-
-FFixed32 FFixedPointMath::CeilToFixed32(const FFixed32& inValue)
-{
-	return FFixed32::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw32::One - 1) >> FixedPoint::Constants::BinaryPoint32) << FixedPoint::Constants::BinaryPoint32);
-}
-
-FFixed64 FFixedPointMath::CeilToFixed64(const FFixed64& inValue)
-{
-	return FFixed64::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw64::One - 1) >> FixedPoint::Constants::BinaryPoint64) << FixedPoint::Constants::BinaryPoint64);
-}
-
-int32 FFixedPointMath::CeilToInt(const FFixed32& inValue)
-{
-	return (inValue.Value + FixedPoint::Constants::Raw32::One - 1) >> FixedPoint::Constants::BinaryPoint32;
-}
-
-int64 FFixedPointMath::CeilToInt(const FFixed64& inValue)
-{
-	return (inValue.Value + FixedPoint::Constants::Raw64::One - 1) >> FixedPoint::Constants::BinaryPoint64;
-}
-
-float FFixedPointMath::CeilToFloat(const FFixed32& inValue)
-{
-	return (float)FFixed32::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw32::One - 1) >> FixedPoint::Constants::BinaryPoint32) << FixedPoint::Constants::BinaryPoint32);
-}
-
-float FFixedPointMath::CeilToFloat(const FFixed64& inValue)
-{
-	return (float)FFixed64::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw64::One - 1) >> FixedPoint::Constants::BinaryPoint64) << FixedPoint::Constants::BinaryPoint64);
-}
-
-double FFixedPointMath::CeilToDouble(const FFixed32& inValue)
-{
-	return (double)FFixed32::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw32::One - 1) >> FixedPoint::Constants::BinaryPoint32) << FixedPoint::Constants::BinaryPoint32);
-}
-
-double FFixedPointMath::CeilToDouble(const FFixed64& inValue)
-{
-	return (double)FFixed64::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw64::One - 1) >> FixedPoint::Constants::BinaryPoint64) << FixedPoint::Constants::BinaryPoint64);
-}
-
 FFixed64 FFixedPointMath::Fmod(FFixed64 X, FFixed64 Y)
 {
 	const FFixed64 AbsY = Abs(Y);
@@ -307,8 +257,9 @@ FFixed64 FFixedPointMath::Fmod(FFixed64 X, FFixed64 Y)
 		FmodReportError(X, Y);
 		return 0.0;
 	}
-
-	return FFixed64::MakeFromRawInt(((X / Y).Value << (63 - FixedPoint::Constants::BinaryPoint64)) >> (63 - FixedPoint::Constants::BinaryPoint64));
+	const FFixed64 quotient = X / Y;
+	return X - (TruncToFixed64(quotient) * Y);
+	//return FFixed64::MakeFromRawInt(((X / Y).Value << (63 - FixedPoint::Constants::BinaryPoint64)) >> (63 - FixedPoint::Constants::BinaryPoint64));
 }
 
 FFixed32 FFixedPointMath::Fmod(FFixed32 X, FFixed32 Y)
@@ -319,8 +270,9 @@ FFixed32 FFixedPointMath::Fmod(FFixed32 X, FFixed32 Y)
 		FmodReportError(X, Y);
 		return 0.0;
 	}
-
-	return FFixed32::MakeFromRawInt(((X / Y).Value << (31 - FixedPoint::Constants::BinaryPoint32)) >> (31 - FixedPoint::Constants::BinaryPoint32));
+	const FFixed32 quotient = X / Y;
+	return X - (TruncToFixed64(quotient) * Y);
+	//return FFixed32::MakeFromRawInt(((X / Y).Value << (31 - FixedPoint::Constants::BinaryPoint32)) >> (31 - FixedPoint::Constants::BinaryPoint32));
 }
 
 void FFixedPointMath::FmodReportError(FFixed64 X, FFixed64 Y)

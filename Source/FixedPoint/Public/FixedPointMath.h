@@ -40,52 +40,146 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	/**
 	* Floor, returns a whole number value, rounded down, as FFixed64
 	*/
-	static FFixed64 Floor(const FFixed64& inValue);
+	static FFixed64 Floor(const FFixed64& inValue)
+	{
+		return FFixed64::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw64::Half - 1) >> FixedPoint::Constants::BinaryPoint64) << FixedPoint::Constants::BinaryPoint64);
+	}
 
 	/**
 	* Floor, returns a whole number value, rounded down, as FFixed32
 	*/
-	static FFixed32 Floor(const FFixed32& inValue);
+	static FFixed32 Floor(const FFixed32& inValue)
+	{
+		return FFixed32::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw32::Half - 1) >> FixedPoint::Constants::BinaryPoint32) << FixedPoint::Constants::BinaryPoint32);
+	}
 
 	/**
 	* Ceil, returns a whole number value, rounded up, as FFixed32
 	*/
-	static FFixed32 CeilToFixed32(const FFixed32& inValue);
+	static FORCEINLINE FFixed32 CeilToFixed32(const FFixed32& inValue)
+	{
+		return FFixed32::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw32::One - 1) >> FixedPoint::Constants::BinaryPoint32) << FixedPoint::Constants::BinaryPoint32);
+	}
 
 	/**
 	* Ceil, returns a whole number value, rounded up, as FFixed32
 	*/
-	static FFixed64 CeilToFixed64(const FFixed64& inValue);
+	static FORCEINLINE FFixed64 CeilToFixed64(const FFixed64& inValue)
+	{
+		return FFixed64::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw64::One - 1) >> FixedPoint::Constants::BinaryPoint64) << FixedPoint::Constants::BinaryPoint64);
+	}
 
 	/**
 	* Ceil, returns a whole number value, rounded up, as int32
 	*/
-	static int32 CeilToInt(const FFixed32& inValue);
+	static FORCEINLINE int32 CeilToInt(const FFixed32& inValue)
+	{
+		return (inValue.Value + FixedPoint::Constants::Raw32::One - 1) >> FixedPoint::Constants::BinaryPoint32;
+	}
 
 	/**
 	* Ceil, returns a whole number value, rounded up, as int64
 	*/
-	static int64 CeilToInt(const FFixed64& inValue);
+	static FORCEINLINE int64 CeilToInt(const FFixed64& inValue)
+	{
+		return (inValue.Value + FixedPoint::Constants::Raw64::One - 1) >> FixedPoint::Constants::BinaryPoint64;
+	}
 
 	/**
 	* Ceil, returns a whole number value, rounded up, as float
 	*/
-	static float CeilToFloat(const FFixed32& inValue);
+	static FORCEINLINE float CeilToFloat(const FFixed32& inValue)
+	{
+		return (float)FFixed32::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw32::One - 1) >> FixedPoint::Constants::BinaryPoint32) << FixedPoint::Constants::BinaryPoint32);
+	}
 
 	/**
 	* Ceil, returns a whole number value, rounded up, as float
 	*/
-	static float CeilToFloat(const FFixed64& inValue);
+	static FORCEINLINE float CeilToFloat(const FFixed64& inValue)
+	{
+		return (float)FFixed64::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw64::One - 1) >> FixedPoint::Constants::BinaryPoint64) << FixedPoint::Constants::BinaryPoint64);
+	}
 
 	/**
 	* Ceil, returns a whole number value, rounded up, as double
 	*/
-	static double CeilToDouble(const FFixed32& inValue);
+	static FORCEINLINE double CeilToDouble(const FFixed32& inValue)
+	{
+		return (double)FFixed32::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw32::One - 1) >> FixedPoint::Constants::BinaryPoint32) << FixedPoint::Constants::BinaryPoint32);
+	}
 
 	/**
 	* Ceil, returns a whole number value, rounded up, as double
 	*/
-	static double CeilToDouble(const FFixed64& inValue);
+	static FORCEINLINE double CeilToDouble(const FFixed64& inValue)
+	{
+		return (double)FFixed64::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw64::One - 1) >> FixedPoint::Constants::BinaryPoint64) << FixedPoint::Constants::BinaryPoint64);
+	}
+
+	/**
+	* Trunc, returns a whole number value, rounded towards 0, as FFixed32
+	*/
+	static FORCEINLINE FFixed32 TruncToFixed32(const FFixed32& inValue)
+	{
+		return FFixed32::MakeFromRawInt((inValue.Value / FixedPoint::Constants::Raw32::One) << FixedPoint::Constants::BinaryPoint32);
+	}
+
+	/**
+	* Trunc, returns a whole number value, rounded towards 0, as FFixed32
+	*/
+	static FORCEINLINE FFixed64 TruncToFixed64(const FFixed64& inValue)
+	{
+		return FFixed64::MakeFromRawInt((inValue.Value / FixedPoint::Constants::Raw64::One) << FixedPoint::Constants::BinaryPoint64);
+	}
+
+	/**
+	* Trunc, returns a whole number value, rounded towards 0, as int32
+	*/
+	static FORCEINLINE int32 TruncToInt(const FFixed32& inValue)
+	{
+		return (int32)TruncToFixed32(inValue);
+	}
+
+	/**
+	* Trunc, returns a whole number value, rounded towards 0, as int64
+	*/
+	static FORCEINLINE int64 TruncToInt(const FFixed64& inValue)
+	{
+		return (int64)TruncToFixed64(inValue);
+	}
+
+	/**
+	* Trunc, returns a whole number value, rounded towards 0, as float
+	*/
+	static FORCEINLINE float TruncToFloat(const FFixed32& inValue)
+	{
+		return (float)TruncToFixed32(inValue);
+	}
+
+	/**
+	* Trunc, returns a whole number value, rounded towards 0, as float
+	*/
+	static FORCEINLINE float TruncToFloat(const FFixed64& inValue)
+	{
+		return (float)TruncToFixed64(inValue);
+	}
+
+	/**
+	* Trunc, returns a whole number value, rounded towards 0, as double
+	*/
+	static FORCEINLINE double TruncToDouble(const FFixed32& inValue)
+	{
+		return (double)TruncToFixed32(inValue);
+	}
+
+	/**
+	* Trunc, returns a whole number value, rounded towards 0, as double
+	*/
+	static FORCEINLINE double TruncToDouble(const FFixed64& inValue)
+	{
+		return (double)TruncToFixed64(inValue);
+	}
 
 	/**
 	* Is Equal, will find if 2 FFixed64s are within default tolerance
