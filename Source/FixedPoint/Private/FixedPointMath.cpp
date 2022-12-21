@@ -178,53 +178,13 @@ FFixed64 FFixedPointMath::Tan(const FFixed64& inValue)
 	FFixed64 cosval;
 	FFixedPointMath::SinCos(&sinval, &cosval, inValue);
 	
-	FFixed64 retval = sinval / cosval;
-	//FFixed64 theta = FFixed64::Internal_Normalize(inValue, FixedPoint::Constants::Fixed64::TwoPi);
-	//int64 sign = 1;
-	//int64 quadrant = theta.Value / FixedPoint::Constants::Fixed64::HalfPi.Value;
-	//switch (quadrant)
-	//{
-	//case 0://all
-	//	break;
-	//case 1://students
-	//	sign = -1;
-	//	break;
-	//case 2://take
-	//	break;
-	//case 3://calculus
-	//	sign = -1;
-	//	break;
-	//default:
-	//	break;
-	//}
-	//retval.Value *= sign;
-	return retval;
+	return sinval / cosval;
 }
 
 void FFixedPointMath::SinCos(FFixed64* outSin, FFixed64* outCos, const FFixed64& inValue)
 {
 	*outSin = FFixedPointMath::Sin(inValue);
 	*outCos = FFixedPointMath::Cos(inValue);
-	//FFixed64 theta = FFixed64::Internal_Normalize(inValue, FixedPoint::Constants::Fixed64::TwoPi);
-	//int64 sign = 1;
-	//int64 quadrant = theta.Value / FixedPoint::Constants::Fixed64::HalfPi.Value;
-	//switch (quadrant)
-	//{
-	//case 0://all
-	//	break;
-	//case 1://students
-	//	sign = -1;
-	//	break;
-	//case 2://take
-	//	sign = -1;
-	//	break;
-	//case 3://calculus
-	//	break;
-	//default:
-	//	break;
-	//}
-	//*outCos = FFixedPointMath::Sqrt(FixedPoint::Constants::Fixed64::One - (*outSin * *outSin));
-	//outCos->Value *= sign;
 }
 
 FFixed32 FFixedPointMath::Sin(const FFixed32& inValue)
@@ -287,24 +247,89 @@ FFixed32 FFixedPointMath::Sin(const FFixed32& inValue)
 
 FFixed32 FFixedPointMath::Cos(const FFixed32& inValue)
 {
-	FFixed32 retval;
+	const FFixed32 twopi = FixedPoint::Constants::Fixed32::TwoPi;
+	const FFixed32 halfpi = FixedPoint::Constants::Fixed32::HalfPi;
+
+	FFixed32 theta = FFixed32::Internal_Normalize(inValue, twopi);
+	bool mirror = false;
+	bool flip = false;
+	int64 quadrant = (int64)(theta / halfpi);
+	switch (quadrant)
+	{
+	case 0:
+		break;
+	case 1:
+		mirror = true;
+		flip = true;
+		break;
+	case 2:
+		flip = true;
+		break;
+	case 3:
+		mirror = true;
+	default:
+		break;
+	}
+
+	theta = FFixed32::Internal_Normalize(theta, halfpi);
+	if (mirror)
+	{
+		theta = halfpi - theta;
+	}
+	FFixed32 thetasquared = theta * theta;
+	FFixed32 result = FixedPoint::Constants::Fixed32::One;
+
+	FFixed32 n = thetasquared;
+	const FFixed32 Factorial2 = FFixed32::MakeFromRawInt(2 * FixedPoint::Constants::Raw32::One);
+	result -= n / Factorial2;
+
+	n *= thetasquared;
+	const FFixed32 Factorial4 = FFixed32::MakeFromRawInt(Factorial2.Value * 3 * 4);
+	result += (n / Factorial4);
+
+	n *= thetasquared;
+	const FFixed32 Factorial6 = FFixed32::MakeFromRawInt(Factorial4.Value * 5 * 6);
+	result -= n / Factorial6;
+
+	//results in better precision, but at what cost?
+	n *= thetasquared;
+	const FFixed32 Factorial8 = FFixed32::MakeFromRawInt(Factorial6.Value * 7 * 8);
+	result += n / Factorial8;
+
+	if (flip)
+	{
+		result.Value *= -1;
+	}
+	return result;
+	/*FFixed32 retval;
 	FFixed32 sinval;
 	FFixedPointMath::SinAndCos(inValue, sinval, retval);
-	return retval;
+	return retval;*/
 }
 
 FFixed32 FFixedPointMath::Tan(const FFixed32& inValue)
 {
+	const FFixed32 unwoundtheta = FFixedPointMath::UnwindRadians(inValue);
+	if (FFixedPointMath::IsEqual(unwoundtheta, FixedPoint::Constants::Fixed32::HalfPi))
+	{
+		return FixedPoint::Constants::Fixed32::BigNumber;
+	}
+	else if (FFixedPointMath::IsEqual(unwoundtheta, -FixedPoint::Constants::Fixed32::HalfPi))
+	{
+		return -FixedPoint::Constants::Fixed32::BigNumber;
+	}
 	FFixed32 sinval;
 	FFixed32 cosval;
-	FFixedPointMath::SinAndCos(inValue, sinval, cosval);
+	FFixedPointMath::SinCos(&sinval, &cosval, inValue);
 	return sinval / cosval;
 }
 
-void FFixedPointMath::SinAndCos(const FFixed32& inValue, FFixed32& outSin, FFixed32& outCos)
+void FFixedPointMath::SinCos(FFixed32* outSin, FFixed32* outCos, const FFixed32& inValue)
 {
-	outSin = FFixedPointMath::Sin(inValue);
-	outCos = FFixedPointMath::Sqrt(FixedPoint::Constants::Fixed32::One - (outSin * outSin));
+	//outSin = FFixedPointMath::Sin(inValue);
+	//outCos = FFixedPointMath::Sqrt(FixedPoint::Constants::Fixed32::One - (outSin * outSin));
+	*outSin = FFixedPointMath::Sin(inValue);
+	*outCos = FFixedPointMath::Cos(inValue);
 }
 
 

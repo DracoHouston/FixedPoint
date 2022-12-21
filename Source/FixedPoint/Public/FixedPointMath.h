@@ -12,7 +12,7 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	*/
 	static FORCEINLINE FFixed32 DegreesToRadians(const FFixed32& inValue)
 	{
-		return inValue * (FixedPoint::Constants::Fixed64::Pi / FixedPoint::Constants::Fixed64::OneEighty);
+		return inValue * (FixedPoint::Constants::Fixed32::Pi / FixedPoint::Constants::Fixed32::OneEighty);
 	}
 
 	/**
@@ -20,7 +20,7 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	*/
 	static FORCEINLINE FFixed32 RadiansToDegrees(const FFixed32& inValue)
 	{
-		return inValue * (FixedPoint::Constants::Fixed64::OneEighty / FixedPoint::Constants::Fixed64::Pi);
+		return inValue * (FixedPoint::Constants::Fixed32::OneEighty / FixedPoint::Constants::Fixed32::Pi);
 	}
 
 	static FORCEINLINE FFixed64 DegreesToRadians(const FFixed64& inValue)
@@ -340,7 +340,7 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	* SinAndCos, gets the sine of a FFixed32 angle in radians, and its cosine, and returns both
 	* Note: this avoids calling FFixed32::Sin twice over calling FFixed32::Sin then FFixed32::Cos, which uses this!
 	*/
-	static void SinAndCos(const FFixed32& inValue, FFixed32& outSin, FFixed32& outCos);
+	static void SinCos(FFixed32* outSin, FFixed32* outCos, const FFixed32& inValue);
 
 	static FFixed32 Acos(FFixed32 x)
 	{
@@ -370,7 +370,7 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 		ret *= x;
 		ret += FixedPoint::Constants::Fixed32::HalfPi;
 		ret = FixedPoint::Constants::Fixed32::Pi * FixedPoint::Constants::Fixed32::Half - Sqrt(FixedPoint::Constants::Fixed32::One - x) * ret;
-		return ret - FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw32::One * 2) * negate * ret;
+		return ret - FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::One * 2) * negate * ret;
 	}
 
 	static FFixed32 Atan(FFixed32 X)

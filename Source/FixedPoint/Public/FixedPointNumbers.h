@@ -526,6 +526,13 @@ public:
 
 	FORCEINLINE FFixed32 operator*(const FFixed32& Other) const
 	{
+		/*const bool thisisnegative = Value < 0;
+		const bool otherisnegative = Other.Value < 0;
+		int64 IntermediateResult = thisisnegative ? -Value : Value;
+		int64 IntermediateOther = otherisnegative ? -Other.Value : Other.Value;
+		IntermediateResult *= IntermediateOther;
+		IntermediateResult >> FixedPoint::Constants::BinaryPoint32;
+		return (int32)IntermediateResult;*/
 		return FFixed32::MakeFromRawInt((int32)(((int64)Value * (int64)Other.Value) >> FixedPoint::Constants::BinaryPoint32));
 	}
 
@@ -548,13 +555,13 @@ public:
 
 	FORCEINLINE FFixed32 operator*=(const FFixed32& Other)
 	{
-		Value *= Other.Value;
+		*this = *this * Other;
 		return *this;
 	}
 
 	FORCEINLINE FFixed32 operator/=(const FFixed32& Other)
 	{
-		Value /= Other.Value;
+		*this = *this / Other;
 		return *this;
 	}
 
