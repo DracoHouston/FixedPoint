@@ -106,24 +106,125 @@ FFixed64 FFixedPointMath::Sin(const FFixed64& inValue)
 
 FFixed64 FFixedPointMath::Cos(const FFixed64& inValue)
 {
-	FFixed64 retval;
-	FFixed64 sinval;
-	FFixedPointMath::SinCos(&sinval, &retval, inValue);
-	return retval;
+	const FFixed64 twopi = FixedPoint::Constants::Fixed64::TwoPi;
+	const FFixed64 halfpi = FixedPoint::Constants::Fixed64::HalfPi;
+
+	FFixed64 theta = FFixed64::Internal_Normalize(inValue, twopi);
+	bool mirror = false;
+	bool flip = false;
+	int64 quadrant = (int64)(theta / halfpi);
+	switch (quadrant)
+	{
+	case 0:
+		break;
+	case 1:
+		mirror = true;
+		flip = true;
+		break;
+	case 2:
+		flip = true;
+		break;
+	case 3:
+		mirror = true;
+	default:
+		break;
+	}
+
+	theta = FFixed64::Internal_Normalize(theta, halfpi);
+	if (mirror)
+	{
+		theta = halfpi - theta;
+	}
+	FFixed64 thetasquared = theta * theta;
+	FFixed64 result = FixedPoint::Constants::Fixed64::One;
+
+	FFixed64 n = thetasquared;
+	const FFixed64 Factorial2 = FFixed64::MakeFromRawInt(2 * FixedPoint::Constants::Raw64::One);
+	result -= n / Factorial2;
+
+	n *= thetasquared;
+	const FFixed64 Factorial4 = FFixed64::MakeFromRawInt(Factorial2.Value * 3 * 4);
+	result += (n / Factorial4);
+
+	n *= thetasquared;
+	const FFixed64 Factorial6 = FFixed64::MakeFromRawInt(Factorial4.Value * 5 * 6);
+	result -= n / Factorial6;
+
+	//results in better precision, but at what cost?
+	n *= thetasquared;
+	const FFixed64 Factorial8 = FFixed64::MakeFromRawInt(Factorial6.Value * 7 * 8);
+	result += n / Factorial8;
+
+	if (flip)
+	{
+		result.Value *= -1;
+	}
+	return result;
 }
 
 FFixed64 FFixedPointMath::Tan(const FFixed64& inValue)
 {
+	const FFixed64 unwoundtheta = FFixedPointMath::UnwindRadians(inValue);
+	if (FFixedPointMath::IsEqual(unwoundtheta, FixedPoint::Constants::Fixed64::HalfPi))
+	{
+		return FixedPoint::Constants::Fixed64::BigNumber;
+	}
+	else if (FFixedPointMath::IsEqual(unwoundtheta, -FixedPoint::Constants::Fixed64::HalfPi))
+	{
+		return -FixedPoint::Constants::Fixed64::BigNumber;
+	}
+
 	FFixed64 sinval;
 	FFixed64 cosval;
 	FFixedPointMath::SinCos(&sinval, &cosval, inValue);
-	return sinval / cosval;
+	
+	FFixed64 retval = sinval / cosval;
+	//FFixed64 theta = FFixed64::Internal_Normalize(inValue, FixedPoint::Constants::Fixed64::TwoPi);
+	//int64 sign = 1;
+	//int64 quadrant = theta.Value / FixedPoint::Constants::Fixed64::HalfPi.Value;
+	//switch (quadrant)
+	//{
+	//case 0://all
+	//	break;
+	//case 1://students
+	//	sign = -1;
+	//	break;
+	//case 2://take
+	//	break;
+	//case 3://calculus
+	//	sign = -1;
+	//	break;
+	//default:
+	//	break;
+	//}
+	//retval.Value *= sign;
+	return retval;
 }
 
 void FFixedPointMath::SinCos(FFixed64* outSin, FFixed64* outCos, const FFixed64& inValue)
 {
 	*outSin = FFixedPointMath::Sin(inValue);
-	*outCos = FFixedPointMath::Sqrt(FixedPoint::Constants::Fixed64::One - (*outSin * *outSin));
+	*outCos = FFixedPointMath::Cos(inValue);
+	//FFixed64 theta = FFixed64::Internal_Normalize(inValue, FixedPoint::Constants::Fixed64::TwoPi);
+	//int64 sign = 1;
+	//int64 quadrant = theta.Value / FixedPoint::Constants::Fixed64::HalfPi.Value;
+	//switch (quadrant)
+	//{
+	//case 0://all
+	//	break;
+	//case 1://students
+	//	sign = -1;
+	//	break;
+	//case 2://take
+	//	sign = -1;
+	//	break;
+	//case 3://calculus
+	//	break;
+	//default:
+	//	break;
+	//}
+	//*outCos = FFixedPointMath::Sqrt(FixedPoint::Constants::Fixed64::One - (*outSin * *outSin));
+	//outCos->Value *= sign;
 }
 
 FFixed32 FFixedPointMath::Sin(const FFixed32& inValue)

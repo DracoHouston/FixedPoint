@@ -43,6 +43,7 @@ namespace FixedPoint
 			constexpr int64 GoldenRatio = 1696631;
 			constexpr int64 InvPi = 333772;
 			constexpr int64 HalfPi = 1647099;
+			constexpr int64 PiAndAHalf = HalfPi + Pi;
 			constexpr int64 TwoPi = 6588397;
 			constexpr int64 PiSquared = 10349030;
 			constexpr int64 SQRT2 = 1482910;
@@ -280,20 +281,33 @@ public:
 
 	FORCEINLINE FFixed64 operator*(const FFixed64& Other) const
 	{
-		TBigInt<128, true> IntermediateResult = TBigInt<128, true>(Value);
-		TBigInt<128, true> IntermediateOther = TBigInt<128, true>(Other.Value);
+		const bool thisisnegative = Value < 0;
+		const bool otherisnegative = Other.Value < 0;
+		TBigInt<128, true> IntermediateResult = thisisnegative ? TBigInt<128, true>(-Value) : TBigInt<128, true>(Value);
+		TBigInt<128, true> IntermediateOther = otherisnegative ? TBigInt<128, true>(-Other.Value) : TBigInt<128, true>(Other.Value);
 		IntermediateResult *= IntermediateOther;
 		IntermediateResult.ShiftRight(FixedPoint::Constants::BinaryPoint64);
-		return FFixed64::MakeFromRawInt(IntermediateResult.ToInt());
+		return thisisnegative != otherisnegative ? -FFixed64::MakeFromRawInt(IntermediateResult.ToInt()) : FFixed64::MakeFromRawInt(IntermediateResult.ToInt());
 	}
 
 	FORCEINLINE FFixed64 operator/(const FFixed64& Other) const
 	{
-		TBigInt<128, true> IntermediateResult = TBigInt<128, true>(Value);
-		TBigInt<128, true> IntermediateOther = TBigInt<128, true>(Other.Value);
+		const bool thisisnegative = Value < 0;
+		const bool otherisnegative = Other.Value < 0;
+		TBigInt<128, true> IntermediateResult = thisisnegative ? TBigInt<128, true>(-Value) : TBigInt<128, true>(Value);
+		TBigInt<128, true> IntermediateOther = otherisnegative ? TBigInt<128, true>(-Other.Value) : TBigInt<128, true>(Other.Value);
 		IntermediateResult.ShiftLeft(FixedPoint::Constants::BinaryPoint64);
 		IntermediateResult /= IntermediateOther;
-		return FFixed64::MakeFromRawInt(IntermediateResult.ToInt());
+		//if ((thisisnegative && !otherisnegative) || (!thisisnegative && otherisnegative))
+		/*if (thisisnegative != otherisnegative)
+		{
+			return -FFixed64::MakeFromRawInt(IntermediateResult.ToInt());
+		}
+		else
+		{
+			return FFixed64::MakeFromRawInt(IntermediateResult.ToInt());
+		}*/
+		return thisisnegative != otherisnegative ? -FFixed64::MakeFromRawInt(IntermediateResult.ToInt()) : FFixed64::MakeFromRawInt(IntermediateResult.ToInt());
 	}
 
 	FORCEINLINE FFixed64 operator+=(const FFixed64& Other)
@@ -310,21 +324,34 @@ public:
 
 	FORCEINLINE FFixed64 operator*=(const FFixed64& Other)
 	{
-		TBigInt<128, true> IntermediateResult = TBigInt<128, true>(Value);
-		TBigInt<128, true> IntermediateOther = TBigInt<128, true>(Other.Value);
+		const bool thisisnegative = Value < 0;
+		const bool otherisnegative = Other.Value < 0;
+		TBigInt<128, true> IntermediateResult = thisisnegative ? TBigInt<128, true>(-Value) : TBigInt<128, true>(Value);
+		TBigInt<128, true> IntermediateOther = otherisnegative ? TBigInt<128, true>(-Other.Value) : TBigInt<128, true>(Other.Value);
 		IntermediateResult *= IntermediateOther;
 		IntermediateResult.ShiftRight(FixedPoint::Constants::BinaryPoint64);
-		Value = IntermediateResult.ToInt();
+		Value = thisisnegative != otherisnegative ? -IntermediateResult.ToInt() : IntermediateResult.ToInt();
 		return *this;
 	}
 
 	FORCEINLINE FFixed64 operator/=(const FFixed64& Other)
 	{
-		TBigInt<128, true> IntermediateResult = TBigInt<128, true>(Value);
-		TBigInt<128, true> IntermediateOther = TBigInt<128, true>(Other.Value);
+		const bool thisisnegative = Value < 0;
+		const bool otherisnegative = Other.Value < 0;
+		TBigInt<128, true> IntermediateResult = thisisnegative ? TBigInt<128, true>(-Value) : TBigInt<128, true>(Value);
+		TBigInt<128, true> IntermediateOther = otherisnegative ? TBigInt<128, true>(-Other.Value) : TBigInt<128, true>(Other.Value);
 		IntermediateResult.ShiftLeft(FixedPoint::Constants::BinaryPoint64);
 		IntermediateResult /= IntermediateOther;
-		Value = IntermediateResult.ToInt();
+		//if ((thisisnegative && !otherisnegative) || (!thisisnegative && otherisnegative))
+		/*if (thisisnegative != otherisnegative)
+		{
+			Value = -IntermediateResult.ToInt();
+		}
+		else
+		{
+			Value = IntermediateResult.ToInt();
+		}*/
+		Value = thisisnegative != otherisnegative ? -IntermediateResult.ToInt() : IntermediateResult.ToInt();
 		return *this;
 	}
 
@@ -577,6 +604,7 @@ namespace FixedPoint
 			constexpr FFixed64 GoldenRatio =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::GoldenRatio);
 			constexpr FFixed64 InvPi =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::InvPi);
 			constexpr FFixed64 HalfPi =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::HalfPi);
+			constexpr FFixed64 PiAndAHalf = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::PiAndAHalf);
 			constexpr FFixed64 TwoPi =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::TwoPi);
 			constexpr FFixed64 PiSquared =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::PiSquared);
 			constexpr FFixed64 SQRT2 =  FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::SQRT2);

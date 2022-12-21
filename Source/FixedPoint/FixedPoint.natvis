@@ -5,4 +5,9 @@
       {(double)Value/1048576.0}
       </DisplayString>
   </Type>
+  <Type Name="FFixed32">
+    <DisplayString>
+      {(double)Value/65536.0}
+    </DisplayString>
+  </Type>
 </AutoVisualizer>
