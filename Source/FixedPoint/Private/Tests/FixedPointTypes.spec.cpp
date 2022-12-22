@@ -680,6 +680,531 @@ void FFixedPointSpec::Define()
                         TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
                     });
                 });
+                Describe("Atan", [this]()
+                {
+                    It("Should get a very similar result to FMath::Atan of negative two", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value * 2);
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+7/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 7)));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+6/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 6)));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+5/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 5)));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+4/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 4)));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+3/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 3)));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+2/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 2)));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+1/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 1)));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative one", [this]()
+                    {
+                        const FFixed64 angle = -FixedPoint::Constants::Fixed64::One;
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 7/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 7));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 6/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 6));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 5/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 5));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 4/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 4));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 3/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 3));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 2/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 2));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 1));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of zero", [this]()
+                    {
+                        FFixed64 fixedresult = FFixedPointMath::Atan(FixedPoint::Constants::Fixed64::Zero);
+                        double floatresult = FMath::Atan((double)FixedPoint::Constants::Fixed64::Zero);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 1);
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 2/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 2);
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 3/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 3);
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 4/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 4);
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 5/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 5);
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 6/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 6);
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 7/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 7);
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of one", [this]()
+                    {
+                        const FFixed64 angle = -FixedPoint::Constants::Fixed64::One;
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+1/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 1));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+2/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 2));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+3/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 3));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+4/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 4));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+5/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 5));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+6/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 6));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+7/8", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * 7));
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of two", [this]()
+                    {
+                        const FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value * 2);
+                        FFixed64 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed64::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)));
+                    });
+                });
+                Describe("Atan2", [this]()
+                {
+                    It("Should get a very similar result to FMath::Atan2 testing x = -1 for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = -FixedPoint::Constants::Fixed64::One;
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 7/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 7));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 6/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 6));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 5/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 5));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 4/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 4));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 3/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 3));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 2/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(-(FixedPoint::Constants::Fixed64::Eigth.Value * 2));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 1/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = -FixedPoint::Constants::Fixed64::Eigth;
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 0 for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FixedPoint::Constants::Fixed64::Zero;
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 1/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FixedPoint::Constants::Fixed64::Eigth;
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 2/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 2);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 3/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 3);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 4/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 4);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 5/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 5);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 6/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 6);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 7/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * 7);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 1 for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed64 x = FixedPoint::Constants::Fixed64::One;
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(-FixedPoint::Constants::Fixed64::One.Value + (FixedPoint::Constants::Fixed64::Eigth.Value * i));
+                            FFixed64 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                });
             });
             Describe("Fixed 32", [this]()
             {
@@ -1312,6 +1837,531 @@ void FFixedPointSpec::Define()
                         FFixed32 fixedresult = FFixedPointMath::Acos(angle);
                         double floatresult = FMath::Acos((double)angle);
                         TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                });
+                Describe("Atan", [this]()
+                {
+                    It("Should get a very similar result to FMath::Atan of negative two", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value * 2);
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+7/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 7)));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+6/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 6)));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+5/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 5)));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+4/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 4)));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+3/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 3)));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+2/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 2)));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1+1/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 1)));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative one", [this]()
+                    {
+                        const FFixed32 angle = -FixedPoint::Constants::Fixed32::One;
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 7/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 7));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 6/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 6));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 5/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 5));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 4/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 4));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 3/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 3));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 2/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 2));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of negative 1/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 1));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of zero", [this]()
+                    {
+                        FFixed32 fixedresult = FFixedPointMath::Atan(FixedPoint::Constants::Fixed32::Zero);
+                        double floatresult = FMath::Atan((double)FixedPoint::Constants::Fixed32::Zero);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 1);
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 2/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 2);
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 3/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 3);
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 4/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 4);
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 5/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 5);
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 6/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 6);
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 7/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 7);
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of one", [this]()
+                    {
+                        const FFixed32 angle = -FixedPoint::Constants::Fixed32::One;
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+1/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 1));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+2/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 2));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+3/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 3));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+4/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 4));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+5/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 5));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+6/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 6));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of 1+7/8", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * 7));
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                    It("Should get a very similar result to FMath::Atan of two", [this]()
+                    {
+                        const FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::One.Value * 2);
+                        FFixed32 fixedresult = FFixedPointMath::Atan(angle);
+                        double floatresult = FMath::Atan((double)angle);
+                        TestTrue("Is within FFixed32::MakeFromRawInt(1500) of their float equivalents", FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)));
+                    });
+                });
+                Describe("Atan2", [this]()
+                {
+                    It("Should get a very similar result to FMath::Atan2 testing x = -1 for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = -FixedPoint::Constants::Fixed32::One;
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 7/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 7));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 6/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 6));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 5/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 5));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 4/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 4));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 3/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 3));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 2/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(-(FixedPoint::Constants::Fixed32::Eigth.Value * 2));
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = negative 1/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = -FixedPoint::Constants::Fixed32::Eigth;
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 0 for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FixedPoint::Constants::Fixed32::Zero;
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 1/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FixedPoint::Constants::Fixed32::Eigth;
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 2/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 2);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 3/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 3);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 4/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 4);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 5/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 5);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 6/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 6);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 7/8ths for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * 7);
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::Atan2 testing x = 1 for every value of y between -1 and 1 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        const FFixed32 x = FixedPoint::Constants::Fixed32::One;
+                        for (int64 i = 0; i < 17; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(-FixedPoint::Constants::Fixed32::One.Value + (FixedPoint::Constants::Fixed32::Eigth.Value * i));
+                            FFixed32 fixedresult = FFixedPointMath::Atan2(x, angle);
+                            double floatresult = FMath::Atan2((double)x, (double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(1500)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
                     });
                 });
             });
