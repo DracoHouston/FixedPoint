@@ -15,20 +15,20 @@ const FFixedMatrix FFixedMatrix::Identity(
 	FFixedPlane(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero),
 	FFixedPlane(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One));
 
-FFixedRotator FFixedMatrix::Rotator() const
+FFixedRotator64 FFixedMatrix::Rotator() const
 {
-	const FFixedVector	XAxis = GetScaledAxis(EAxis::X);
-	const FFixedVector	YAxis = GetScaledAxis(EAxis::Y);
-	const FFixedVector	ZAxis = GetScaledAxis(EAxis::Z);
+	const FFixedVector64	XAxis = GetScaledAxis(EAxis::X);
+	const FFixedVector64	YAxis = GetScaledAxis(EAxis::Y);
+	const FFixedVector64	ZAxis = GetScaledAxis(EAxis::Z);
 	const FFixed64 RadToDeg = FixedPoint::Constants::Fixed64::OneEighty / FixedPoint::Constants::Fixed64::Pi;
 
-	FFixedRotator Rotator = FFixedRotator(
+	FFixedRotator64 Rotator = FFixedRotator64(
 		FFixedPointMath::Atan2(XAxis.Z, FFixedPointMath::Sqrt(FFixedPointMath::Square(XAxis.X) + FFixedPointMath::Square(XAxis.Y))) * RadToDeg,
 		FFixedPointMath::Atan2(XAxis.Y, XAxis.X) * RadToDeg,
 		FixedPoint::Constants::Fixed64::Zero
 	);
 
-	const FFixedVector	SYAxis = (FFixedVector)FFixedRotationMatrix(Rotator).GetScaledAxis(EAxis::Y);
+	const FFixedVector64	SYAxis = (FFixedVector64)FFixedRotationMatrix(Rotator).GetScaledAxis(EAxis::Y);
 	Rotator.Roll = FFixedPointMath::Atan2(ZAxis | SYAxis, YAxis | SYAxis) * RadToDeg;
 
 	return Rotator;

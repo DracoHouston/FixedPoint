@@ -2,9 +2,9 @@
 
 #include "FixedPointRotator.h"
 
-const FFixedRotator FFixedRotator::ZeroRotator = FFixedRotator(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero);
+const FFixedRotator64 FFixedRotator64::ZeroRotator = FFixedRotator64(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero);
 
-void FFixedRotator::GetWindingAndRemainder(FFixedRotator& Winding, FFixedRotator& Remainder) const
+void FFixedRotator64::GetWindingAndRemainder(FFixedRotator64& Winding, FFixedRotator64& Remainder) const
 {
 	//// YAW
 	Remainder.Yaw = NormalizeAxis(Yaw);
@@ -20,4 +20,9 @@ void FFixedRotator::GetWindingAndRemainder(FFixedRotator& Winding, FFixedRotator
 	Remainder.Roll = NormalizeAxis(Roll);
 
 	Winding.Roll = Roll - Remainder.Roll;
+}
+
+FFixedRotator64 FFixedRotator64::MakeFromEuler(const FFixedVector64& Euler)
+{
+	return FFixedRotator64(Euler.Y, Euler.Z, Euler.X);
 }

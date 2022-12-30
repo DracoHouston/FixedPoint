@@ -25,7 +25,7 @@ public:
 	 * @param Rot rotation
 	 * @param Origin translation to apply
 	 */
-	FFixedRotationTranslationMatrix(const FFixedRotator& Rot, const FFixedVector& Origin)
+	FFixedRotationTranslationMatrix(const FFixedRotator64& Rot, const FFixedVector64& Origin)
 	{
 		FFixed64 SP, SY, SR;
 		FFixed64 CP, CY, CR;
@@ -55,7 +55,7 @@ public:
 	}
 
 	/** Matrix factory. Return an TMatrix<T> so we don't have type conversion issues in expressions. */
-	static FFixedMatrix Make(const FFixedRotator& Rot, const FFixedVector& Origin)
+	static FFixedMatrix Make(const FFixedRotator64& Rot, const FFixedVector64& Origin)
 	{
 		return FFixedRotationTranslationMatrix(Rot, Origin);
 	}

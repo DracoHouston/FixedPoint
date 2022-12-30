@@ -4,17 +4,17 @@
 #include "FixedPointVector.h"
 
 
-const FFixedVector FFixedVector::ZeroVector =		FFixedVector((int64)0,	(int64)0,	(int64)0);
-const FFixedVector FFixedVector::OneVector =		FFixedVector((int64)1,	(int64)1,	(int64)1);
-const FFixedVector FFixedVector::UpVector =			FFixedVector((int64)0,	(int64)0,	(int64)1);
-const FFixedVector FFixedVector::DownVector =		FFixedVector((int64)0,	(int64)0,	(int64)-1);
-const FFixedVector FFixedVector::ForwardVector =	FFixedVector((int64)1,	(int64)0,	(int64)0);
-const FFixedVector FFixedVector::BackwardVector =	FFixedVector((int64)-1, (int64)0,	(int64)0);
-const FFixedVector FFixedVector::RightVector =		FFixedVector((int64)0,	(int64)1,	(int64)0);
-const FFixedVector FFixedVector::LeftVector =		FFixedVector((int64)0,	(int64)-1,	(int64)0);
-const FFixedVector FFixedVector::XAxisVector =		FFixedVector((int64)1,	(int64)0,	(int64)0);
-const FFixedVector FFixedVector::YAxisVector =		FFixedVector((int64)0,	(int64)1,	(int64)0);
-const FFixedVector FFixedVector::ZAxisVector =		FFixedVector((int64)0,	(int64)0,	(int64)1);
+const FFixedVector64 FFixedVector64::ZeroVector =		FFixedVector64((int64)0,	(int64)0,	(int64)0);
+const FFixedVector64 FFixedVector64::OneVector =		FFixedVector64((int64)1,	(int64)1,	(int64)1);
+const FFixedVector64 FFixedVector64::UpVector =			FFixedVector64((int64)0,	(int64)0,	(int64)1);
+const FFixedVector64 FFixedVector64::DownVector =		FFixedVector64((int64)0,	(int64)0,	(int64)-1);
+const FFixedVector64 FFixedVector64::ForwardVector =	FFixedVector64((int64)1,	(int64)0,	(int64)0);
+const FFixedVector64 FFixedVector64::BackwardVector =	FFixedVector64((int64)-1, (int64)0,	(int64)0);
+const FFixedVector64 FFixedVector64::RightVector =		FFixedVector64((int64)0,	(int64)1,	(int64)0);
+const FFixedVector64 FFixedVector64::LeftVector =		FFixedVector64((int64)0,	(int64)-1,	(int64)0);
+const FFixedVector64 FFixedVector64::XAxisVector =		FFixedVector64((int64)1,	(int64)0,	(int64)0);
+const FFixedVector64 FFixedVector64::YAxisVector =		FFixedVector64((int64)0,	(int64)1,	(int64)0);
+const FFixedVector64 FFixedVector64::ZAxisVector =		FFixedVector64((int64)0,	(int64)0,	(int64)1);
 
 
 //FFixedVector FFixedVector::MirrorByPlane(const FFixedPlane& Plane) const

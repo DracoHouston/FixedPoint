@@ -5,14 +5,14 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogTransform, Log, All);
 
-const FFixedTransform FFixedTransform::Identity(
-	FFixedQuat(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One), 
-	FFixedVector(FixedPoint::Constants::Fixed64::Zero), 
-	FFixedVector(FixedPoint::Constants::Fixed64::One));
+const FFixedTransform64 FFixedTransform64::Identity(
+	FFixedQuat64(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One), 
+	FFixedVector64(FixedPoint::Constants::Fixed64::Zero), 
+	FFixedVector64(FixedPoint::Constants::Fixed64::One));
 
-bool FFixedTransform::DebugEqualMatrix(const FFixedMatrix& Matrix) const
+bool FFixedTransform64::DebugEqualMatrix(const FFixedMatrix& Matrix) const
 {
-	FFixedTransform TestResult(Matrix);
+	FFixedTransform64 TestResult(Matrix);
 	if (!Equals(TestResult))
 	{
 		// see now which one isn't equal
@@ -41,16 +41,16 @@ bool FFixedTransform::DebugEqualMatrix(const FFixedMatrix& Matrix) const
 	return true;
 }
 
-void FFixedTransform::DebugPrint() const
+void FFixedTransform64::DebugPrint() const
 {
 	UE_LOG(LogTransform, Log, TEXT("%s"), *ToHumanReadableString());
 }
 
-FString FFixedTransform::ToHumanReadableString() const
+FString FFixedTransform64::ToHumanReadableString() const
 {
-	FFixedRotator R(GetRotation());
-	FFixedVector TT(GetTranslation());
-	FFixedVector S(GetScale3D());
+	FFixedRotator64 R(GetRotation());
+	FFixedVector64 TT(GetTranslation());
+	FFixedVector64 S(GetScale3D());
 
 	FString Output = FString::Printf(TEXT("Rotation: Pitch %f Yaw %f Roll %f\r\n"), (double)R.Pitch, (double)R.Yaw, (double)R.Roll);
 	Output += FString::Printf(TEXT("Translation: %f %f %f\r\n"), (double)TT.X, (double)TT.Y, (double)TT.Z);
@@ -59,16 +59,16 @@ FString FFixedTransform::ToHumanReadableString() const
 	return Output;
 }
 
-FString FFixedTransform::ToString() const
+FString FFixedTransform64::ToString() const
 {
-	const FFixedRotator R(GetRotation());
-	const FFixedVector TT(GetTranslation());
-	const FFixedVector S(GetScale3D());
+	const FFixedRotator64 R(GetRotation());
+	const FFixedVector64 TT(GetTranslation());
+	const FFixedVector64 S(GetScale3D());
 
 	return FString::Printf(TEXT("%f,%f,%f|%f,%f,%f|%f,%f,%f"), (double)TT.X, (double)TT.Y, (double)TT.Z, (double)R.Pitch, (double)R.Yaw, (double)R.Roll, (double)S.X, (double)S.Y, (double)S.Z);
 }
 
-bool FFixedTransform::InitFromString(const FString& Source)
+bool FFixedTransform64::InitFromString(const FString& Source)
 {
 	TArray<FString> ComponentStrings;
 	Source.ParseIntoArray(ComponentStrings, TEXT("|"), true);
@@ -99,24 +99,24 @@ bool FFixedTransform::InitFromString(const FString& Source)
 		return false;
 	}
 
-	SetComponents(FFixedQuat(FFixedRotator(ParsedRotation)), FFixedVector(ParsedTranslation), FFixedVector(ParsedScale));
+	SetComponents(FFixedQuat64(FFixedRotator64(ParsedRotation)), FFixedVector64(ParsedTranslation), FFixedVector64(ParsedScale));
 
 	return true;
 }
 
-void FFixedTransform::GetRelativeTransformUsingMatrixWithScale(FFixedTransform* OutTransform, const FFixedTransform* Base, const FFixedTransform* Relative)
+void FFixedTransform64::GetRelativeTransformUsingMatrixWithScale(FFixedTransform64* OutTransform, const FFixedTransform64* Base, const FFixedTransform64* Relative)
 {
 	// the goal of using M is to get the correct orientation
 	// but for translation, we still need scale
 	FFixedMatrix AM = Base->ToMatrixWithScale();
 	FFixedMatrix BM = Relative->ToMatrixWithScale();
 	// get combined scale
-	FFixedVector SafeRecipScale3D = GetSafeScaleReciprocal(Relative->Scale3D, FixedPoint::Constants::Fixed64::SmallNumber);
-	FFixedVector DesiredScale3D = Base->Scale3D * SafeRecipScale3D;
+	FFixedVector64 SafeRecipScale3D = GetSafeScaleReciprocal(Relative->Scale3D, FixedPoint::Constants::Fixed64::SmallNumber);
+	FFixedVector64 DesiredScale3D = Base->Scale3D * SafeRecipScale3D;
 	ConstructTransformFromMatrixWithDesiredScale(AM, BM.Inverse(), DesiredScale3D, *OutTransform);
 }
 
-FFixedTransform FFixedTransform::GetRelativeTransform(const FFixedTransform& Other) const
+FFixedTransform64 FFixedTransform64::GetRelativeTransform(const FFixedTransform64& Other) const
 {
 	// A * B(-1) = VQS(B)(-1) (VQS (A))
 	// 
@@ -124,7 +124,7 @@ FFixedTransform FFixedTransform::GetRelativeTransform(const FFixedTransform& Oth
 	// Rotation = Q(B)(-1) * Q(A)
 	// Translation = 1/S(B) *[Q(B)(-1)*(T(A)-T(B))*Q(B)]
 	// where A = this, B = Other
-	FFixedTransform Result;
+	FFixedTransform64 Result;
 
 	if (AnyHasNegativeScale(Scale3D, Other.GetScale3D()))
 	{
@@ -133,15 +133,15 @@ FFixedTransform FFixedTransform::GetRelativeTransform(const FFixedTransform& Oth
 	}
 	else
 	{
-		FFixedVector SafeRecipScale3D = GetSafeScaleReciprocal(Other.Scale3D, FixedPoint::Constants::Fixed64::SmallNumber);
+		FFixedVector64 SafeRecipScale3D = GetSafeScaleReciprocal(Other.Scale3D, FixedPoint::Constants::Fixed64::SmallNumber);
 		Result.Scale3D = Scale3D * SafeRecipScale3D;
 
 		if (Other.Rotation.IsNormalized() == false)
 		{
-			return FFixedTransform::Identity;
+			return FFixedTransform64::Identity;
 		}
 
-		FFixedQuat Inverse = Other.Rotation.Inverse();
+		FFixedQuat64 Inverse = Other.Rotation.Inverse();
 		Result.Rotation = Inverse * Rotation;
 
 		Result.Translation = (Inverse * (Translation - Other.Translation)) * (SafeRecipScale3D);
@@ -150,7 +150,7 @@ FFixedTransform FFixedTransform::GetRelativeTransform(const FFixedTransform& Oth
 	return Result;
 }
 
-FFixedTransform FFixedTransform::GetRelativeTransformReverse(const FFixedTransform& Other) const
+FFixedTransform64 FFixedTransform64::GetRelativeTransformReverse(const FFixedTransform64& Other) const
 {
 	// A (-1) * B = VQS(B)(VQS (A)(-1))
 	// 
@@ -158,9 +158,9 @@ FFixedTransform FFixedTransform::GetRelativeTransformReverse(const FFixedTransfo
 	// Rotation = Q(B) * Q(A)(-1)
 	// Translation = T(B)-S(B)/S(A) *[Q(B)*Q(A)(-1)*T(A)*Q(A)*Q(B)(-1)]
 	// where A = this, and B = Other
-	FFixedTransform Result;
+	FFixedTransform64 Result;
 
-	FFixedVector SafeRecipScale3D = GetSafeScaleReciprocal(Scale3D);
+	FFixedVector64 SafeRecipScale3D = GetSafeScaleReciprocal(Scale3D);
 	Result.Scale3D = Other.Scale3D * SafeRecipScale3D;
 
 	Result.Rotation = Other.Rotation * Rotation.Inverse();
@@ -174,7 +174,7 @@ FFixedTransform FFixedTransform::GetRelativeTransformReverse(const FFixedTransfo
  * Set current transform and the relative to ParentTransform.
  * Equates to This = This->GetRelativeTransform(Parent), but saves the intermediate TTransform<T> storage and copy.
  */
-void FFixedTransform::SetToRelativeTransform(const FFixedTransform& ParentTransform)
+void FFixedTransform64::SetToRelativeTransform(const FFixedTransform64& ParentTransform)
 {
 	// A * B(-1) = VQS(B)(-1) (VQS (A))
 	// 
@@ -183,8 +183,8 @@ void FFixedTransform::SetToRelativeTransform(const FFixedTransform& ParentTransf
 	// Translation = 1/S(B) *[Q(B)(-1)*(T(A)-T(B))*Q(B)]
 	// where A = this, B = Other
 
-	const FFixedVector SafeRecipScale3D = GetSafeScaleReciprocal(ParentTransform.Scale3D, FixedPoint::Constants::Fixed64::SmallNumber);
-	const FFixedQuat InverseRot = ParentTransform.Rotation.Inverse();
+	const FFixedVector64 SafeRecipScale3D = GetSafeScaleReciprocal(ParentTransform.Scale3D, FixedPoint::Constants::Fixed64::SmallNumber);
+	const FFixedQuat64 InverseRot = ParentTransform.Rotation.Inverse();
 
 	Scale3D *= SafeRecipScale3D;
 	Translation = (InverseRot * (Translation - ParentTransform.Translation)) * SafeRecipScale3D;

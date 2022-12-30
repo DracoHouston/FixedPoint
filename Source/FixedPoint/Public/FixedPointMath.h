@@ -32,10 +32,39 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	{
 		return inValue * (FixedPoint::Constants::Fixed64::OneEighty / FixedPoint::Constants::Fixed64::Pi);
 	}
+	/*
+	static FORCEINLINE FFixed64 Exp(FFixed64 Value) 
+	{ 
+		FFixed64 retval = FixedPoint::Constants::Fixed64::One + Value;
+		FFixed64 x = Value * Value;
+		const FFixed64 Factorial2 = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value * 2);
+		retval += (x / Factorial2);
+		x = x * Value;
+		const FFixed64 Factorial3 = FFixed64::MakeFromRawInt(Factorial2.Value * 3);
+		retval += (x / Factorial3);
+		x = x * Value;
+		const FFixed64 Factorial4 = FFixed64::MakeFromRawInt(Factorial3.Value * 4);
+		retval += (x / Factorial4);
+		x = x * Value;
+		const FFixed64 Factorial5 = FFixed64::MakeFromRawInt(Factorial4.Value * 5);
+		retval += (x / Factorial5);
+		x = x * Value;
+		const FFixed64 Factorial6 = FFixed64::MakeFromRawInt(Factorial5.Value * 6);
+		retval += (x / Factorial6);
+		x = x * Value;
+		const FFixed64 Factorial7 = FFixed64::MakeFromRawInt(Factorial6.Value * 7);
+		retval += (x / Factorial7);
+		x = x * Value;
+		const FFixed64 Factorial8 = FFixed64::MakeFromRawInt(Factorial7.Value * 8);
+		retval += (x / Factorial8);
+		x = x * Value;
+		
+		return retval; 
+	}
+	*/
+	//static FFixed32 Pow(FFixed32 inValue, int32 inPower);
 
-	static FFixed32 Pow(FFixed32 inValue, int32 inPower);
-
-	static FFixed64 Pow(const FFixed64& inValue, int32 inPower);
+	//static FFixed64 Pow(const FFixed64& inValue, int32 inPower);
 
 	/**
 	* Floor, returns a whole number value, rounded down, as FFixed64
@@ -52,6 +81,74 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	{
 		return FFixed32::MakeFromRawInt(((inValue.Value + FixedPoint::Constants::Raw32::Half - 1) >> FixedPoint::Constants::BinaryPoint32) << FixedPoint::Constants::BinaryPoint32);
 	}
+
+	/**
+	 * Converts a float to a nearest less or equal integer.
+	 * @param F		Floating point value to convert
+	 * @return		An integer less or equal to 'F'.
+	 */
+	static FORCEINLINE int32 FloorToInt32(FFixed32 F)
+	{
+		return (int32)Floor(F);
+	}
+	static FORCEINLINE int32 FloorToInt32(FFixed64 F)
+	{
+		return (int32)Floor(F);
+	}
+	static FORCEINLINE int64 FloorToInt64(FFixed64 F)
+	{
+		return (int64)Floor(F);
+	}
+
+	static FORCEINLINE int32 FloorToInt(FFixed32 F) { return FloorToInt32(F); }
+	static FORCEINLINE int64 FloorToInt(FFixed64 F) { return FloorToInt64(F); }
+
+
+	/**
+	* Converts a float to the nearest less or equal integer.
+	* @param F		Floating point value to convert
+	* @return		An integer less or equal to 'F'.
+	*/
+	static FORCEINLINE float FloorToFloat(FFixed32 F)
+	{
+		return (float)Floor(F);
+	}
+
+	/**
+	* Converts a double to a less or equal integer.
+	* @param F		Floating point value to convert
+	* @return		The nearest integer value to 'F'.
+	*/
+	static FORCEINLINE double FloorToDouble(FFixed64 F)
+	{
+		return (double)Floor(F);
+	}
+
+	static FORCEINLINE float FloorToFloat(FFixed64 F)
+	{
+		return (float)FloorToDouble(F);
+	}
+
+	/**
+	 * Converts a float to the nearest integer. Rounds up when the fraction is .5
+	 * @param F		Floating point value to convert
+	 * @return		The nearest integer to 'F'.
+	 */
+	static FORCEINLINE int32 RoundToInt32(FFixed32 F)
+	{
+		return FloorToInt32(F + FixedPoint::Constants::Fixed64::Half);
+	}
+	static FORCEINLINE int32 RoundToInt32(FFixed64 F)
+	{
+		return FloorToInt32(F + FixedPoint::Constants::Fixed64::Half);
+	}
+	static FORCEINLINE int64 RoundToInt64(FFixed64 F)
+	{
+		return FloorToInt64(F + FixedPoint::Constants::Fixed64::Half);
+	}
+
+	static FORCEINLINE int32 RoundToInt(FFixed32 F) { return RoundToInt32(F); }
+	static FORCEINLINE int64 RoundToInt(FFixed64 F) { return RoundToInt64(F); }
 
 	/**
 	* Ceil, returns a whole number value, rounded up, as FFixed32
@@ -209,6 +306,16 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 	UE_NODISCARD static FORCEINLINE bool IsNearlyEqual(FFixed64 A, FFixed64 B, FFixed64 ErrorTolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
 	{
 		return Abs(A - B) <= ErrorTolerance;
+	}
+
+	UE_NODISCARD static FORCEINLINE bool IsNearlyZero(FFixed32 Value, FFixed32 ErrorTolerance = FixedPoint::Constants::Fixed64::SmallNumber)
+	{
+		return Abs(Value) <= ErrorTolerance;
+	}
+
+	UE_NODISCARD static FORCEINLINE bool IsNearlyZero(FFixed64 Value, FFixed64 ErrorTolerance = FixedPoint::Constants::Fixed64::SmallNumber)
+	{
+		return Abs(Value) <= ErrorTolerance;
 	}
 
 	/**

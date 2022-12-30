@@ -6,9 +6,9 @@
 #include "FixedPointVector.h"
 
 
-const FFixedQuat FFixedQuat::Identity = FFixedQuat(FFixed64(), FFixed64(), FFixed64(), FFixed64((int64)1));
+const FFixedQuat64 FFixedQuat64::Identity = FFixedQuat64(FFixed64(), FFixed64(), FFixed64(), FFixed64((int64)1));
 
-FFixedRotator FFixedQuat::Rotator() const
+FFixedRotator64 FFixedQuat64::Rotator() const
 {
 	const FFixed64 Two = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2);
 	const FFixed64 Ninety = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 90);
@@ -24,13 +24,13 @@ FFixedRotator FFixedQuat::Rotator() const
 	{
 		Pitch = -Ninety;
 		Yaw = FFixedPointMath::Atan2(YawY, YawX) * RAD_TO_DEG;
-		Roll = FFixedRotator::NormalizeAxis(-Yaw - (Two * FFixedPointMath::Atan2(X, W) * RAD_TO_DEG));
+		Roll = FFixedRotator64::NormalizeAxis(-Yaw - (Two * FFixedPointMath::Atan2(X, W) * RAD_TO_DEG));
 	}
 	else if (SingularityTest > SINGULARITY_THRESHOLD)
 	{
 		Pitch = Ninety;
 		Yaw = FFixedPointMath::Atan2(YawY, YawX) * RAD_TO_DEG;
-		Roll = FFixedRotator::NormalizeAxis(Yaw - (Two * FFixedPointMath::Atan2(X, W) * RAD_TO_DEG));
+		Roll = FFixedRotator64::NormalizeAxis(Yaw - (Two * FFixedPointMath::Atan2(X, W) * RAD_TO_DEG));
 	}
 	else
 	{
@@ -39,18 +39,18 @@ FFixedRotator FFixedQuat::Rotator() const
 		Roll = (FFixedPointMath::Atan2(-Two * (W * X + Y * Z), (FixedPoint::Constants::Fixed64::One - Two * (FFixedPointMath::Square(X) + FFixedPointMath::Square(Y)))) * RAD_TO_DEG);
 	}
 
-	return FFixedRotator(Pitch, Yaw, Roll);
+	return FFixedRotator64(Pitch, Yaw, Roll);
 }
 
 /**
 * CONSTRUCTORS
 */
 
-//FFixedQuat
+//FFixedQuat64
 
 
 
-//FFixedQuat::FFixedQuat(int64 inX, int64 inY, int64 inZ, int64 inW)
+//FFixedQuat64::FFixedQuat64(int64 inX, int64 inY, int64 inZ, int64 inW)
 //{
 //	X = FFixed64(inX);
 //	Y = FFixed64(inY);
@@ -58,7 +58,7 @@ FFixedRotator FFixedQuat::Rotator() const
 //	W = FFixed64(inW);
 //}
 //
-//FFixedQuat::FFixedQuat(float inX, float inY, float inZ, float inW)
+//FFixedQuat64::FFixedQuat64(float inX, float inY, float inZ, float inW)
 //{
 //	X = FFixed64(inX);
 //	Y = FFixed64(inY);
@@ -66,7 +66,7 @@ FFixedRotator FFixedQuat::Rotator() const
 //	W = FFixed64(inW);
 //}
 //
-//FFixedQuat::FFixedQuat(double inX, double inY, double inZ, double inW)
+//FFixedQuat64::FFixedQuat64(double inX, double inY, double inZ, double inW)
 //{
 //	X = FFixed64(inX);
 //	Y = FFixed64(inY);

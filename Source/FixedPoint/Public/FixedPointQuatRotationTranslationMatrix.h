@@ -26,7 +26,7 @@ public:
 	 * @param Rot rotation
 	 * @param Origin translation to apply
 	 */
-	FORCEINLINE FFixedQuatRotationTranslationMatrix(const FFixedQuat& Q, const FFixedVector& Origin)
+	FORCEINLINE FFixedQuatRotationTranslationMatrix(const FFixedQuat64& Q, const FFixedVector64& Origin)
 	{
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST) && WITH_EDITORONLY_DATA
 		// Make sure Quaternion is normalized
@@ -48,7 +48,7 @@ public:
 	}
 
 	/** Matrix factory. Return an FFixedMatrix so we don't have type conversion issues in expressions. */
-	static FFixedMatrix Make(const FFixedQuat& Q, const FFixedVector& Origin)
+	static FFixedMatrix Make(const FFixedQuat64& Q, const FFixedVector64& Origin)
 	{
 		return FFixedQuatRotationTranslationMatrix(Q, Origin);
 	}
@@ -66,13 +66,13 @@ public:
 	*
 	* @param Q rotation
 	*/
-	FFixedQuatRotationMatrix(const FFixedQuat& Q)
-		: FFixedQuatRotationTranslationMatrix(Q, FFixedVector::ZeroVector)
+	FFixedQuatRotationMatrix(const FFixedQuat64& Q)
+		: FFixedQuatRotationTranslationMatrix(Q, FFixedVector64::ZeroVector)
 	{
 	}
 
 	/** Matrix factory. Return an FMatrix so we don't have type conversion issues in expressions. */
-	static FFixedMatrix Make(const FFixedQuat& Q)
+	static FFixedMatrix Make(const FFixedQuat64& Q)
 	{
 		return FFixedQuatRotationMatrix(Q);
 	}

@@ -18,22 +18,23 @@
 #include "FixedPointRotationTranslationMatrix.h"
 #include "FixedPointRotationMatrix.h"
 #include "FixedPointQuatRotationTranslationMatrix.h"
+#include "FixedPointTransform.h"
 
-FORCEINLINE FFixedVector::FFixedVector(const FFixedVector2d& V, const FFixed64& InZ)
+FORCEINLINE FFixedVector64::FFixedVector64(const FFixedVector2d& V, const FFixed64& InZ)
 {
 	X = V.X;
 	Y = V.Y;
 	Z = InZ;
 }
 
-FORCEINLINE FFixedVector::FFixedVector(const FFixedVector4d& V)
+FORCEINLINE FFixedVector64::FFixedVector64(const FFixedVector4d& V)
 {
 	X = V.X;
 	Y = V.Y;
 	Z = V.Z;
 }
 
-FORCEINLINE FFixedVector2d FFixedVector::UnitCartesianToSpherical() const
+FORCEINLINE FFixedVector2d FFixedVector64::UnitCartesianToSpherical() const
 {
 	checkSlow(IsUnit());
 	//not safe for deterministic sims
@@ -50,7 +51,7 @@ FORCEINLINE FFixedMatrix::FFixedMatrix(const FFixedPlane& InX, const FFixedPlane
 	M[3][0] = InW.X; M[3][1] = InW.Y;  M[3][2] = InW.Z;  M[3][3] = InW.W;
 }
 
-FORCEINLINE  FFixedMatrix::FFixedMatrix(const FFixedVector& InX, const FFixedVector& InY, const FFixedVector& InZ, const FFixedVector& InW)
+FORCEINLINE  FFixedMatrix::FFixedMatrix(const FFixedVector64& InX, const FFixedVector64& InY, const FFixedVector64& InZ, const FFixedVector64& InW)
 {
 	M[0][0] = InX.X; M[0][1] = InX.Y;  M[0][2] = InX.Z;  M[0][3] = FixedPoint::Constants::Fixed64::Zero;
 	M[1][0] = InY.X; M[1][1] = InY.Y;  M[1][2] = InY.Z;  M[1][3] = FixedPoint::Constants::Fixed64::Zero;
@@ -58,38 +59,38 @@ FORCEINLINE  FFixedMatrix::FFixedMatrix(const FFixedVector& InX, const FFixedVec
 	M[3][0] = InW.X; M[3][1] = InW.Y;  M[3][2] = InW.Z;  M[3][3] = FixedPoint::Constants::Fixed64::One;
 }
 
-inline FFixedVector FFixedMatrix::GetScaledAxis(EAxis::Type InAxis) const
+inline FFixedVector64 FFixedMatrix::GetScaledAxis(EAxis::Type InAxis) const
 {
 	switch (InAxis)
 	{
 	case EAxis::X:
-		return FFixedVector(M[0][0], M[0][1], M[0][2]);
+		return FFixedVector64(M[0][0], M[0][1], M[0][2]);
 
 	case EAxis::Y:
-		return FFixedVector(M[1][0], M[1][1], M[1][2]);
+		return FFixedVector64(M[1][0], M[1][1], M[1][2]);
 
 	case EAxis::Z:
-		return FFixedVector(M[2][0], M[2][1], M[2][2]);
+		return FFixedVector64(M[2][0], M[2][1], M[2][2]);
 
 	default:
 		ensure(0);
-		return FFixedVector::ZeroVector;
+		return FFixedVector64::ZeroVector;
 	}
 }
 
-inline void FFixedMatrix::GetScaledAxes(FFixedVector& X, FFixedVector& Y, FFixedVector& Z) const
+inline void FFixedMatrix::GetScaledAxes(FFixedVector64& X, FFixedVector64& Y, FFixedVector64& Z) const
 {
 	X.X = M[0][0]; X.Y = M[0][1]; X.Z = M[0][2];
 	Y.X = M[1][0]; Y.Y = M[1][1]; Y.Z = M[1][2];
 	Z.X = M[2][0]; Z.Y = M[2][1]; Z.Z = M[2][2];
 }
 
-inline FFixedVector FFixedMatrix::GetUnitAxis(EAxis::Type InAxis) const
+inline FFixedVector64 FFixedMatrix::GetUnitAxis(EAxis::Type InAxis) const
 {
 	return GetScaledAxis(InAxis).GetSafeNormal();
 }
 
-inline void FFixedMatrix::GetUnitAxes(FFixedVector& X, FFixedVector& Y, FFixedVector& Z) const
+inline void FFixedMatrix::GetUnitAxes(FFixedVector64& X, FFixedVector64& Y, FFixedVector64& Z) const
 {
 	GetScaledAxes(X, Y, Z);
 	X.Normalize();
@@ -152,9 +153,9 @@ FORCEINLINE FFixedMatrix FFixedMatrix::Inverse() const
 	return Result;
 }
 
-inline FFixedVector FFixedMatrix::ExtractScaling(FFixed64 Tolerance/*=UE_SMALL_NUMBER*/)
+inline FFixedVector64 FFixedMatrix::ExtractScaling(FFixed64 Tolerance/*=UE_SMALL_NUMBER*/)
 {
-	FFixedVector Scale3D(0, 0, 0);
+	FFixedVector64 Scale3D(0, 0, 0);
 
 	// For each row, find magnitude, and if its non-zero re-scale so its unit length.
 	const FFixed64 SquareSum0 = (M[0][0] * M[0][0]) + (M[0][1] * M[0][1]) + (M[0][2] * M[0][2]);
@@ -206,9 +207,9 @@ inline FFixedVector FFixedMatrix::ExtractScaling(FFixed64 Tolerance/*=UE_SMALL_N
 	return Scale3D;
 }
 
-inline FFixedVector FFixedMatrix::GetScaleVector(FFixed64 Tolerance) const
+inline FFixedVector64 FFixedMatrix::GetScaleVector(FFixed64 Tolerance) const
 {
-	FFixedVector Scale3D(FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::One);
+	FFixedVector64 Scale3D(FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::One);
 
 	// For each row, find magnitude, and if its non-zero re-scale so its unit length.
 	for (int32 i = 0; i < 3; i++)
@@ -227,7 +228,7 @@ inline FFixedVector FFixedMatrix::GetScaleVector(FFixed64 Tolerance) const
 	return Scale3D;
 }
 
-FORCEINLINE FFixedMatrix FFixedMatrix::ConcatTranslation(const FFixedVector& Translation) const
+FORCEINLINE FFixedMatrix FFixedMatrix::ConcatTranslation(const FFixedVector64& Translation) const
 {
 	FFixedMatrix Result;
 
@@ -255,7 +256,7 @@ FORCEINLINE FFixedMatrix FFixedMatrix::ConcatTranslation(const FFixedVector& Tra
 	return Result;
 }
 
-inline void FFixedMatrix::ScaleTranslation(const FFixedVector& InScale3D)
+inline void FFixedMatrix::ScaleTranslation(const FFixedVector64& InScale3D)
 {
 	M[3][0] *= InScale3D.X;
 	M[3][1] *= InScale3D.Y;
@@ -273,9 +274,9 @@ inline FFixedMatrix FFixedMatrix::ApplyScale(FFixed64 Scale) const
 	return ScaleMatrix * *this;
 }
 
-inline FFixedVector FFixedMatrix::GetOrigin() const
+inline FFixedVector64 FFixedMatrix::GetOrigin() const
 {
-	return FFixedVector(M[3][0], M[3][1], M[3][2]);
+	return FFixedVector64(M[3][0], M[3][1], M[3][2]);
 }
 
 inline FFixedPlane FFixedPlane::TransformBy(const FFixedMatrix& M) const
@@ -305,46 +306,46 @@ FORCEINLINE FFixedVector4d FFixedMatrix::TransformFVector4(const FFixedVector4d&
 	return VTempX;
 }
 
-FORCEINLINE FFixedVector4d FFixedMatrix::TransformPosition(const FFixedVector& V) const
+FORCEINLINE FFixedVector4d FFixedMatrix::TransformPosition(const FFixedVector64& V) const
 {
 	return TransformFVector4(FFixedVector4d(V.X, V.Y, V.Z, FixedPoint::Constants::Fixed64::One));
 }
 
-FORCEINLINE FFixedVector FFixedMatrix::InverseTransformPosition(const FFixedVector& V) const
+FORCEINLINE FFixedVector64 FFixedMatrix::InverseTransformPosition(const FFixedVector64& V) const
 {
 	FFixedMatrix InvSelf = this->InverseFast();
 	return InvSelf.TransformPosition(V);
-	return FFixedVector();
+	return FFixedVector64();
 }
 
-FORCEINLINE FFixedVector4d FFixedMatrix::TransformVector(const FFixedVector& V) const
+FORCEINLINE FFixedVector4d FFixedMatrix::TransformVector(const FFixedVector64& V) const
 {
 	return TransformFVector4(FFixedVector4d(V.X, V.Y, V.Z, FFixed64()));
 }
 
-FORCEINLINE FFixedVector FFixedMatrix::InverseTransformVector(const FFixedVector& V) const
+FORCEINLINE FFixedVector64 FFixedMatrix::InverseTransformVector(const FFixedVector64& V) const
 {
 	FFixedMatrix InvSelf = this->InverseFast();
 	return InvSelf.TransformVector(V);
-	return FFixedVector();
+	return FFixedVector64();
 }
 
-FORCEINLINE FFixedRotator::FFixedRotator(const FFixedQuat& Quat)
+FORCEINLINE FFixedRotator64::FFixedRotator64(const FFixedQuat64& Quat)
 {
 	*this = Quat.Rotator();
 }
 
-FORCEINLINE FFixedQuat::FFixedQuat(const FFixedRotator& R)
+FORCEINLINE FFixedQuat64::FFixedQuat64(const FFixedRotator64& R)
 {
 	*this = R.Quaternion();
 }
 
-FORCEINLINE FFixedRotator FFixedRotator::GetInverse() const
+FORCEINLINE FFixedRotator64 FFixedRotator64::GetInverse() const
 {
 	return Quaternion().Inverse().Rotator();
 }
 
-FORCEINLINE FFixedQuat FFixedRotator::Quaternion() const
+FORCEINLINE FFixedQuat64 FFixedRotator64::Quaternion() const
 {
 	const FFixed64 DEG_TO_RAD = FixedPoint::Constants::Fixed64::Pi / (FixedPoint::Constants::Fixed64::OneEighty);
 	const FFixed64 RADS_DIVIDED_BY_2 = DEG_TO_RAD / FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2);
@@ -359,7 +360,7 @@ FORCEINLINE FFixedQuat FFixedRotator::Quaternion() const
 	FFixedPointMath::SinCos(&SY, &CY, YawNoWinding * RADS_DIVIDED_BY_2);
 	FFixedPointMath::SinCos(&SR, &CR, RollNoWinding * RADS_DIVIDED_BY_2);
 
-	FFixedQuat RotationQuat;
+	FFixedQuat64 RotationQuat;
 	RotationQuat.X = CR * SP * SY - SR * CP * CY;
 	RotationQuat.Y = -CR * SP * CY - SR * CP * SY;
 	RotationQuat.Z = CR * CP * SY - SR * SP * CY;
@@ -368,7 +369,7 @@ FORCEINLINE FFixedQuat FFixedRotator::Quaternion() const
 	return RotationQuat;
 }
 
-FORCEINLINE FFixedVector FFixedRotator::Vector() const
+FORCEINLINE FFixedVector64 FFixedRotator64::Vector() const
 {
 	// Remove winding and clamp to [-360, 360]
 	const FFixed64 PitchNoWinding = FFixedPointMath::Fmod(Pitch, FixedPoint::Constants::Fixed64::ThreeSixty);
@@ -377,17 +378,27 @@ FORCEINLINE FFixedVector FFixedRotator::Vector() const
 	FFixed64 CP, SP, CY, SY;
 	FFixedPointMath::SinCos(&SP, &CP, FFixedPointMath::DegreesToRadians(PitchNoWinding));
 	FFixedPointMath::SinCos(&SY, &CY, FFixedPointMath::DegreesToRadians(YawNoWinding));
-	FFixedVector V = FFixedVector(CP * CY, CP * SY, SP);
+	FFixedVector64 V = FFixedVector64(CP * CY, CP * SY, SP);
 
 	return V;
 }
 
-FFixedVector FFixedRotator::Euler() const
+FORCEINLINE FFixedVector64 FFixedRotator64::Euler() const
 {
-	return FFixedVector(Roll, Pitch, Yaw);
+	return FFixedVector64(Roll, Pitch, Yaw);
 }
 
-inline void FFixedMatrix::SetAxis(int32 i, const FFixedVector& Axis)
+FORCEINLINE FFixedVector64 FFixedRotator64::RotateVector(const FFixedVector64& V) const
+{
+	return FFixedRotationMatrix(*this).TransformVector(V);
+}
+
+FORCEINLINE FFixedVector64 FFixedRotator64::UnrotateVector(const FFixedVector64& V) const
+{
+	return FFixedRotationMatrix(*this).GetTransposed().TransformVector(V);
+}
+
+inline void FFixedMatrix::SetAxis(int32 i, const FFixedVector64& Axis)
 {
 	checkSlow(i >= 0 && i <= 2);
 	M[i][0] = Axis.X;
@@ -395,14 +406,14 @@ inline void FFixedMatrix::SetAxis(int32 i, const FFixedVector& Axis)
 	M[i][2] = Axis.Z;
 }
 
-inline void FFixedMatrix::SetOrigin(const FFixedVector& NewOrigin)
+inline void FFixedMatrix::SetOrigin(const FFixedVector64& NewOrigin)
 {
 	M[3][0] = NewOrigin.X;
 	M[3][1] = NewOrigin.Y;
 	M[3][2] = NewOrigin.Z;
 }
 
-inline void FFixedMatrix::SetAxes(const FFixedVector* Axis0 /*= NULL*/, const FFixedVector* Axis1 /*= NULL*/, const FFixedVector* Axis2 /*= NULL*/, const FFixedVector* Origin /*= NULL*/)
+inline void FFixedMatrix::SetAxes(const FFixedVector64* Axis0 /*= NULL*/, const FFixedVector64* Axis1 /*= NULL*/, const FFixedVector64* Axis2 /*= NULL*/, const FFixedVector64* Origin /*= NULL*/)
 {
 	if (Axis0 != NULL)
 	{
@@ -430,13 +441,13 @@ inline void FFixedMatrix::SetAxes(const FFixedVector* Axis0 /*= NULL*/, const FF
 	}
 }
 
-inline FFixedVector FFixedMatrix::GetColumn(int32 i) const
+inline FFixedVector64 FFixedMatrix::GetColumn(int32 i) const
 {
 	checkSlow(i >= 0 && i <= 3);
-	return FFixedVector(M[0][i], M[1][i], M[2][i]);
+	return FFixedVector64(M[0][i], M[1][i], M[2][i]);
 }
 
-inline void FFixedMatrix::SetColumn(int32 i, FFixedVector Value)
+inline void FFixedMatrix::SetColumn(int32 i, FFixedVector64 Value)
 {
 	checkSlow(i >= 0 && i <= 3);
 	M[0][i] = Value.X;
@@ -444,12 +455,12 @@ inline void FFixedMatrix::SetColumn(int32 i, FFixedVector Value)
 	M[2][i] = Value.Z;
 }
 
-//FFixedVector FFixedRotator::RotateVector(const FFixedVector& V) const
+//FFixedVector FFixedRotator64::RotateVector(const FFixedVector& V) const
 //{
 //	return FFixedRotationMatrix(*this).TransformVector(V);
 //}
 
-//FFixedVector FFixedRotator::UnrotateVector(const FFixedVector& V) const
+//FFixedVector FFixedRotator64::UnrotateVector(const FFixedVector& V) const
 //{
 //	FFixedRotationMatrix(*this).GetTransposed().TransformVector( V );
 //}

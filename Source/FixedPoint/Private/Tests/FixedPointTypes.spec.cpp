@@ -1205,6 +1205,41 @@ void FFixedPointSpec::Define()
                         TestTrue("All are within FFixed64::MakeFromRawInt(1500) of their float equivalents", result);
                     });
                 });
+                Describe("Sqrt", [this]()
+                {
+                    It("Should get a very similar result to FMath::Sqrt testing every value between 0 and 20 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        for (int64 i = 0; i < 161; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * i);
+                            FFixed64 fixedresult = FFixedPointMath::Sqrt(angle);
+                            double floatresult = FMath::Sqrt((double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1024)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1024) of their float equivalents", result);
+                    });
+                    It("Should get a very similar result to FMath::InvSqrt testing every value between 0 and 20 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        for (int64 i = 1; i < 161; i++)
+                        {
+                            FFixed64 angle = FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::Eigth.Value * i);
+                            FFixed64 fixedresult = FFixedPointMath::InvSqrt(angle);
+                            double floatresult = FMath::InvSqrt((double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed64)floatresult, FFixed64::MakeFromRawInt(1200)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed64::MakeFromRawInt(1024) of their float equivalents", result);
+                    });
+                });
             });
             Describe("Fixed 32", [this]()
             {
@@ -2364,22 +2399,41 @@ void FFixedPointSpec::Define()
                         TestTrue("All are within FFixed32::MakeFromRawInt(1500) of their float equivalents", result);
                     });
                 });
+                Describe("Sqrt", [this]()
+                {
+                    It("Should get a very similar result to FMath::Sqrt testing every value between 0 and 20 in increments of 1/8th", [this]()
+                    {
+                        bool result = true;
+                        for (int32 i = 0; i < 161; i++)
+                        {
+                            FFixed32 angle = FFixed32::MakeFromRawInt(FixedPoint::Constants::Fixed32::Eigth.Value * i);
+                            FFixed32 fixedresult = FFixedPointMath::Sqrt(angle);
+                            double floatresult = FMath::Sqrt((double)angle);
+                            if (!FFixedPointMath::IsEqual(fixedresult, (FFixed32)floatresult, FFixed32::MakeFromRawInt(512)))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                        TestTrue("All are within FFixed32::MakeFromRawInt(512) of their float equivalents", result);
+                    });
+                });
             });
         });
         Describe("Fixed Point Vector 3D", [this]()
         {
             It("Should rotate a vector starting as forward unit vector 90 degrees and it should be equal to epics vector doing the same", [this]()
             {
-                FFixedVector testvec = FFixedVector::ForwardVector;
-                FFixedRotator testrot(FixedPoint::Constants::Fixed64::Zero, FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 90), FixedPoint::Constants::Fixed64::Zero);
-                FFixedQuat testquat = testrot.Quaternion();
+                FFixedVector64 testvec = FFixedVector64::ForwardVector;
+                FFixedRotator64 testrot(FixedPoint::Constants::Fixed64::Zero, FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 90), FixedPoint::Constants::Fixed64::Zero);
+                FFixedQuat64 testquat = testrot.Quaternion();
                 testvec = testquat * testvec;
                 FVector testepicvec = FVector::ForwardVector;
                 FRotator testepicrot(0, 90, 0);
                 FQuat testepicquat = testepicrot.Quaternion();
                 testepicvec = testepicquat * testepicvec;
                 
-                TestTrue("Is Equal to epics vector within FFixed64::MakeFromRawInt(256) tolerance", testvec.Equals(FFixedVector(testepicvec), FFixed64::MakeFromRawInt(256)));
+                TestTrue("Is Equal to epics vector within FFixed64::MakeFromRawInt(256) tolerance", testvec.Equals(FFixedVector64(testepicvec), FFixed64::MakeFromRawInt(256)));
             });
         });
     });

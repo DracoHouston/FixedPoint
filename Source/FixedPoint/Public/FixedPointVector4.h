@@ -62,7 +62,7 @@ public:
 	 *
 	 * @param InVector 3D Vector to set first three components.
 	 */
-	FORCEINLINE FFixedVector4d(const FFixedVector& InVector)
+	FORCEINLINE FFixedVector4d(const FFixedVector64& InVector)
 		: X(InVector.X)
 		, Y(InVector.Y)
 		, Z(InVector.Z)
@@ -76,7 +76,7 @@ public:
 	 * @param InVector 3D Vector to set first three components.
 	 * @param InW W Coordinate.
 	 */
-	FORCEINLINE FFixedVector4d(const FFixedVector& InVector, FFixed64 InW)
+	FORCEINLINE FFixedVector4d(const FFixedVector64& InVector, FFixed64 InW)
 		: X(InVector.X)
 		, Y(InVector.Y)
 		, Z(InVector.Z)

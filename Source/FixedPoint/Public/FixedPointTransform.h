@@ -16,7 +16,7 @@
 #include "FixedPointTransform.generated.h"
 
 USTRUCT(BlueprintType)
-struct FIXEDPOINT_API FFixedTransform
+struct FIXEDPOINT_API FFixedTransform64
 {
 public:
 	GENERATED_BODY()
@@ -28,18 +28,25 @@ public:
 	FORCEINLINE void DiagnosticCheck_IsValid() const {}
 protected:
 	/** Rotation of this transformation, as a quaternion. */
-	FFixedQuat Rotation;
+	FFixedQuat64 Rotation;
 	/** Translation of this transformation, as a vector. */
-	FFixedVector Translation;
+	FFixedVector64 Translation;
 	/** 3D scale (always applied in local space) as a vector. */
-	FFixedVector Scale3D;
+	FFixedVector64 Scale3D;
 public:
 	/** Default constructor. */
-	FORCEINLINE FFixedTransform()
+	FORCEINLINE FFixedTransform64()
 	: Rotation(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One)
 	, Translation(FixedPoint::Constants::Fixed64::Zero)
-	, Scale3D(FFixedVector::OneVector)
+	, Scale3D(FFixedVector64::OneVector)
 	{
+	}
+
+	FORCEINLINE FFixedTransform64(const FTransform& Other)
+	{
+		Translation = Other.GetTranslation();
+		Scale3D = Other.GetScale3D();
+		Rotation = Other.GetRotation();
 	}
 
 	/**
@@ -47,27 +54,27 @@ public:
 	*
 	* @param InTranslation The value to use for the translation component
 	*/
-	FORCEINLINE explicit FFixedTransform(const FFixedVector& InTranslation)
-		: Rotation(FFixedQuat::Identity),
+	FORCEINLINE explicit FFixedTransform64(const FFixedVector64& InTranslation)
+		: Rotation(FFixedQuat64::Identity),
 		Translation(InTranslation),
-		Scale3D(FFixedVector::OneVector)
+		Scale3D(FFixedVector64::OneVector)
 	{
 	}
 
 	/**
 	* Constructor with leaving uninitialized memory
 	*/
-	FORCEINLINE explicit FFixedTransform(ENoInit){}
+	FORCEINLINE explicit FFixedTransform64(ENoInit){}
 
 	/**
 	* Constructor with an initial rotation
 	*
 	* @param InRotation The value to use for rotation component
 	*/
-	FORCEINLINE explicit FFixedTransform(const FFixedQuat& InRotation)
+	FORCEINLINE explicit FFixedTransform64(const FFixedQuat64& InRotation)
 		: Rotation(InRotation),
-		Translation(FFixedVector::ZeroVector),
-		Scale3D(FFixedVector::OneVector)
+		Translation(FFixedVector64::ZeroVector),
+		Scale3D(FFixedVector64::OneVector)
 	{
 	}
 
@@ -76,10 +83,10 @@ public:
 	*
 	* @param InRotation The value to use for rotation component  (after being converted to a quaternion)
 	*/
-	FORCEINLINE explicit FFixedTransform(const FFixedRotator& InRotation)
+	FORCEINLINE explicit FFixedTransform64(const FFixedRotator64& InRotation)
 		: Rotation(InRotation),
-		Translation(FFixedVector::ZeroVector),
-		Scale3D(FFixedVector::OneVector)
+		Translation(FFixedVector64::ZeroVector),
+		Scale3D(FFixedVector64::OneVector)
 	{
 	}
 
@@ -90,7 +97,7 @@ public:
 	* @param InTranslation The value to use for the translation component
 	* @param InScale3D The value to use for the scale component
 	*/
-	FORCEINLINE FFixedTransform(const FFixedQuat& InRotation, const FFixedVector& InTranslation, const FFixedVector& InScale3D = FFixedVector::OneVector)
+	FORCEINLINE FFixedTransform64(const FFixedQuat64& InRotation, const FFixedVector64& InTranslation, const FFixedVector64& InScale3D = FFixedVector64::OneVector)
 		: Rotation(InRotation),
 		Translation(InTranslation),
 		Scale3D(InScale3D)
@@ -104,7 +111,7 @@ public:
 	* @param InTranslation The value to use for the translation component
 	* @param InScale3D The value to use for the scale component
 	*/
-	FORCEINLINE FFixedTransform(const FFixedRotator& InRotation, const FFixedVector& InTranslation, const FFixedVector& InScale3D = FFixedVector::OneVector)
+	FORCEINLINE FFixedTransform64(const FFixedRotator64& InRotation, const FFixedVector64& InTranslation, const FFixedVector64& InScale3D = FFixedVector64::OneVector)
 		: Rotation(InRotation),
 		Translation(InTranslation),
 		Scale3D(InScale3D)
@@ -112,20 +119,20 @@ public:
 	}
 
 	/**
-	* Constructor for converting a Matrix (including scale) into a FFixedTransform.
+	* Constructor for converting a Matrix (including scale) into a FFixedTransform64.
 	*/
-	FORCEINLINE explicit FFixedTransform(const FFixedMatrix& InMatrix)
+	FORCEINLINE explicit FFixedTransform64(const FFixedMatrix& InMatrix)
 	{
 		SetFromMatrix(InMatrix);
 	}
 
 	/** Constructor that takes basis axes and translation */
-	FORCEINLINE FFixedTransform(const FFixedVector& InX, const FFixedVector& InY, const FFixedVector& InZ, const FFixedVector& InTranslation)
+	FORCEINLINE FFixedTransform64(const FFixedVector64& InX, const FFixedVector64& InY, const FFixedVector64& InZ, const FFixedVector64& InTranslation)
 	{
 		SetFromMatrix(FFixedMatrix(InX, InY, InZ, InTranslation));
 	}
 
-	static const FFixedTransform Identity;
+	static const FFixedTransform64 Identity;
 
 	/**
 	* Does a debugf of the contents of this Transform.
@@ -135,7 +142,7 @@ public:
 	/** Debug purpose only **/
 	bool DebugEqualMatrix(const FFixedMatrix& Matrix) const;
 
-	/** Convert FFixedTransform contents to a string */
+	/** Convert FFixedTransform64 contents to a string */
 	FString ToHumanReadableString() const;
 
 	FString ToString() const;
@@ -212,14 +219,14 @@ public:
 	/**
 	* Convert this Transform to inverse.
 	*/
-	FORCEINLINE FFixedTransform Inverse() const
+	FORCEINLINE FFixedTransform64 Inverse() const
 	{
-		FFixedQuat   InvRotation = Rotation.Inverse();
+		FFixedQuat64   InvRotation = Rotation.Inverse();
 		// this used to cause NaN if Scale contained 0 
-		FFixedVector InvScale3D = GetSafeScaleReciprocal(Scale3D);
-		FFixedVector InvTranslation = InvRotation * (InvScale3D * -Translation);
+		FFixedVector64 InvScale3D = GetSafeScaleReciprocal(Scale3D);
+		FFixedVector64 InvTranslation = InvRotation * (InvScale3D * -Translation);
 
-		return FFixedTransform(InvRotation, InvTranslation, InvScale3D);
+		return FFixedTransform64(InvRotation, InvTranslation, InvScale3D);
 	}
 
 	/**
@@ -280,7 +287,7 @@ public:
 	}
 
 	/** Set this transform to the weighted blend of the supplied two transforms. */
-	FORCEINLINE void Blend(const FFixedTransform& Atom1, const FFixedTransform& Atom2, FFixed64 Alpha)
+	FORCEINLINE void Blend(const FFixedTransform64& Atom1, const FFixedTransform64& Atom2, FFixed64 Alpha)
 	{
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST) && WITH_EDITORONLY_DATA
 		// Check that all bone atoms coming from animation are normalized
@@ -302,7 +309,7 @@ public:
 			// Simple linear interpolation for translation and scale.
 			Translation = FFixedPointMath::Lerp(Atom1.Translation, Atom2.Translation, Alpha);
 			Scale3D = FFixedPointMath::Lerp(Atom1.Scale3D, Atom2.Scale3D, Alpha);
-			Rotation = FFixedQuat::FastLerp(Atom1.Rotation, Atom2.Rotation, Alpha);
+			Rotation = FFixedQuat64::FastLerp(Atom1.Rotation, Atom2.Rotation, Alpha);
 
 			// ..and renormalize
 			Rotation.Normalize();
@@ -310,7 +317,7 @@ public:
 	}
 
 	/** Set this Transform to the weighted blend of it and the supplied Transform. */
-	FORCEINLINE void BlendWith(const FFixedTransform& OtherAtom, FFixed64 Alpha)
+	FORCEINLINE void BlendWith(const FFixedTransform64& OtherAtom, FFixed64 Alpha)
 	{
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST) && WITH_EDITORONLY_DATA
 		// Check that all bone atoms coming from animation are normalized
@@ -329,7 +336,7 @@ public:
 				// Simple linear interpolation for translation and scale.
 				Translation = FFixedPointMath::Lerp(Translation, OtherAtom.Translation, Alpha);
 				Scale3D = FFixedPointMath::Lerp(Scale3D, OtherAtom.Scale3D, Alpha);
-				Rotation = FFixedQuat::FastLerp(Rotation, OtherAtom.Rotation, Alpha);
+				Rotation = FFixedQuat64::FastLerp(Rotation, OtherAtom.Rotation, Alpha);
 
 				// ..and renormalize
 				Rotation.Normalize();
@@ -342,12 +349,12 @@ public:
 	* Use only within blends!!
 	* Rotation part is NOT normalized!!
 	*/
-	FORCEINLINE FFixedTransform operator+(const FFixedTransform& Atom) const
+	FORCEINLINE FFixedTransform64 operator+(const FFixedTransform64& Atom) const
 	{
-		return FFixedTransform(Rotation + Atom.Rotation, Translation + Atom.Translation, Scale3D + Atom.Scale3D);
+		return FFixedTransform64(Rotation + Atom.Rotation, Translation + Atom.Translation, Scale3D + Atom.Scale3D);
 	}
 
-	FORCEINLINE FFixedTransform& operator+=(const FFixedTransform& Atom)
+	FORCEINLINE FFixedTransform64& operator+=(const FFixedTransform64& Atom)
 	{
 		Translation += Atom.Translation;
 
@@ -361,12 +368,12 @@ public:
 		return *this;
 	}
 
-	FORCEINLINE FFixedTransform operator*(FFixed64 Mult) const
+	FORCEINLINE FFixedTransform64 operator*(FFixed64 Mult) const
 	{
-		return FFixedTransform(Rotation * Mult, Translation * Mult, Scale3D * Mult);
+		return FFixedTransform64(Rotation * Mult, Translation * Mult, Scale3D * Mult);
 	}
 
-	FORCEINLINE FFixedTransform& operator*=(FFixed64 Mult)
+	FORCEINLINE FFixedTransform64& operator*=(FFixed64 Mult)
 	{
 		Translation *= Mult;
 		Rotation.X *= Mult;
@@ -385,9 +392,9 @@ public:
 	* @param  Other other transform by which to multiply.
 	* @return new transform: this * Other
 	*/
-	FORCEINLINE FFixedTransform operator*(const FFixedTransform& Other) const
+	FORCEINLINE FFixedTransform64 operator*(const FFixedTransform64& Other) const
 	{
-		FFixedTransform Output;
+		FFixedTransform64 Output;
 		Multiply(&Output, this, &Other);
 		return Output;
 	}
@@ -398,7 +405,7 @@ public:
 	*
 	* @param  Other other transform by which to multiply.
 	*/
-	FORCEINLINE void operator*=(const FFixedTransform& Other)
+	FORCEINLINE void operator*=(const FFixedTransform64& Other)
 	{
 		Multiply(this, this, &Other);
 	}
@@ -410,9 +417,9 @@ public:
 	* @param  Other other quaternion rotation by which to multiply.
 	* @return new transform: this * TTransform(Other)
 	*/
-	FORCEINLINE FFixedTransform operator*(const FFixedQuat& Other) const
+	FORCEINLINE FFixedTransform64 operator*(const FFixedQuat64& Other) const
 	{
-		FFixedTransform Output, OtherTransform(Other, FFixedVector::ZeroVector, FFixedVector::OneVector);
+		FFixedTransform64 Output, OtherTransform(Other, FFixedVector64::ZeroVector, FFixedVector64::OneVector);
 		Multiply(&Output, this, &OtherTransform);
 		return Output;
 	}
@@ -423,19 +430,19 @@ public:
 	*
 	* @param  Other other quaternion rotation by which to multiply.
 	*/
-	FORCEINLINE void operator*=(const FFixedQuat& Other)
+	FORCEINLINE void operator*=(const FFixedQuat64& Other)
 	{
-		FFixedTransform OtherTransform(Other, FFixedVector::ZeroVector, FFixedVector::OneVector);
+		FFixedTransform64 OtherTransform(Other, FFixedVector64::ZeroVector, FFixedVector64::OneVector);
 		Multiply(this, this, &OtherTransform);
 	}
 
-	FORCEINLINE static bool AnyHasNegativeScale(const FFixedVector& InScale3D, const FFixedVector& InOtherScale3D)
+	FORCEINLINE static bool AnyHasNegativeScale(const FFixedVector64& InScale3D, const FFixedVector64& InOtherScale3D)
 	{
 		return  (InScale3D.X < FixedPoint::Constants::Fixed64::Zero || InScale3D.Y < FixedPoint::Constants::Fixed64::Zero || InScale3D.Z < FixedPoint::Constants::Fixed64::Zero
 			|| InOtherScale3D.X < FixedPoint::Constants::Fixed64::Zero || InOtherScale3D.Y < FixedPoint::Constants::Fixed64::Zero || InOtherScale3D.Z < FixedPoint::Constants::Fixed64::Zero);
 	}
 
-	FORCEINLINE void ScaleTranslation(const FFixedVector& InScale3D)
+	FORCEINLINE void ScaleTranslation(const FFixedVector64& InScale3D)
 	{
 		Translation *= InScale3D;
 	}
@@ -447,7 +454,7 @@ public:
 
 	FORCEINLINE void RemoveScaling(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber)
 	{
-		Scale3D = FFixedVector::OneVector;
+		Scale3D = FFixedVector64::OneVector;
 		Rotation.Normalize();
 	}
 
@@ -464,20 +471,20 @@ public:
 	// Inverse does not work well with VQS format(in particular non-uniform), so removing it, but made two below functions to be used instead. 
 
 	/*******************************************************************************************
-	* The below 2 functions are the ones to get delta transform and return FFixedTransform format that can be concatenated
+	* The below 2 functions are the ones to get delta transform and return FFixedTransform64 format that can be concatenated
 	* Inverse itself can't concatenate with VQS format(since VQS always transform from S->Q->T, where inverse happens from T(-1)->Q(-1)->S(-1))
 	* So these 2 provides ways to fix this
 	* GetRelativeTransform returns this*Other(-1) and parameter is Other(not Other(-1))
 	* GetRelativeTransformReverse returns this(-1)*Other, and parameter is Other.
 	*******************************************************************************************/
-	FFixedTransform GetRelativeTransform(const FFixedTransform& Other) const;
-	FFixedTransform GetRelativeTransformReverse(const FFixedTransform& Other) const;
+	FFixedTransform64 GetRelativeTransform(const FFixedTransform64& Other) const;
+	FFixedTransform64 GetRelativeTransformReverse(const FFixedTransform64& Other) const;
 
 	/**
 	* Set current transform and the relative to ParentTransform.
-	* Equates to This = This->GetRelativeTransform(Parent), but saves the intermediate FFixedTransform storage and copy.
+	* Equates to This = This->GetRelativeTransform(Parent), but saves the intermediate FFixedTransform64 storage and copy.
 	*/
-	void SetToRelativeTransform(const FFixedTransform& ParentTransform);
+	void SetToRelativeTransform(const FFixedTransform64& ParentTransform);
 
 	FORCEINLINE FFixedVector4d TransformFVector4(const FFixedVector4d& V) const
 	{
@@ -489,7 +496,7 @@ public:
 		//Transform using QST is following
 		//QST(P) = Q*S*P*-Q + T where Q = quaternion, S = scale, T = translation
 
-		FFixedVector4d Transform = FFixedVector4d(Rotation.RotateVector(Scale3D * FFixedVector(V)), FixedPoint::Constants::Fixed64::Zero);
+		FFixedVector4d Transform = FFixedVector4d(Rotation.RotateVector(Scale3D * FFixedVector64(V)), FixedPoint::Constants::Fixed64::Zero);
 		if (V.W == FixedPoint::Constants::Fixed64::One)
 		{
 			Transform += FFixedVector4d(Translation, FixedPoint::Constants::Fixed64::One);
@@ -507,7 +514,7 @@ public:
 
 		//Transform using QST is following
 		//QST(P) = Q*S*P*-Q + T where Q = quaternion, S = scale, T = translation
-		FFixedVector4d Transform = FFixedVector4d(Rotation.RotateVector(FFixedVector(V)), FixedPoint::Constants::Fixed64::Zero);
+		FFixedVector4d Transform = FFixedVector4d(Rotation.RotateVector(FFixedVector64(V)), FixedPoint::Constants::Fixed64::Zero);
 		if (V.W == FixedPoint::Constants::Fixed64::One)
 		{
 			Transform += FFixedVector4d(Translation, FixedPoint::Constants::Fixed64::One);
@@ -516,35 +523,35 @@ public:
 		return Transform;
 	}
 
-	FORCEINLINE FFixedVector TransformPosition(const FFixedVector& V) const
+	FORCEINLINE FFixedVector64 TransformPosition(const FFixedVector64& V) const
 	{
 		return Rotation.RotateVector(Scale3D * V) + Translation;
 	}
 
-	FORCEINLINE FFixedVector TransformPositionNoScale(const FFixedVector& V) const
+	FORCEINLINE FFixedVector64 TransformPositionNoScale(const FFixedVector64& V) const
 	{
 		return Rotation.RotateVector(V) + Translation;
 	}
 
 	/** Inverts the transform and then transforms V - correctly handles scaling in this transform. */
-	FORCEINLINE FFixedVector InverseTransformPosition(const FFixedVector& V) const
+	FORCEINLINE FFixedVector64 InverseTransformPosition(const FFixedVector64& V) const
 	{
 		return (Rotation.UnrotateVector(V - Translation)) * GetSafeScaleReciprocal(Scale3D);
 	}
 
 
-	FORCEINLINE FFixedVector InverseTransformPositionNoScale(const FFixedVector& V) const
+	FORCEINLINE FFixedVector64 InverseTransformPositionNoScale(const FFixedVector64& V) const
 	{
 		return (Rotation.UnrotateVector(V - Translation));
 	}
 
 
-	FORCEINLINE FFixedVector TransformVector(const FFixedVector& V) const
+	FORCEINLINE FFixedVector64 TransformVector(const FFixedVector64& V) const
 	{
 		return Rotation.RotateVector(Scale3D * V);
 	}
 
-	FORCEINLINE FFixedVector TransformVectorNoScale(const FFixedVector& V) const
+	FORCEINLINE FFixedVector64 TransformVectorNoScale(const FFixedVector64& V) const
 	{
 		return Rotation.RotateVector(V);
 	}
@@ -553,12 +560,12 @@ public:
 	*	Transform a direction vector by the inverse of this transform - will not take into account translation part.
 	*	If you want to transform a surface normal (or plane) and correctly account for non-uniform scaling you should use TransformByUsingAdjointT with adjoint of matrix inverse.
 	*/
-	FORCEINLINE FFixedVector InverseTransformVector(const FFixedVector& V) const
+	FORCEINLINE FFixedVector64 InverseTransformVector(const FFixedVector64& V) const
 	{
 		return (Rotation.UnrotateVector(V)) * GetSafeScaleReciprocal(Scale3D);
 	}
 
-	FORCEINLINE FFixedVector InverseTransformVectorNoScale(const FFixedVector& V) const
+	FORCEINLINE FFixedVector64 InverseTransformVectorNoScale(const FFixedVector64& V) const
 	{
 		return (Rotation.UnrotateVector(V));
 	}
@@ -567,7 +574,7 @@ public:
 	 * Transform a rotation.
 	 * For example if this is a LocalToWorld transform, TransformRotation(Q) would transform Q from local to world space.
 	 */
-	FORCEINLINE FFixedQuat TransformRotation(const FFixedQuat& Q) const
+	FORCEINLINE FFixedQuat64 TransformRotation(const FFixedQuat64& Q) const
 	{
 		return GetRotation() * Q;
 	}
@@ -576,53 +583,53 @@ public:
 	* Inverse transform a rotation.
 	* For example if this is a LocalToWorld transform, InverseTransformRotation(Q) would transform Q from world to local space.
 	*/
-	FORCEINLINE FFixedQuat InverseTransformRotation(const FFixedQuat& Q) const
+	FORCEINLINE FFixedQuat64 InverseTransformRotation(const FFixedQuat64& Q) const
 	{
 		return GetRotation().Inverse() * Q;
 	}
 
-	FORCEINLINE FFixedTransform GetScaled(FFixed64 InScale) const
+	FORCEINLINE FFixedTransform64 GetScaled(FFixed64 InScale) const
 	{
-		FFixedTransform A(*this);
+		FFixedTransform64 A(*this);
 		A.Scale3D *= InScale;
 
 		return A;
 	}
 
-	FORCEINLINE FFixedTransform GetScaled(FFixedVector InScale) const
+	FORCEINLINE FFixedTransform64 GetScaled(FFixedVector64 InScale) const
 	{
-		FFixedTransform A(*this);
+		FFixedTransform64 A(*this);
 		A.Scale3D *= InScale;
 
 		return A;
 	}
 
-	FORCEINLINE FFixedVector GetScaledAxis(EAxis::Type InAxis) const
+	FORCEINLINE FFixedVector64 GetScaledAxis(EAxis::Type InAxis) const
 	{
 		if (InAxis == EAxis::X)
 		{
-			return TransformVector(FFixedVector(FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero));
+			return TransformVector(FFixedVector64(FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero));
 		}
 		else if (InAxis == EAxis::Y)
 		{
-			return TransformVector(FFixedVector(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero));
+			return TransformVector(FFixedVector64(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero));
 		}
 
-		return TransformVector(FFixedVector(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One));
+		return TransformVector(FFixedVector64(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One));
 	}
 
-	FORCEINLINE FFixedVector GetUnitAxis(EAxis::Type InAxis) const
+	FORCEINLINE FFixedVector64 GetUnitAxis(EAxis::Type InAxis) const
 	{
 		if (InAxis == EAxis::X)
 		{
-			return TransformVectorNoScale(FFixedVector(FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero));
+			return TransformVectorNoScale(FFixedVector64(FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero));
 		}
 		else if (InAxis == EAxis::Y)
 		{
-			return TransformVectorNoScale(FFixedVector(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero));
+			return TransformVectorNoScale(FFixedVector64(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One, FixedPoint::Constants::Fixed64::Zero));
 		}
 
-		return TransformVectorNoScale(FFixedVector(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One));
+		return TransformVectorNoScale(FFixedVector64(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::One));
 	}
 
 	FORCEINLINE void Mirror(EAxis::Type MirrorAxis, EAxis::Type FlipAxis)
@@ -633,9 +640,9 @@ public:
 		SetFromMatrix(M);
 	}
 
-	FORCEINLINE static FFixedVector GetSafeScaleReciprocal(const FFixedVector& InScale, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber)
+	FORCEINLINE static FFixedVector64 GetSafeScaleReciprocal(const FFixedVector64& InScale, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber)
 	{
-		FFixedVector SafeReciprocalScale;
+		FFixedVector64 SafeReciprocalScale;
 		if (FFixedPointMath::Abs(InScale.X) <= Tolerance)
 		{
 			SafeReciprocalScale.X = FixedPoint::Constants::Fixed64::Zero;
@@ -667,12 +674,12 @@ public:
 	}
 
 	// temp function for easy conversion
-	FORCEINLINE FFixedVector GetLocation() const
+	FORCEINLINE FFixedVector64 GetLocation() const
 	{
 		return GetTranslation();
 	}
 
-	FORCEINLINE FFixedRotator Rotator() const
+	FORCEINLINE FFixedRotator64 Rotator() const
 	{
 		return Rotation.Rotator();
 	}
@@ -684,7 +691,7 @@ public:
 	}
 
 	/** Set the translation of this transformation */
-	FORCEINLINE void SetLocation(const FFixedVector& Origin)
+	FORCEINLINE void SetLocation(const FFixedVector64& Origin)
 	{
 		Translation = Origin;
 	}
@@ -710,72 +717,72 @@ public:
 	}
 
 private:
-	FORCEINLINE bool Private_RotationEquals(const FFixedQuat& InRotation, const FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
+	FORCEINLINE bool Private_RotationEquals(const FFixedQuat64& InRotation, const FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
 		return Rotation.Equals(InRotation, Tolerance);
 	}
 
-	FORCEINLINE bool Private_TranslationEquals(const FFixedVector& InTranslation, const FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
+	FORCEINLINE bool Private_TranslationEquals(const FFixedVector64& InTranslation, const FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
 		return Translation.Equals(InTranslation, Tolerance);
 	}
 
-	FORCEINLINE bool Private_Scale3DEquals(const FFixedVector& InScale3D, const FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
+	FORCEINLINE bool Private_Scale3DEquals(const FFixedVector64& InScale3D, const FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
 		return Scale3D.Equals(InScale3D, Tolerance);
 	}
 public:
 
 	// Test if A's rotation equals B's rotation, within a tolerance. Preferred over "A.GetRotation().Equals(B.GetRotation())" because it is faster on some platforms.
-	FORCEINLINE static bool AreRotationsEqual(const FFixedTransform& A, const FFixedTransform& B, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
+	FORCEINLINE static bool AreRotationsEqual(const FFixedTransform64& A, const FFixedTransform64& B, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
 	{
 		return A.Private_RotationEquals(B.Rotation, Tolerance);
 	}
 
 	// Test if A's translation equals B's translation, within a tolerance. Preferred over "A.GetTranslation().Equals(B.GetTranslation())" because it is faster on some platforms.
-	FORCEINLINE static bool AreTranslationsEqual(const FFixedTransform& A, const FFixedTransform& B, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
+	FORCEINLINE static bool AreTranslationsEqual(const FFixedTransform64& A, const FFixedTransform64& B, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
 	{
 		return A.Private_TranslationEquals(B.Translation, Tolerance);
 	}
 
 	// Test if A's scale equals B's scale, within a tolerance. Preferred over "A.GetScale3D().Equals(B.GetScale3D())" because it is faster on some platforms.
-	FORCEINLINE static bool AreScale3DsEqual(const FFixedTransform& A, const FFixedTransform& B, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
+	FORCEINLINE static bool AreScale3DsEqual(const FFixedTransform64& A, const FFixedTransform64& B, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
 	{
 		return A.Private_Scale3DEquals(B.Scale3D, Tolerance);
 	}
 
 	// Test if this Transform's rotation equals another's rotation, within a tolerance. Preferred over "GetRotation().Equals(Other.GetRotation())" because it is faster on some platforms.
-	FORCEINLINE bool RotationEquals(const FFixedTransform& Other, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
+	FORCEINLINE bool RotationEquals(const FFixedTransform64& Other, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
 		return AreRotationsEqual(*this, Other, Tolerance);
 	}
 
 	// Test if this Transform's translation equals another's translation, within a tolerance. Preferred over "GetTranslation().Equals(Other.GetTranslation())" because it is faster on some platforms.
-	FORCEINLINE bool TranslationEquals(const FFixedTransform& Other, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
+	FORCEINLINE bool TranslationEquals(const FFixedTransform64& Other, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
 		return AreTranslationsEqual(*this, Other, Tolerance);
 	}
 
 	// Test if this Transform's scale equals another's scale, within a tolerance. Preferred over "GetScale3D().Equals(Other.GetScale3D())" because it is faster on some platforms.
-	FORCEINLINE bool Scale3DEquals(const FFixedTransform& Other, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
+	FORCEINLINE bool Scale3DEquals(const FFixedTransform64& Other, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
 		return AreScale3DsEqual(*this, Other, Tolerance);
 	}
 
 	// Test if all components of the transforms are equal, within a tolerance.
-	FORCEINLINE bool Equals(const FFixedTransform& Other, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
+	FORCEINLINE bool Equals(const FFixedTransform64& Other, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
 		return Private_TranslationEquals(Other.Translation, Tolerance) && Private_RotationEquals(Other.Rotation, Tolerance) && Private_Scale3DEquals(Other.Scale3D, Tolerance);
 	}
 
 	// Test if all components of the transform property are equal.
-	FORCEINLINE bool Identical(const FFixedTransform* Other, uint32 PortFlags) const
+	FORCEINLINE bool Identical(const FFixedTransform64* Other, uint32 PortFlags) const
 	{
 		return Equals(*Other, FixedPoint::Constants::Fixed64::Zero);
 	}
 
 	// Test if rotation and translation components of the transforms are equal, within a tolerance.
-	FORCEINLINE bool EqualsNoScale(const FFixedTransform& Other, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
+	FORCEINLINE bool EqualsNoScale(const FFixedTransform64& Other, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
 		return Private_TranslationEquals(Other.Translation, Tolerance) && Private_RotationEquals(Other.Rotation, Tolerance);
 	}
@@ -789,7 +796,7 @@ public:
 	* @param  A Transform A.
 	* @param  B Transform B.
 	*/
-	FORCEINLINE static void Multiply(FFixedTransform* OutTransform, const FFixedTransform* A, const FFixedTransform* B)
+	FORCEINLINE static void Multiply(FFixedTransform64* OutTransform, const FFixedTransform64* A, const FFixedTransform64* B)
 	{
 		checkSlow(A->IsRotationNormalized());
 		checkSlow(B->IsRotationNormalized());
@@ -831,7 +838,7 @@ public:
 	* @param InTranslation The new value for the Translation component
 	* @param InScale3D The new value for the Scale3D component
 	*/
-	FORCEINLINE void SetComponents(const FFixedQuat& InRotation, const FFixedVector& InTranslation, const FFixedVector& InScale3D)
+	FORCEINLINE void SetComponents(const FFixedQuat64& InRotation, const FFixedVector64& InTranslation, const FFixedVector64& InScale3D)
 	{
 		Rotation = InRotation;
 		Translation = InTranslation;
@@ -846,9 +853,9 @@ public:
 	*/
 	FORCEINLINE void SetIdentity()
 	{
-		Rotation = FFixedQuat::Identity;
-		Translation = FFixedVector::ZeroVector;
-		Scale3D = FFixedVector(1, 1, 1);
+		Rotation = FFixedQuat64::Identity;
+		Translation = FFixedVector64::ZeroVector;
+		Scale3D = FFixedVector64(1, 1, 1);
 	}
 
 	/**
@@ -859,16 +866,16 @@ public:
 	*/
 	FORCEINLINE void SetIdentityZeroScale()
 	{
-		Rotation = FFixedQuat::Identity;
-		Translation = FFixedVector::ZeroVector;
-		Scale3D = FFixedVector::ZeroVector;
+		Rotation = FFixedQuat64::Identity;
+		Translation = FFixedVector64::ZeroVector;
+		Scale3D = FFixedVector64::ZeroVector;
 	}
 
 	/**
 	* Scales the Scale3D component by a new factor
 	* @param Scale3DMultiplier The value to multiply Scale3D with
 	*/
-	FORCEINLINE void MultiplyScale3D(const FFixedVector& Scale3DMultiplier)
+	FORCEINLINE void MultiplyScale3D(const FFixedVector64& Scale3DMultiplier)
 	{
 		Scale3D *= Scale3DMultiplier;
 	}
@@ -877,13 +884,13 @@ public:
 	* Sets the translation component
 	* @param NewTranslation The new value for the translation component
 	*/
-	FORCEINLINE void SetTranslation(const FFixedVector& NewTranslation)
+	FORCEINLINE void SetTranslation(const FFixedVector64& NewTranslation)
 	{
 		Translation = NewTranslation;
 	}
 
-	/** Copy translation from another FFixedTransform. */
-	FORCEINLINE void CopyTranslation(const FFixedTransform& Other)
+	/** Copy translation from another FFixedTransform64. */
+	FORCEINLINE void CopyTranslation(const FFixedTransform64& Other)
 	{
 		Translation = Other.Translation;
 	}
@@ -892,7 +899,7 @@ public:
 	* Concatenates another rotation to this transformation
 	* @param DeltaRotation The rotation to concatenate in the following fashion: Rotation = Rotation * DeltaRotation
 	*/
-	FORCEINLINE void ConcatenateRotation(const FFixedQuat& DeltaRotation)
+	FORCEINLINE void ConcatenateRotation(const FFixedQuat64& DeltaRotation)
 	{
 		Rotation = Rotation * DeltaRotation;
 	}
@@ -901,7 +908,7 @@ public:
 	* Adjusts the translation component of this transformation
 	* @param DeltaTranslation The translation to add in the following fashion: Translation += DeltaTranslation
 	*/
-	FORCEINLINE void AddToTranslation(const FFixedVector& DeltaTranslation)
+	FORCEINLINE void AddToTranslation(const FFixedVector64& DeltaTranslation)
 	{
 		Translation += DeltaTranslation;
 	}
@@ -910,7 +917,7 @@ public:
 	* Add the translations from two FFixedTransforms and return the result.
 	* @return A.Translation + B.Translation
 	*/
-	FORCEINLINE static FFixedVector AddTranslations(const FFixedTransform& A, const FFixedTransform& B)
+	FORCEINLINE static FFixedVector64 AddTranslations(const FFixedTransform64& A, const FFixedTransform64& B)
 	{
 		return A.Translation + B.Translation;
 	}
@@ -919,7 +926,7 @@ public:
 	* Subtract translations from two FFixedTransforms and return the difference.
 	* @return A.Translation - B.Translation.
 	*/
-	FORCEINLINE static FFixedVector SubtractTranslations(const FFixedTransform& A, const FFixedTransform& B)
+	FORCEINLINE static FFixedVector64 SubtractTranslations(const FFixedTransform64& A, const FFixedTransform64& B)
 	{
 		return A.Translation - B.Translation;
 	}
@@ -928,13 +935,13 @@ public:
 	* Sets the rotation component
 	* @param NewRotation The new value for the rotation component
 	*/
-	FORCEINLINE void SetRotation(const FFixedQuat& NewRotation)
+	FORCEINLINE void SetRotation(const FFixedQuat64& NewRotation)
 	{
 		Rotation = NewRotation;
 	}
 
-	/** Copy rotation from another FFixedTransform. */
-	FORCEINLINE void CopyRotation(const FFixedTransform& Other)
+	/** Copy rotation from another FFixedTransform64. */
+	FORCEINLINE void CopyRotation(const FFixedTransform64& Other)
 	{
 		Rotation = Other.Rotation;
 	}
@@ -943,13 +950,13 @@ public:
 	* Sets the Scale3D component
 	* @param NewScale3D The new value for the Scale3D component
 	*/
-	FORCEINLINE void SetScale3D(const FFixedVector& NewScale3D)
+	FORCEINLINE void SetScale3D(const FFixedVector64& NewScale3D)
 	{
 		Scale3D = NewScale3D;
 	}
 
-	/** Copy scale from another FFixedTransform. */
-	FORCEINLINE void CopyScale3D(const FFixedTransform& Other)
+	/** Copy scale from another FFixedTransform64. */
+	FORCEINLINE void CopyScale3D(const FFixedTransform64& Other)
 	{
 		Scale3D = Other.Scale3D;
 	}
@@ -959,7 +966,7 @@ public:
 	* @param NewTranslation The new value for the translation component
 	* @param NewScale3D The new value for the Scale3D component
 	*/
-	FORCEINLINE void SetTranslationAndScale3D(const FFixedVector& NewTranslation, const FFixedVector& NewScale3D)
+	FORCEINLINE void SetTranslationAndScale3D(const FFixedVector64& NewTranslation, const FFixedVector64& NewScale3D)
 	{
 		Translation = NewTranslation;
 		Scale3D = NewScale3D;
@@ -982,13 +989,13 @@ public:
 	{ 
 		FVector newval;
 		VectorStoreFloat3(InTranslation, &newval);
-		Translation = (FFixedVector)newval;
+		Translation = (FFixedVector64)newval;
 	}
 	void SetRotationRegister(TVectorRegisterType<double> InRotation) 
 	{
 		FQuat newval;
 		VectorStore(InRotation, &newval);
-		Rotation = (FFixedQuat)newval;
+		Rotation = (FFixedQuat64)newval;
 	}
 
 	/**
@@ -1000,7 +1007,7 @@ public:
 	*
 	* @param SourceAtom The other transform to accumulate into this one
 	*/
-	FORCEINLINE void Accumulate(const FFixedTransform& SourceAtom)
+	FORCEINLINE void Accumulate(const FFixedTransform64& SourceAtom)
 	{
 		// Add ref pose relative animation to base animation, only if rotation is significant.
 		if (FFixedPointMath::Square(SourceAtom.Rotation.W) < FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One - 1))
@@ -1028,9 +1035,9 @@ public:
 	* @param Atom The other transform to accumulate into this one
 	* @param BlendWeight The weight to multiply Atom by before it is accumulated.
 	*/
-	FORCEINLINE void Accumulate(const FFixedTransform& Atom, FFixed64 BlendWeight/* default param doesn't work since vectorized version takes ref param */)
+	FORCEINLINE void Accumulate(const FFixedTransform64& Atom, FFixed64 BlendWeight/* default param doesn't work since vectorized version takes ref param */)
 	{
-		FFixedTransform SourceAtom(Atom * BlendWeight);
+		FFixedTransform64 SourceAtom(Atom * BlendWeight);
 
 		// Add ref pose relative animation to base animation, only if rotation is significant.
 		if (FFixedPointMath::Square(SourceAtom.Rotation.W) < FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One - 1))
@@ -1054,9 +1061,9 @@ public:
 	* @param DeltaAtom The other transform to accumulate into this one
 	* @param Weight The weight to multiply DeltaAtom by before it is accumulated.
 	*/
-	FORCEINLINE void AccumulateWithShortestRotation(const FFixedTransform& DeltaAtom, FFixed64 BlendWeight/* default param doesn't work since vectorized version takes ref param */)
+	FORCEINLINE void AccumulateWithShortestRotation(const FFixedTransform64& DeltaAtom, FFixed64 BlendWeight/* default param doesn't work since vectorized version takes ref param */)
 	{
-		FFixedTransform Atom(DeltaAtom * BlendWeight);
+		FFixedTransform64 Atom(DeltaAtom * BlendWeight);
 
 		// To ensure the 'shortest route', we make sure the dot product between the accumulator and the incoming child atom is positive.
 		if ((Atom.Rotation | Rotation) < FixedPoint::Constants::Fixed64::Zero)
@@ -1098,11 +1105,11 @@ public:
 	* @param Atom The other transform to accumulate into this one
 	* @param BlendWeight The weight to multiply Atom by before it is accumulated.
 	*/
-	FORCEINLINE void AccumulateWithAdditiveScale(const FFixedTransform& Atom, FFixed64 BlendWeight/* default param doesn't work since vectorized version takes ref param */)
+	FORCEINLINE void AccumulateWithAdditiveScale(const FFixedTransform64& Atom, FFixed64 BlendWeight/* default param doesn't work since vectorized version takes ref param */)
 	{
-		const FFixedVector DefaultScale(FFixedVector::OneVector);
+		const FFixedVector64 DefaultScale(FFixedVector64::OneVector);
 
-		FFixedTransform SourceAtom(Atom * BlendWeight);
+		FFixedTransform64 SourceAtom(Atom * BlendWeight);
 
 		// Add ref pose relative animation to base animation, only if rotation is significant.
 		if (FFixedPointMath::Square(SourceAtom.Rotation.W) < FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One - 1))
@@ -1123,7 +1130,7 @@ public:
 	* @param SourceAtom2 The ending point source atom (used 100% if Alpha is 1)
 	* @param Alpha The blending weight between SourceAtom1 and SourceAtom2
 	*/
-	FORCEINLINE void LerpTranslationScale3D(const FFixedTransform& SourceAtom1, const FFixedTransform& SourceAtom2, FFixed64 Alpha)
+	FORCEINLINE void LerpTranslationScale3D(const FFixedTransform64& SourceAtom1, const FFixedTransform64& SourceAtom2, FFixed64 Alpha)
 	{
 		Translation = FFixedPointMath::Lerp(SourceAtom1.Translation, SourceAtom2.Translation, Alpha);
 		Scale3D = FFixedPointMath::Lerp(SourceAtom1.Scale3D, SourceAtom2.Scale3D, Alpha);
@@ -1159,11 +1166,11 @@ public:
 	* @param SourceAtom The target transformation (used when BlendWeight = 1); this is modified during the process
 	* @param BlendWeight The blend weight between Identity and SourceAtom
 	*/
-	FORCEINLINE static void BlendFromIdentityAndAccumulate(FFixedTransform& FinalAtom, const FFixedTransform& SourceAtom, FFixed64 BlendWeight)
+	FORCEINLINE static void BlendFromIdentityAndAccumulate(FFixedTransform64& FinalAtom, const FFixedTransform64& SourceAtom, FFixed64 BlendWeight)
 	{
-		const FFixedTransform AdditiveIdentity(FFixedQuat::Identity, FFixedVector::ZeroVector, FFixedVector::ZeroVector);
-		const FFixedVector DefaultScale(FFixedVector::OneVector);
-		FFixedTransform DeltaAtom = SourceAtom;
+		const FFixedTransform64 AdditiveIdentity(FFixedQuat64::Identity, FFixedVector64::ZeroVector, FFixedVector64::ZeroVector);
+		const FFixedVector64 DefaultScale(FFixedVector64::OneVector);
+		FFixedTransform64 DeltaAtom = SourceAtom;
 
 		// Scale delta by weight
 		if (BlendWeight < (FixedPoint::Constants::Fixed64::One - FixedPoint::Constants::Fixed64::ZeroAnimWeightThresh))
@@ -1188,7 +1195,7 @@ public:
 	*
 	* @return The rotation component
 	*/
-	FORCEINLINE FFixedQuat GetRotation() const
+	FORCEINLINE FFixedQuat64 GetRotation() const
 	{
 		return Rotation;
 	}
@@ -1198,7 +1205,7 @@ public:
 	*
 	* @return The translation component
 	*/
-	FORCEINLINE FFixedVector GetTranslation() const
+	FORCEINLINE FFixedVector64 GetTranslation() const
 	{
 		return Translation;
 	}
@@ -1208,7 +1215,7 @@ public:
 	*
 	* @return The Scale3D component
 	*/
-	FORCEINLINE FFixedVector GetScale3D() const
+	FORCEINLINE FFixedVector64 GetScale3D() const
 	{
 		return Scale3D;
 	}
@@ -1218,7 +1225,7 @@ public:
 	*
 	* @param SrcBA The transform to copy rotation and Scale3D from
 	*/
-	FORCEINLINE void CopyRotationPart(const FFixedTransform& SrcBA)
+	FORCEINLINE void CopyRotationPart(const FFixedTransform64& SrcBA)
 	{
 		Rotation = SrcBA.Rotation;
 		Scale3D = SrcBA.Scale3D;
@@ -1229,7 +1236,7 @@ public:
 	*
 	* @param SrcBA The transform to copy translation and Scale3D from
 	*/
-	FORCEINLINE void CopyTranslationAndScale3D(const FFixedTransform& SrcBA)
+	FORCEINLINE void CopyTranslationAndScale3D(const FFixedTransform64& SrcBA)
 	{
 		Translation = SrcBA.Translation;
 		Scale3D = SrcBA.Scale3D;
@@ -1251,7 +1258,7 @@ public:
 			M.SetAxis(FixedPoint::Constants::Fixed64::Zero, -M.GetScaledAxis(EAxis::X));
 		}
 
-		Rotation = FFixedQuat(M);
+		Rotation = FFixedQuat64(M);
 		Translation = InMatrix.GetOrigin();
 
 		// Normalize rotation
@@ -1268,7 +1275,7 @@ private:
 	* @param  A Transform A.
 	* @param  B Transform B.
 	*/
-	FORCEINLINE static void MultiplyUsingMatrixWithScale(FFixedTransform* OutTransform, const FFixedTransform* A, const FFixedTransform* B)
+	FORCEINLINE static void MultiplyUsingMatrixWithScale(FFixedTransform64* OutTransform, const FFixedTransform64* A, const FFixedTransform64* B)
 	{
 		// the goal of using M is to get the correct orientation
 		// but for translation, we still need scale
@@ -1286,7 +1293,7 @@ private:
 	* @param	OutTransform the constructed transform
 	*/
 
-	FORCEINLINE static void ConstructTransformFromMatrixWithDesiredScale(const FFixedMatrix& AMatrix, const FFixedMatrix& BMatrix, const FFixedVector& DesiredScale, FFixedTransform& OutTransform)
+	FORCEINLINE static void ConstructTransformFromMatrixWithDesiredScale(const FFixedMatrix& AMatrix, const FFixedMatrix& BMatrix, const FFixedVector64& DesiredScale, FFixedTransform64& OutTransform)
 	{
 		// the goal of using M is to get the correct orientation
 		// but for translation, we still need scale
@@ -1294,7 +1301,7 @@ private:
 		M.RemoveScaling();
 
 		// apply negative scale back to axes
-		FFixedVector SignedScale = DesiredScale.GetSignVector();
+		FFixedVector64 SignedScale = DesiredScale.GetSignVector();
 
 		M.SetAxis(0, SignedScale.X * M.GetScaledAxis(EAxis::X));
 		M.SetAxis(1, SignedScale.Y * M.GetScaledAxis(EAxis::Y));
@@ -1302,16 +1309,16 @@ private:
 
 		// @note: if you have negative with 0 scale, this will return rotation that is identity
 		// since matrix loses that axes
-		FFixedQuat Rotation = FFixedQuat(M);
+		FFixedQuat64 Rotation = FFixedQuat64(M);
 		Rotation.Normalize();
 
 		// set values back to output
 		OutTransform.Scale3D = DesiredScale;
 		OutTransform.Rotation = Rotation;
 
-		// technically I could calculate this using FFixedTransform but then it does more quat multiplication 
+		// technically I could calculate this using FFixedTransform64 but then it does more quat multiplication 
 		// instead of using Scale in matrix multiplication
-		// it's a question of between RemoveScaling vs using FFixedTransform to move translation
+		// it's a question of between RemoveScaling vs using FFixedTransform64 to move translation
 		OutTransform.Translation = M.GetOrigin();
 	}
 
@@ -1323,5 +1330,10 @@ private:
 	* @param  BAse Transform Base.
 	* @param  Relative Transform Relative.
 	*/
-	static void GetRelativeTransformUsingMatrixWithScale(FFixedTransform* OutTransform, const FFixedTransform* Base, const FFixedTransform* Relative);
+	static void GetRelativeTransformUsingMatrixWithScale(FFixedTransform64* OutTransform, const FFixedTransform64* Base, const FFixedTransform64* Relative);
+public:
+	FORCEINLINE operator FTransform() const
+	{
+		return FTransform((FQuat)Rotation, (FVector)Translation, (FVector)Scale3D);
+	}
 };

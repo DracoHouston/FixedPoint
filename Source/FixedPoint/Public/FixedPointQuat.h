@@ -7,7 +7,7 @@
 #include "FixedPointQuat.generated.h"
 
 USTRUCT(BlueprintType)
-struct FIXEDPOINT_API FFixedQuat
+struct FIXEDPOINT_API FFixedQuat64
 {
 public:
 	GENERATED_BODY()
@@ -15,12 +15,12 @@ public:
 	/**
 	* Default constructor, no initialization.
 	*/
-	FORCEINLINE FFixedQuat() {}
+	FORCEINLINE FFixedQuat64() {}
 
 	/**
-	* Constructor that casts from FQuat to FFixedQuat
+	* Constructor that casts from FQuat to FFixedQuat64
 	*/
-	FORCEINLINE FFixedQuat(FQuat Other)
+	FORCEINLINE FFixedQuat64(FQuat Other)
 	{
 		X = (FFixed64)Other.X;
 		Y = (FFixed64)Other.Y;
@@ -33,27 +33,27 @@ public:
 	 *
 	 * @param EForceInit Force init enum: if equal to ForceInitToZero then W is 0, otherwise W = 1 (creating an identity transform)
 	 */
-	explicit FORCEINLINE FFixedQuat(EForceInit ZeroOrNot);
+	explicit FORCEINLINE FFixedQuat64(EForceInit ZeroOrNot);
 
-	FORCEINLINE FFixedQuat(const FFixedVector& inAxis, const FFixed64& inAngleRad);
+	FORCEINLINE FFixedQuat64(const FFixedVector64& inAxis, const FFixed64& inAngleRad);
 
-	FORCEINLINE FFixedQuat(const FFixed64& inValue);
+	FORCEINLINE FFixedQuat64(const FFixed64& inValue);
 
-	FORCEINLINE FFixedQuat(const FFixed64& inX, const FFixed64& inY, const FFixed64& inZ, const FFixed64& inW);
-
-	/**
-	 * Creates and initializes a new quaternion from the given rotator.
-	 *
-	 * @param R The rotator to initialize from.
-	 */
-	explicit FFixedQuat(const FFixedRotator& R);
+	FORCEINLINE FFixedQuat64(const FFixed64& inX, const FFixed64& inY, const FFixed64& inZ, const FFixed64& inW);
 
 	/**
 	 * Creates and initializes a new quaternion from the given rotator.
 	 *
 	 * @param R The rotator to initialize from.
 	 */
-	//explicit FFixedQuat(const FFixedRotator& R);
+	explicit FFixedQuat64(const FFixedRotator64& R);
+
+	/**
+	 * Creates and initializes a new quaternion from the given rotator.
+	 *
+	 * @param R The rotator to initialize from.
+	 */
+	//explicit FFixedQuat64(const FFixedRotator64& R);
 	//NEED ROTATOR CLASS!
 
 	/**
@@ -61,13 +61,13 @@ public:
 	 *
 	 * @param M The rotation matrix to initialize from.
 	 */
-	explicit FFixedQuat(const FFixedMatrix& M);
+	explicit FFixedQuat64(const FFixedMatrix& M);
 
-	/*FFixedQuat(int64 inX, int64 inY, int64 inZ, int64 inW);
+	/*FFixedQuat64(int64 inX, int64 inY, int64 inZ, int64 inW);
 
-	FFixedQuat(float inX, float inY, float inZ, float inW);
+	FFixedQuat64(float inX, float inY, float inZ, float inW);
 
-	FFixedQuat(double inX, double inY, double inZ, double inW);*/
+	FFixedQuat64(double inX, double inY, double inZ, double inW);*/
 
 	UPROPERTY(EditAnywhere)
 	FFixed64 X;
@@ -81,7 +81,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	FFixed64 W;
 
-	static const FFixedQuat Identity;
+	static const FFixedQuat64 Identity;
 
 	/**
 	 * Gets the result of adding a Quaternion to this.
@@ -90,7 +90,7 @@ public:
 	 * @param Q The Quaternion to add.
 	 * @return The result of addition.
 	 */
-	FORCEINLINE FFixedQuat operator+(const FFixedQuat& Q) const;
+	FORCEINLINE FFixedQuat64 operator+(const FFixedQuat64& Q) const;
 
 	/**
 	 * Adds to this quaternion.
@@ -99,7 +99,7 @@ public:
 	 * @param Other The quaternion to add to this.
 	 * @return Result after addition.
 	 */
-	FORCEINLINE FFixedQuat operator+=(const FFixedQuat& Q);
+	FORCEINLINE FFixedQuat64 operator+=(const FFixedQuat64& Q);
 
 	/**
 	 * Gets the result of subtracting a Quaternion to this.
@@ -108,14 +108,14 @@ public:
 	 * @param Q The Quaternion to subtract.
 	 * @return The result of subtraction.
 	 */
-	FORCEINLINE FFixedQuat operator-(const FFixedQuat& Q) const;
+	FORCEINLINE FFixedQuat64 operator-(const FFixedQuat64& Q) const;
 
 	/**
 	* Negates the quaternion. Note that this represents the same rotation.
 	*
 	* @return The result of negation.
 	*/
-	FORCEINLINE FFixedQuat operator-() const;
+	FORCEINLINE FFixedQuat64 operator-() const;
 
 	/**
 	 * Checks whether another Quaternion is equal to this, within specified tolerance.
@@ -124,7 +124,7 @@ public:
 	 * @param Tolerance Error tolerance for comparison with other Quaternion.
 	 * @return true if two Quaternions are equal, within specified tolerance, otherwise false.
 	 */
-	FORCEINLINE bool Equals(const FFixedQuat& Q, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const;
+	FORCEINLINE bool Equals(const FFixedQuat64& Q, FFixed64 Tolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const;
 
 	/**
 	 * Checks whether this Quaternion is an Identity Quaternion.
@@ -142,7 +142,7 @@ public:
 	 * @param Q The other quaternion.
 	 * @return reference to this after subtraction.
 	 */
-	FORCEINLINE FFixedQuat operator-=(const FFixedQuat& Q);
+	FORCEINLINE FFixedQuat64 operator-=(const FFixedQuat64& Q);
 
 	/**
 	 * Gets the result of multiplying this by another quaternion (this * Q).
@@ -153,7 +153,7 @@ public:
 	 * @param Q The Quaternion to multiply this by.
 	 * @return The result of multiplication (this * Q).
 	 */
-	FORCEINLINE FFixedQuat operator*(const FFixedQuat& Q) const;
+	FORCEINLINE FFixedQuat64 operator*(const FFixedQuat64& Q) const;
 
 	/**
 	 * Multiply this by a quaternion (this = this * Q).
@@ -164,7 +164,7 @@ public:
 	 * @param Q the quaternion to multiply this by.
 	 * @return The result of multiplication (this * Q).
 	 */
-	FORCEINLINE FFixedQuat operator*=(const FFixedQuat& Q);
+	FORCEINLINE FFixedQuat64 operator*=(const FFixedQuat64& Q);
 
 	/**
 	 * Rotate a vector by this quaternion.
@@ -173,7 +173,7 @@ public:
 	 * @return vector after rotation
 	 * @see RotateVector
 	 */
-	FFixedVector operator*(const FFixedVector& V) const
+	FFixedVector64 operator*(const FFixedVector64& V) const
 	{
 		return RotateVector(V);
 	}
@@ -189,7 +189,7 @@ public:
 	 */
 	FFixedMatrix operator*(const FFixedMatrix& M) const;
 
-	FORCEINLINE FFixedQuat operator*=(const FFixed64& Scale)
+	FORCEINLINE FFixedQuat64 operator*=(const FFixed64& Scale)
 	{
 		X *= Scale;
 		Y *= Scale;
@@ -204,9 +204,9 @@ public:
 	 * @param Scale The scaling factor.
 	 * @return The result of scaling.
 	 */
-	FORCEINLINE FFixedQuat operator*(const FFixed64& Scale) const
+	FORCEINLINE FFixedQuat64 operator*(const FFixed64& Scale) const
 	{
-		return FFixedQuat(Scale * X, Scale * Y, Scale * Z, Scale * W);
+		return FFixedQuat64(Scale * X, Scale * Y, Scale * Z, Scale * W);
 	}
 
 	/**
@@ -215,7 +215,7 @@ public:
 	 * @param Scale What to divide by.
 	 * @return a reference to this after scaling.
 	 */
-	FORCEINLINE FFixedQuat operator/=(const FFixed64& Scale)
+	FORCEINLINE FFixedQuat64 operator/=(const FFixed64& Scale)
 	{
 		const FFixed64 Recip = FFixed64((int64)1) / Scale;
 		X *= Recip;
@@ -231,17 +231,17 @@ public:
 	 * @param Scale What to divide by.
 	 * @return new Quaternion of this after division by scale.
 	 */
-	FORCEINLINE FFixedQuat operator/(const FFixed64& Scale) const
+	FORCEINLINE FFixedQuat64 operator/(const FFixed64& Scale) const
 	{
 		const FFixed64 Recip = FFixed64((int64)1) / Scale;
-		return FFixedQuat(X * Recip, Y * Recip, Z * Recip, W * Recip);
+		return FFixedQuat64(X * Recip, Y * Recip, Z * Recip, W * Recip);
 	}
 
 	/**
 	 * Identical implementation for TQuat properties.
 	 * Avoids intrinsics to remain consistent with previous per-property comparison.
 	 */
-	bool Identical(const FFixedQuat* Q, const uint32 PortFlags) const;
+	bool Identical(const FFixedQuat64* Q, const uint32 PortFlags) const;
 
 	/**
 	 * Checks whether two quaternions are identical.
@@ -252,7 +252,7 @@ public:
 	 * @return true if two quaternion are identical, otherwise false.
 	 * @see Equals
 	 */
-	bool operator==(const FFixedQuat& Q) const;
+	bool operator==(const FFixedQuat64& Q) const;
 
 	/**
 	 * Checks whether two quaternions are not identical.
@@ -260,7 +260,7 @@ public:
 	 * @param Q The other quaternion.
 	 * @return true if two quaternion are not identical, otherwise false.
 	 */
-	bool operator!=(const FFixedQuat& Q) const;
+	bool operator!=(const FFixedQuat64& Q) const;
 
 	/**
 	 * Calculates dot product of two quaternions.
@@ -268,9 +268,9 @@ public:
 	 * @param Q The other quaternions.
 	 * @return The dot product.
 	 */
-	FFixed64 operator|(const FFixedQuat& Q) const;
+	FFixed64 operator|(const FFixedQuat64& Q) const;
 
-	FFixedRotator Rotator() const;
+	FFixedRotator64 Rotator() const;
 
 	// Return true if this quaternion is normalized
 	FORCEINLINE bool IsNormalized() const
@@ -302,11 +302,11 @@ public:
 	 * @return inverse of this quaternion
 	 * @warning : Requires this quaternion to be normalized.
 	 */
-	FORCEINLINE FFixedQuat Inverse() const
+	FORCEINLINE FFixedQuat64 Inverse() const
 	{
 		checkSlow(IsNormalized());
 
-		return FFixedQuat(-X, -Y, -Z, W);
+		return FFixedQuat64(-X, -Y, -Z, W);
 	}
 
 	/**
@@ -330,7 +330,7 @@ public:
 		}
 		else
 		{
-			*this = FFixedQuat::Identity;
+			*this = FFixedQuat64::Identity;
 		}
 	}
 
@@ -350,7 +350,7 @@ public:
 	 * @param V the vector to be rotated
 	 * @return vector after rotation
 	 */
-	FFixedVector RotateVector(FFixedVector V) const
+	FFixedVector64 RotateVector(FFixedVector64 V) const
 	{
 		// http://people.csail.mit.edu/bkph/articles/Quaternions.pdf
 		// V' = V + 2w(Q x V) + (2Q x (Q x V))
@@ -359,9 +359,9 @@ public:
 		// T = 2(Q x V);
 		// V' = V + w*(T) + (Q x T)
 
-		const FFixedVector Q(X, Y, Z);
-		const FFixedVector TT = FFixedVector::CrossProduct(Q, V) * FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2);
-		const FFixedVector Result = V + (TT * W) + FFixedVector::CrossProduct(Q, TT);
+		const FFixedVector64 Q(X, Y, Z);
+		const FFixedVector64 TT = FFixedVector64::CrossProduct(Q, V) * FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2);
+		const FFixedVector64 Result = V + (TT * W) + FFixedVector64::CrossProduct(Q, TT);
 		return Result;
 	}
 
@@ -371,11 +371,11 @@ public:
 	 * @param V the vector to be rotated
 	 * @return vector after rotation by the inverse of this quaternion.
 	 */
-	FFixedVector UnrotateVector(FFixedVector V) const
+	FFixedVector64 UnrotateVector(FFixedVector64 V) const
 	{
-		const FFixedVector Q(-X, -Y, -Z); // Inverse
-		const FFixedVector TT = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2) * FFixedVector::CrossProduct(Q, V);
-		const FFixedVector Result = V + (W * TT) + FFixedVector::CrossProduct(Q, TT);
+		const FFixedVector64 Q(-X, -Y, -Z); // Inverse
+		const FFixedVector64 TT = FFixed64::MakeFromRawInt(FixedPoint::Constants::Raw64::One * 2) * FFixedVector64::CrossProduct(Q, V);
+		const FFixedVector64 Result = V + (W * TT) + FFixedVector64::CrossProduct(Q, TT);
 		return Result;
 	}
 
@@ -383,7 +383,7 @@ public:
 	 * Fast Linear Quaternion Interpolation.
 	 * Result is NOT normalized.
 	 */
-	static FORCEINLINE FFixedQuat FastLerp(const FFixedQuat& A, const FFixedQuat& B, const FFixed64 Alpha)
+	static FORCEINLINE FFixedQuat64 FastLerp(const FFixedQuat64& A, const FFixedQuat64& B, const FFixed64 Alpha)
 	{
 		// To ensure the 'shortest route', we make sure the dot product between the both rotations is positive.
 		const FFixed64 DotResult = (A | B);
@@ -397,7 +397,7 @@ public:
 	}
 };
 
-FORCEINLINE FFixedQuat::FFixedQuat(EForceInit ZeroOrNot)
+FORCEINLINE FFixedQuat64::FFixedQuat64(EForceInit ZeroOrNot)
 { 
 	X = FFixed64();
 	Y = FFixed64();
@@ -405,7 +405,7 @@ FORCEINLINE FFixedQuat::FFixedQuat(EForceInit ZeroOrNot)
 	W = ZeroOrNot == EForceInit::ForceInitToZero ? FFixed64() : FFixed64((int64)1);
 }
 
-FORCEINLINE FFixedQuat::FFixedQuat(const FFixedVector& inAxis, const FFixed64& inAngleRad)
+FORCEINLINE FFixedQuat64::FFixedQuat64(const FFixedVector64& inAxis, const FFixed64& inAngleRad)
 {
 	const FFixed64 half_a = FixedPoint::Constants::Fixed64::Half * inAngleRad;
 	FFixed64 s, c;
@@ -417,7 +417,7 @@ FORCEINLINE FFixedQuat::FFixedQuat(const FFixedVector& inAxis, const FFixed64& i
 	W = c;
 }
 
-FORCEINLINE FFixedQuat::FFixedQuat(const FFixed64& inValue)
+FORCEINLINE FFixedQuat64::FFixedQuat64(const FFixed64& inValue)
 {
 	X = inValue;
 	Y = inValue;
@@ -425,7 +425,7 @@ FORCEINLINE FFixedQuat::FFixedQuat(const FFixed64& inValue)
 	W = inValue;
 }
 
-FORCEINLINE FFixedQuat::FFixedQuat(const FFixed64& inX, const FFixed64& inY, const FFixed64& inZ, const FFixed64& inW)
+FORCEINLINE FFixedQuat64::FFixedQuat64(const FFixed64& inX, const FFixed64& inY, const FFixed64& inZ, const FFixed64& inW)
 {
 	X = inX;
 	Y = inY;
@@ -433,14 +433,14 @@ FORCEINLINE FFixedQuat::FFixedQuat(const FFixed64& inX, const FFixed64& inY, con
 	W = inW;
 }
 
-inline FFixedQuat::FFixedQuat(const FFixedMatrix& M)
+inline FFixedQuat64::FFixedQuat64(const FFixedMatrix& M)
 {
 	// If Matrix is NULL, return Identity quaternion. If any of them is 0, you won't be able to construct rotation
 	// if you have two plane at least, we can reconstruct the frame using cross product, but that's a bit expensive op to do here
 	// for now, if you convert to matrix from 0 scale and convert back, you'll lose rotation. Don't do that. 
 	if (M.GetScaledAxis(EAxis::X).IsNearlyZero() || M.GetScaledAxis(EAxis::Y).IsNearlyZero() || M.GetScaledAxis(EAxis::Z).IsNearlyZero())
 	{
-		*this = FFixedQuat::Identity;
+		*this = FFixedQuat64::Identity;
 		return;
 	}
 
@@ -449,7 +449,7 @@ inline FFixedQuat::FFixedQuat(const FFixedMatrix& M)
 	// Changed to this (same as RemoveScaling) from RotDeterminant as using two different ways of checking unit length matrix caused inconsistency. 
 	if (!ensure((FFixedPointMath::Abs(FixedPoint::Constants::Fixed64::One - M.GetScaledAxis(EAxis::X).SizeSquared()) <= FixedPoint::Constants::Fixed64::KindaSmallNumber) && (FFixedPointMath::Abs(FixedPoint::Constants::Fixed64::One - M.GetScaledAxis(EAxis::Y).SizeSquared()) <= FixedPoint::Constants::Fixed64::KindaSmallNumber) && (FFixedPointMath::Abs(FixedPoint::Constants::Fixed64::One - M.GetScaledAxis(EAxis::Z).SizeSquared()) <= FixedPoint::Constants::Fixed64::KindaSmallNumber)))
 	{
-		*this = FFixedQuat::Identity;
+		*this = FFixedQuat64::Identity;
 		return;
 	}
 #endif
@@ -506,12 +506,12 @@ inline FFixedQuat::FFixedQuat(const FFixedMatrix& M)
 	}
 }
 
-FORCEINLINE FFixedQuat FFixedQuat::operator+(const FFixedQuat& Q) const
+FORCEINLINE FFixedQuat64 FFixedQuat64::operator+(const FFixedQuat64& Q) const
 {
-	return FFixedQuat(X + Q.X, Y + Q.Y, Z + Q.Z, W + Q.W);
+	return FFixedQuat64(X + Q.X, Y + Q.Y, Z + Q.Z, W + Q.W);
 }
 
-FORCEINLINE FFixedQuat FFixedQuat::operator+=(const FFixedQuat& Q)
+FORCEINLINE FFixedQuat64 FFixedQuat64::operator+=(const FFixedQuat64& Q)
 {
 	this->X += Q.X;
 	this->Y += Q.Y;
@@ -521,28 +521,28 @@ FORCEINLINE FFixedQuat FFixedQuat::operator+=(const FFixedQuat& Q)
 	return *this;
 }
 
-FORCEINLINE FFixedQuat FFixedQuat::operator-(const FFixedQuat& Q) const
+FORCEINLINE FFixedQuat64 FFixedQuat64::operator-(const FFixedQuat64& Q) const
 {
-	return FFixedQuat(X - Q.X, Y - Q.Y, Z - Q.Z, W - Q.W);
+	return FFixedQuat64(X - Q.X, Y - Q.Y, Z - Q.Z, W - Q.W);
 }
 
-FORCEINLINE FFixedQuat FFixedQuat::operator-() const
+FORCEINLINE FFixedQuat64 FFixedQuat64::operator-() const
 {
-	return FFixedQuat(-X, -Y, -Z, -W);
+	return FFixedQuat64(-X, -Y, -Z, -W);
 }
 
-FORCEINLINE bool FFixedQuat::Equals(const FFixedQuat& Q, FFixed64 Tolerance) const
+FORCEINLINE bool FFixedQuat64::Equals(const FFixedQuat64& Q, FFixed64 Tolerance) const
 {
 	return (FFixedPointMath::Abs(X - Q.X) <= Tolerance && FFixedPointMath::Abs(Y - Q.Y) <= Tolerance && FFixedPointMath::Abs(Z - Q.Z) <= Tolerance && FFixedPointMath::Abs(W - Q.W) <= Tolerance)
 		|| (FFixedPointMath::Abs(X + Q.X) <= Tolerance && FFixedPointMath::Abs(Y + Q.Y) <= Tolerance && FFixedPointMath::Abs(Z + Q.Z) <= Tolerance && FFixedPointMath::Abs(W + Q.W) <= Tolerance);
 }
 
-FORCEINLINE bool FFixedQuat::IsIdentity(FFixed64 Tolerance) const
+FORCEINLINE bool FFixedQuat64::IsIdentity(FFixed64 Tolerance) const
 {
-	return Equals(FFixedQuat::Identity, Tolerance);
+	return Equals(FFixedQuat64::Identity, Tolerance);
 }
 
-FORCEINLINE FFixedQuat FFixedQuat::operator-=(const FFixedQuat& Q)
+FORCEINLINE FFixedQuat64 FFixedQuat64::operator-=(const FFixedQuat64& Q)
 {
 	this->X -= Q.X;
 	this->Y -= Q.Y;
@@ -552,9 +552,9 @@ FORCEINLINE FFixedQuat FFixedQuat::operator-=(const FFixedQuat& Q)
 	return *this;
 }
 
-FORCEINLINE FFixedQuat FFixedQuat::operator*(const FFixedQuat& Q) const
+FORCEINLINE FFixedQuat64 FFixedQuat64::operator*(const FFixedQuat64& Q) const
 {
-	return FFixedQuat(
+	return FFixedQuat64(
 		W * Q.W - X * Q.X - Y * Q.Y - Z * Q.Z,  // 1
 		W * Q.X + X * Q.W + Y * Q.Z - Z * Q.Y,  // i
 		W * Q.Y - X * Q.Z + Y * Q.W + Z * Q.X,  // j
@@ -562,7 +562,7 @@ FORCEINLINE FFixedQuat FFixedQuat::operator*(const FFixedQuat& Q) const
 	);
 }
 
-FORCEINLINE FFixedQuat FFixedQuat::operator*=(const FFixedQuat& Q)
+FORCEINLINE FFixedQuat64 FFixedQuat64::operator*=(const FFixedQuat64& Q)
 {
 	this->X = W * Q.W - X * Q.X - Y * Q.Y - Z * Q.Z;  // 1
 	this->Y = W * Q.X + X * Q.W + Y * Q.Z - Z * Q.Y;  // i
@@ -572,33 +572,33 @@ FORCEINLINE FFixedQuat FFixedQuat::operator*=(const FFixedQuat& Q)
 	return *this;
 }
 
-FORCEINLINE bool FFixedQuat::Identical(const FFixedQuat* Q, const uint32 PortFlags) const
+FORCEINLINE bool FFixedQuat64::Identical(const FFixedQuat64* Q, const uint32 PortFlags) const
 {
 	return X == Q->X && Y == Q->Y && Z == Q->Z && W == Q->W;
 }
 
-FORCEINLINE bool FFixedQuat::operator==(const FFixedQuat& Q) const
+FORCEINLINE bool FFixedQuat64::operator==(const FFixedQuat64& Q) const
 {
 	return X == Q.X && Y == Q.Y && Z == Q.Z && W == Q.W;
 }
 
-FORCEINLINE bool FFixedQuat::operator!=(const FFixedQuat& Q) const
+FORCEINLINE bool FFixedQuat64::operator!=(const FFixedQuat64& Q) const
 {
 	return X != Q.X || Y != Q.Y || Z != Q.Z || W != Q.W;
 }
 
-FORCEINLINE FFixed64 FFixedQuat::operator|(const FFixedQuat& Q) const
+FORCEINLINE FFixed64 FFixedQuat64::operator|(const FFixedQuat64& Q) const
 {
 	return X * Q.X + Y * Q.Y + Z * Q.Z + W * Q.W;
 }
 // Global operator for (fixed32 * Quat)
-FORCEINLINE FFixedQuat operator*(const FFixed32 Scale, const FFixedQuat& Q)
+FORCEINLINE FFixedQuat64 operator*(const FFixed32 Scale, const FFixedQuat64& Q)
 {
 	return Q.operator*(Scale);
 }
 
 // Global operator for (double * Quat)
-FORCEINLINE FFixedQuat operator*(const FFixed64 Scale, const FFixedQuat& Q)
+FORCEINLINE FFixedQuat64 operator*(const FFixed64 Scale, const FFixedQuat64& Q)
 {
 	return Q.operator*(Scale);
 }

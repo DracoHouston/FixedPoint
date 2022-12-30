@@ -8,7 +8,7 @@
 #include "FixedPointVector.generated.h"
 
 USTRUCT(BlueprintType)
-struct FIXEDPOINT_API FFixedVector
+struct FIXEDPOINT_API FFixedVector64
 {
 public:
 	GENERATED_BODY()
@@ -25,12 +25,12 @@ public:
 	/**
 	* Default constructor, no initialization
 	*/
-	FORCEINLINE FFixedVector() {}
+	FORCEINLINE FFixedVector64() {}
 	
 	/**
-	* Constructor that casts FVector to FFixedVector
+	* Constructor that casts FVector to FFixedVector64
 	*/
-	FORCEINLINE FFixedVector(const FVector& inValue)
+	FORCEINLINE FFixedVector64(const FVector& inValue)
 	{
 		X = inValue.X;
 		Y = inValue.Y;
@@ -40,7 +40,7 @@ public:
 	/**
 	* Sets all components to the supplied FFixed64 value
 	*/
-	FORCEINLINE FFixedVector(const FFixed64& inValue)
+	FORCEINLINE FFixedVector64(const FFixed64& inValue)
 	{
 		X = inValue;
 		Y = inValue;
@@ -50,7 +50,7 @@ public:
 	/**
 	* Sets components to the supplied FFixed64 values
 	*/
-	FORCEINLINE FFixedVector(const FFixed64& inX, const FFixed64& inY, const FFixed64& inZ) : X(inX), Y(inY), Z(inZ){}
+	FORCEINLINE FFixedVector64(const FFixed64& inX, const FFixed64& inY, const FFixed64& inZ) : X(inX), Y(inY), Z(inZ){}
 
 	/**
 	 * Constructs a vector from an TVector2<T> and Z value.
@@ -58,64 +58,64 @@ public:
 	 * @param V Vector to copy from.
 	 * @param InZ Z Coordinate.
 	 */
-	explicit FORCEINLINE FFixedVector(const FFixedVector2d& V, const FFixed64& InZ);
+	explicit FORCEINLINE FFixedVector64(const FFixedVector2d& V, const FFixed64& InZ);
 
 	/**
 	 * Constructor using the XYZ components from a 4D vector.
 	 *
 	 * @param V 4D Vector to copy from.
 	 */
-	FORCEINLINE FFixedVector(const FFixedVector4d& V);
+	FORCEINLINE FFixedVector64(const FFixedVector4d& V);
 
-	explicit FORCEINLINE FFixedVector(EForceInit) : X(FixedPoint::Constants::Fixed64::Zero), Y(FixedPoint::Constants::Fixed64::Zero), Z(FixedPoint::Constants::Fixed64::Zero) {}
+	explicit FORCEINLINE FFixedVector64(EForceInit) : X(FixedPoint::Constants::Fixed64::Zero), Y(FixedPoint::Constants::Fixed64::Zero), Z(FixedPoint::Constants::Fixed64::Zero) {}
 
 	/** Zero vector (0,0,0) */
-	static const FFixedVector ZeroVector;
+	static const FFixedVector64 ZeroVector;
 
 	/** One vector (1,1,1) */
-	static const FFixedVector OneVector;
+	static const FFixedVector64 OneVector;
 
 	/** Unreal up vector (0,0,1) */
-	static const FFixedVector UpVector;
+	static const FFixedVector64 UpVector;
 
 	/** Unreal down vector (0,0,-1) */
-	static const FFixedVector DownVector;
+	static const FFixedVector64 DownVector;
 
 	/** Unreal forward vector (1,0,0) */
-	static const FFixedVector ForwardVector;
+	static const FFixedVector64 ForwardVector;
 
 	/** Unreal backward vector (-1,0,0) */
-	static const FFixedVector BackwardVector;
+	static const FFixedVector64 BackwardVector;
 
 	/** Unreal right vector (0,1,0) */
-	static const FFixedVector RightVector;
+	static const FFixedVector64 RightVector;
 
 	/** Unreal left vector (0,-1,0) */
-	static const FFixedVector LeftVector;
+	static const FFixedVector64 LeftVector;
 
 	/** Unit X axis vector (1,0,0) */
-	static const FFixedVector XAxisVector;
+	static const FFixedVector64 XAxisVector;
 
 	/** Unit Y axis vector (0,1,0) */
-	static const FFixedVector YAxisVector;
+	static const FFixedVector64 YAxisVector;
 
 	/** Unit Z axis vector (0,0,1) */
-	static const FFixedVector ZAxisVector;
+	static const FFixedVector64 ZAxisVector;
 
 	/** @return Zero Vector (0,0,0) */
-	static inline FFixedVector Zero() { return ZeroVector; }
+	static inline FFixedVector64 Zero() { return ZeroVector; }
 
 	/** @return One Vector (1,1,1) */
-	static inline FFixedVector One() { return OneVector; }
+	static inline FFixedVector64 One() { return OneVector; }
 
 	/** @return Unit X Vector (1,0,0)  */
-	static inline FFixedVector UnitX() { return XAxisVector; }
+	static inline FFixedVector64 UnitX() { return XAxisVector; }
 
 	/** @return Unit Y Vector (0,1,0)  */
-	static inline FFixedVector UnitY() { return YAxisVector; }
+	static inline FFixedVector64 UnitY() { return YAxisVector; }
 
 	/** @return Unit Z Vector (0,0,1)  */
-	static inline FFixedVector UnitZ() { return ZAxisVector; }
+	static inline FFixedVector64 UnitZ() { return ZAxisVector; }
 
 	//for interoperability with epics classes, they do nothing, ints and fixed point numbers can't be nan
 
@@ -125,9 +125,9 @@ public:
 	/**
 	* Equals, will find if this and Other are within supplied tolerance
 	*/
-	FORCEINLINE bool Equals(const FFixedVector& Other, const FFixed64& inTolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
+	FORCEINLINE bool Equals(const FFixedVector64& Other, const FFixed64& inTolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
-		return FFixedVector::IsEqual(*this, Other, inTolerance);
+		return FFixedVector64::IsEqual(*this, Other, inTolerance);
 	}
 
 	/**
@@ -184,21 +184,21 @@ public:
 	 *
 	 * @return A copy of this vector with absolute value of each component.
 	 */
-	FORCEINLINE FFixedVector GetAbs() const
+	FORCEINLINE FFixedVector64 GetAbs() const
 	{
-		return FFixedVector(FFixedPointMath::Abs(X), FFixedPointMath::Abs(Y), FFixedPointMath::Abs(Z));
+		return FFixedVector64(FFixedPointMath::Abs(X), FFixedPointMath::Abs(Y), FFixedPointMath::Abs(Z));
 	}
 
 	/** Gets the component-wise min of two vectors. */
-	FORCEINLINE FFixedVector ComponentMin(const FFixedVector& Other) const
+	FORCEINLINE FFixedVector64 ComponentMin(const FFixedVector64& Other) const
 	{
-		return FFixedVector(FFixedPointMath::Min(X, Other.X), FFixedPointMath::Min(Y, Other.Y), FFixedPointMath::Min(Z, Other.Z));
+		return FFixedVector64(FFixedPointMath::Min(X, Other.X), FFixedPointMath::Min(Y, Other.Y), FFixedPointMath::Min(Z, Other.Z));
 	}
 
 	/** Gets the component-wise max of two vectors. */
-	FORCEINLINE FFixedVector ComponentMax(const FFixedVector& Other) const
+	FORCEINLINE FFixedVector64 ComponentMax(const FFixedVector64& Other) const
 	{
-		return FFixedVector(FFixedPointMath::Max(X, Other.X), FFixedPointMath::Max(Y, Other.Y), FFixedPointMath::Max(Z, Other.Z));
+		return FFixedVector64(FFixedPointMath::Max(X, Other.X), FFixedPointMath::Max(Y, Other.Y), FFixedPointMath::Max(Z, Other.Z));
 	}
 
 	FORCEINLINE FFixed64 SizeSquared() const
@@ -279,7 +279,7 @@ public:
 	/**
 	* Is Equal, will find if 2 FFixedVectors are within supplied tolerance
 	*/
-	FORCEINLINE static bool IsEqual(const FFixedVector& A, const FFixedVector& B, const FFixed64& inTolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
+	FORCEINLINE static bool IsEqual(const FFixedVector64& A, const FFixedVector64& B, const FFixed64& inTolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
 	{
 		return FFixedPointMath::IsEqual(A.X, B.X, inTolerance) && FFixedPointMath::IsEqual(A.Y, B.Y, inTolerance) && FFixedPointMath::IsEqual(A.Z, B.Z, inTolerance);
 	}
@@ -309,7 +309,7 @@ public:
 	 * @param V2 The second point.
 	 * @return The squared distance between two points.
 	 */
-	FORCEINLINE static FFixed64 DistSquared(const FFixedVector& A, const FFixedVector& B)
+	FORCEINLINE static FFixed64 DistSquared(const FFixedVector64& A, const FFixedVector64& B)
 	{
 		return FFixedPointMath::Square(B.X - A.X) + FFixedPointMath::Square(B.Y - A.Y) + FFixedPointMath::Square(B.Z - A.Z);
 	}
@@ -321,11 +321,11 @@ public:
 	 * @param V2 The second point.
 	 * @return The distance between two points.
 	 */
-	FORCEINLINE static FFixed64 Dist(const FFixedVector& A, const FFixedVector& B)
+	FORCEINLINE static FFixed64 Dist(const FFixedVector64& A, const FFixedVector64& B)
 	{
-		return FFixedPointMath::Sqrt(FFixedVector::DistSquared(A, B));
+		return FFixedPointMath::Sqrt(FFixedVector64::DistSquared(A, B));
 	}
-	static FORCEINLINE FFixed64 Distance(const FFixedVector& V1, const FFixedVector& V2) { return Dist(V1, V2); }
+	static FORCEINLINE FFixed64 Distance(const FFixedVector64& V1, const FFixedVector64& V2) { return Dist(V1, V2); }
 
 	/**
 	 * Squared distance between two points in the XY plane only.
@@ -334,11 +334,11 @@ public:
 	 * @param V2 The second point.
 	 * @return The squared distance between two points in the XY plane
 	 */
-	static FORCEINLINE FFixed64 DistSquaredXY(const FFixedVector& V1, const FFixedVector& V2)
+	static FORCEINLINE FFixed64 DistSquaredXY(const FFixedVector64& V1, const FFixedVector64& V2)
 	{
 		return FMath::Square(V2.X - V1.X) + FMath::Square(V2.Y - V1.Y);
 	}
-	static FORCEINLINE FFixed64 DistSquared2D(const FFixedVector& V1, const FFixedVector& V2) { return DistSquaredXY(V1, V2); }
+	static FORCEINLINE FFixed64 DistSquared2D(const FFixedVector64& V1, const FFixedVector64& V2) { return DistSquaredXY(V1, V2); }
 
 	/**
 	* Euclidean distance between two points in the XY plane (ignoring Z).
@@ -347,18 +347,18 @@ public:
 	* @param V2 The second point.
 	* @return The distance between two points in the XY plane.
 	*/
-	static FORCEINLINE FFixed64 DistXY(const FFixedVector& V1, const FFixedVector& V2)
+	static FORCEINLINE FFixed64 DistXY(const FFixedVector64& V1, const FFixedVector64& V2)
 	{
 		return FFixedPointMath::Sqrt(DistSquaredXY(V1, V2));
 	}
-	static FORCEINLINE FFixed64 Dist2D(const FFixedVector& V1, const FFixedVector& V2) { return DistXY(V1, V2); }
+	static FORCEINLINE FFixed64 Dist2D(const FFixedVector64& V1, const FFixedVector64& V2) { return DistXY(V1, V2); }
 
-	FORCEINLINE static FFixedVector CrossProduct(const FFixedVector& A, const FFixedVector& B)
+	FORCEINLINE static FFixedVector64 CrossProduct(const FFixedVector64& A, const FFixedVector64& B)
 	{
 		return A ^ B;
 	}
 
-	FORCEINLINE static FFixedVector DotProduct(const FFixedVector& A, const FFixedVector& B)
+	FORCEINLINE static FFixedVector64 DotProduct(const FFixedVector64& A, const FFixedVector64& B)
 	{
 		return A | B;
 	}
@@ -371,7 +371,7 @@ public:
 	 * @param Z The third vector.
 	 * @return The triple product: X dot (Y cross Z).
 	 */
-	FORCEINLINE static FFixedVector Triple(const FFixedVector& X, const FFixedVector& Y, const FFixedVector& Z)
+	FORCEINLINE static FFixedVector64 Triple(const FFixedVector64& X, const FFixedVector64& Y, const FFixedVector64& Z)
 	{
 		return
 			((X.X * (Y.Y * Z.Z - Y.Z * Z.Y))
@@ -379,62 +379,62 @@ public:
 				+ (X.Z * (Y.X * Z.Y - Y.Y * Z.X)));
 	}
 
-	FORCEINLINE bool operator==(const FFixedVector& Other) const
+	FORCEINLINE bool operator==(const FFixedVector64& Other) const
 	{
 		return ((X == Other.X) && (Y == Other.Y) && (Z == Other.Z));
 	}
 
-	FORCEINLINE bool operator!=(const FFixedVector& Other) const
+	FORCEINLINE bool operator!=(const FFixedVector64& Other) const
 	{
 		return ((X != Other.X) && (Y != Other.Y) && (Z != Other.Z));
 	}
 
-	FORCEINLINE FFixedVector operator-() const
+	FORCEINLINE FFixedVector64 operator-() const
 	{
-		return FFixedVector(-X, -Y, -Z);
+		return FFixedVector64(-X, -Y, -Z);
 	}
 
-	FORCEINLINE FFixedVector operator+(const FFixedVector& Other) const
+	FORCEINLINE FFixedVector64 operator+(const FFixedVector64& Other) const
 	{
-		return FFixedVector(X + Other.X, Y + Other.Y, Z + Other.Z);
+		return FFixedVector64(X + Other.X, Y + Other.Y, Z + Other.Z);
 	}
 
-	FORCEINLINE FFixedVector operator-(const FFixedVector& Other) const 
+	FORCEINLINE FFixedVector64 operator-(const FFixedVector64& Other) const 
 	{
-		return FFixedVector(X - Other.X, Y - Other.Y, Z - Other.Z);
+		return FFixedVector64(X - Other.X, Y - Other.Y, Z - Other.Z);
 	}
 
-	FORCEINLINE FFixedVector operator*(const FFixedVector& Other) const
+	FORCEINLINE FFixedVector64 operator*(const FFixedVector64& Other) const
 	{
-		return FFixedVector(X * Other.X, Y * Other.Y, Z * Other.Z);
+		return FFixedVector64(X * Other.X, Y * Other.Y, Z * Other.Z);
 	}
 
-	FORCEINLINE FFixedVector operator/(const FFixedVector& Other) const
+	FORCEINLINE FFixedVector64 operator/(const FFixedVector64& Other) const
 	{
-		return FFixedVector(X / Other.X, Y / Other.Y, Z / Other.Z);
+		return FFixedVector64(X / Other.X, Y / Other.Y, Z / Other.Z);
 	}
 
-	FORCEINLINE FFixedVector operator+(const FFixed64& Other) const
+	FORCEINLINE FFixedVector64 operator+(const FFixed64& Other) const
 	{
-		return FFixedVector(X + Other, Y + Other, Z + Other);
+		return FFixedVector64(X + Other, Y + Other, Z + Other);
 	}
 
-	FORCEINLINE FFixedVector operator-(const FFixed64& Other) const
+	FORCEINLINE FFixedVector64 operator-(const FFixed64& Other) const
 	{
-		return FFixedVector(X - Other, Y - Other, Z - Other);
+		return FFixedVector64(X - Other, Y - Other, Z - Other);
 	}
 
-	FORCEINLINE FFixedVector operator*(const FFixed64& Other) const
+	FORCEINLINE FFixedVector64 operator*(const FFixed64& Other) const
 	{
-		return FFixedVector(X * Other, Y * Other, Z * Other);
+		return FFixedVector64(X * Other, Y * Other, Z * Other);
 	}
 
-	FORCEINLINE FFixedVector operator/(const FFixed64& Other) const
+	FORCEINLINE FFixedVector64 operator/(const FFixed64& Other) const
 	{
-		return FFixedVector(X / Other, Y / Other, Z / Other);
+		return FFixedVector64(X / Other, Y / Other, Z / Other);
 	}
 
-	FORCEINLINE FFixedVector operator+=(const FFixedVector& Other)
+	FORCEINLINE FFixedVector64 operator+=(const FFixedVector64& Other)
 	{
 		X += Other.X;
 		Y += Other.Y;
@@ -442,7 +442,7 @@ public:
 		return *this;
 	}
 
-	FORCEINLINE FFixedVector operator-=(const FFixedVector& Other)
+	FORCEINLINE FFixedVector64 operator-=(const FFixedVector64& Other)
 	{
 		X -= Other.X;
 		Y -= Other.Y;
@@ -450,7 +450,7 @@ public:
 		return *this;
 	}
 
-	FORCEINLINE FFixedVector operator*=(const FFixedVector& Other)
+	FORCEINLINE FFixedVector64 operator*=(const FFixedVector64& Other)
 	{
 		X *= Other.X;
 		Y *= Other.Y;
@@ -458,7 +458,7 @@ public:
 		return *this;
 	}
 
-	FORCEINLINE FFixedVector operator/=(const FFixedVector& Other)
+	FORCEINLINE FFixedVector64 operator/=(const FFixedVector64& Other)
 	{
 		X /= Other.X;
 		Y /= Other.Y;
@@ -466,7 +466,7 @@ public:
 		return *this;
 	}
 
-	FORCEINLINE FFixedVector operator+=(const FFixed64& Other)
+	FORCEINLINE FFixedVector64 operator+=(const FFixed64& Other)
 	{
 		X += Other;
 		Y += Other;
@@ -474,7 +474,7 @@ public:
 		return *this;
 	}
 
-	FORCEINLINE FFixedVector operator-=(const FFixed64& Other)
+	FORCEINLINE FFixedVector64 operator-=(const FFixed64& Other)
 	{
 		X -= Other;
 		Y -= Other;
@@ -482,7 +482,7 @@ public:
 		return *this;
 	}
 
-	FORCEINLINE FFixedVector operator*=(const FFixed64& Other)
+	FORCEINLINE FFixedVector64 operator*=(const FFixed64& Other)
 	{
 		X *= Other;
 		Y *= Other;
@@ -490,7 +490,7 @@ public:
 		return *this;
 	}
 
-	FORCEINLINE FFixedVector operator/=(const FFixed64& Other)
+	FORCEINLINE FFixedVector64 operator/=(const FFixed64& Other)
 	{
 		X /= Other;
 		Y /= Other;
@@ -498,9 +498,9 @@ public:
 		return *this;
 	}
 
-	FORCEINLINE FFixedVector operator^(const FFixedVector& Other) const
+	FORCEINLINE FFixedVector64 operator^(const FFixedVector64& Other) const
 	{
-		return FFixedVector
+		return FFixedVector64
 		(
 			(Y * Other.Z) - (Z * Other.Y),
 			(Z * Other.X) - (X * Other.Z),
@@ -508,7 +508,7 @@ public:
 		);
 	}
 
-	FORCEINLINE FFixed64 operator|(const FFixedVector& Other) const
+	FORCEINLINE FFixed64 operator|(const FFixedVector64& Other) const
 	{
 		return (X * Other.X) + (Y * Other.Y) + (Z * Other.Z);
 	}
@@ -650,10 +650,10 @@ public:
 	 * @return Normalized version of vector.
 	 * @see GetSafeNormal()
 	 */
-	FORCEINLINE FFixedVector GetUnsafeNormal() const
+	FORCEINLINE FFixedVector64 GetUnsafeNormal() const
 	{
 		const FFixed64 Scale = FFixedPointMath::InvSqrt(X * X + Y * Y + Z * Z);
-		return FFixedVector(X * Scale, Y * Scale, Z * Scale);
+		return FFixedVector64(X * Scale, Y * Scale, Z * Scale);
 	}
 
 	/**
@@ -663,7 +663,7 @@ public:
 	 * @param Tolerance Minimum squared vector length.
 	 * @return A normalized copy if safe, ResultIfZero otherwise.
 	 */
-	FORCEINLINE FFixedVector GetSafeNormal(const FFixed64& Tolerance = FixedPoint::Constants::Fixed64::SmallNumber, const FFixedVector& ResultIfZero = ZeroVector) const
+	FORCEINLINE FFixedVector64 GetSafeNormal(const FFixed64& Tolerance = FixedPoint::Constants::Fixed64::SmallNumber, const FFixedVector64& ResultIfZero = ZeroVector) const
 	{
 		const FFixed64 SquareSum = X * X + Y * Y + Z * Z;
 
@@ -677,7 +677,7 @@ public:
 			return ResultIfZero;
 		}
 		const FFixed64 Scale = FFixedPointMath::InvSqrt(SquareSum);
-		return FFixedVector(X * Scale, Y * Scale, Z * Scale);
+		return FFixedVector64(X * Scale, Y * Scale, Z * Scale);
 	}
 
 	/**
@@ -686,10 +686,10 @@ public:
 	* @return Normalized version of vector.
 	* @see GetSafeNormal2D()
 	*/
-	FORCEINLINE FFixedVector GetUnsafeNormal2D() const
+	FORCEINLINE FFixedVector64 GetUnsafeNormal2D() const
 	{
 		const FFixed64 Scale = FFixedPointMath::InvSqrt(X * X + Y * Y);
-		return FFixedVector(X * Scale, Y * Scale, FixedPoint::Constants::Fixed64::Zero);
+		return FFixedVector64(X * Scale, Y * Scale, FixedPoint::Constants::Fixed64::Zero);
 	}
 
 	/**
@@ -699,7 +699,7 @@ public:
 	 * @param Tolerance Minimum squared vector length.
 	 * @return Normalized copy if safe, otherwise returns ResultIfZero.
 	 */
-	FORCEINLINE FFixedVector GetSafeNormal2D(const FFixed64& Tolerance = FixedPoint::Constants::Fixed64::SmallNumber, const FFixedVector& ResultIfZero = ZeroVector) const
+	FORCEINLINE FFixedVector64 GetSafeNormal2D(const FFixed64& Tolerance = FixedPoint::Constants::Fixed64::SmallNumber, const FFixedVector64& ResultIfZero = ZeroVector) const
 	{
 		const FFixed64 SquareSum = X * X + Y * Y;
 
@@ -712,7 +712,7 @@ public:
 			}
 			else
 			{
-				return FFixedVector(X, Y, 0.f);
+				return FFixedVector64(X, Y, 0.f);
 			}
 		}
 		else if (SquareSum < Tolerance)
@@ -721,7 +721,7 @@ public:
 		}
 
 		const FFixed64 Scale = FFixedPointMath::InvSqrt(SquareSum);
-		return FFixedVector(X * Scale, Y * Scale, 0.f);
+		return FFixedVector64(X * Scale, Y * Scale, 0.f);
 	}
 
 	/**
@@ -730,13 +730,13 @@ public:
 	 * @param OutDir Reference passed in to store unit direction vector.
 	 * @param OutLength Reference passed in to store length of the vector.
 	 */
-	FORCEINLINE void ToDirectionAndLength(FFixedVector& OutDir, FFixed64& OutLength) const
+	FORCEINLINE void ToDirectionAndLength(FFixedVector64& OutDir, FFixed64& OutLength) const
 	{
 		OutLength = Size();
 		if (OutLength > FixedPoint::Constants::Fixed64::SmallNumber)
 		{
 			FFixed64 OneOverLength = FixedPoint::Constants::Fixed64::One / OutLength;
-			OutDir = FFixedVector(X * OneOverLength, Y * OneOverLength, Z * OneOverLength);
+			OutDir = FFixedVector64(X * OneOverLength, Y * OneOverLength, Z * OneOverLength);
 		}
 		else
 		{
@@ -750,9 +750,9 @@ public:
 	 *
 	 * @param A copy of the vector with each component set to +1 or -1
 	 */
-	FORCEINLINE FFixedVector GetSignVector() const
+	FORCEINLINE FFixedVector64 GetSignVector() const
 	{
-		return FFixedVector
+		return FFixedVector64
 			(
 				FFixedPointMath::FloatSelect(X, FixedPoint::Constants::Fixed64::One, -FixedPoint::Constants::Fixed64::One),
 				FFixedPointMath::FloatSelect(Y, FixedPoint::Constants::Fixed64::One, -FixedPoint::Constants::Fixed64::One),
@@ -765,10 +765,10 @@ public:
 	 *
 	 * @return Projected version of vector based on Z.
 	 */
-	FORCEINLINE FFixedVector Projection() const
+	FORCEINLINE FFixedVector64 Projection() const
 	{
 		const FFixed64 RZ = FixedPoint::Constants::Fixed64::One / Z;
-		return FFixedVector(X * RZ, Y * RZ, FixedPoint::Constants::Fixed64::One);
+		return FFixedVector64(X * RZ, Y * RZ, FixedPoint::Constants::Fixed64::One);
 	}
 
 	/**
@@ -778,9 +778,9 @@ public:
 	 * @return A copy of this vector snapped to a grid.
 	 * @see FMath::GridSnap()
 	 */
-	FORCEINLINE FFixedVector GridSnap(const FFixed64& GridSz) const
+	FORCEINLINE FFixedVector64 GridSnap(const FFixed64& GridSz) const
 	{
-		return FFixedVector(FFixedPointMath::GridSnap(X, GridSz), FFixedPointMath::GridSnap(Y, GridSz), FFixedPointMath::GridSnap(Z, GridSz));
+		return FFixedVector64(FFixedPointMath::GridSnap(X, GridSz), FFixedPointMath::GridSnap(Y, GridSz), FFixedPointMath::GridSnap(Z, GridSz));
 	}
 
 	/**
@@ -789,9 +789,9 @@ public:
 	 * @param Radius Half size of the cube.
 	 * @return A copy of this vector, bound by cube.
 	 */
-	FORCEINLINE FFixedVector BoundToCube(FFixed64 Radius) const
+	FORCEINLINE FFixedVector64 BoundToCube(FFixed64 Radius) const
 	{
-		return FFixedVector
+		return FFixedVector64
 			(
 				FFixedPointMath::Clamp(X, -Radius, Radius),
 				FFixedPointMath::Clamp(Y, -Radius, Radius),
@@ -800,9 +800,9 @@ public:
 	}
 
 	/** Get a copy of this vector, clamped inside of a cube. */
-	FORCEINLINE FFixedVector BoundToBox(const FFixedVector& Min, const FFixedVector& Max) const
+	FORCEINLINE FFixedVector64 BoundToBox(const FFixedVector64& Min, const FFixedVector64& Max) const
 	{
-		return FFixedVector
+		return FFixedVector64
 			(
 				FFixedPointMath::Clamp(X, Min.X, Max.X),
 				FFixedPointMath::Clamp(Y, Min.Y, Max.Y),
@@ -811,10 +811,10 @@ public:
 	}
 
 	/** Create a copy of this vector, with its magnitude clamped between Min and Max. */
-	FORCEINLINE FFixedVector GetClampedToSize(FFixed64 Min, FFixed64 Max) const
+	FORCEINLINE FFixedVector64 GetClampedToSize(FFixed64 Min, FFixed64 Max) const
 	{
 		FFixed64 VecSize = Size();
-		const FFixedVector VecDir = (VecSize > FixedPoint::Constants::Fixed64::SmallNumber) ? (*this / VecSize) : ZeroVector;
+		const FFixedVector64 VecDir = (VecSize > FixedPoint::Constants::Fixed64::SmallNumber) ? (*this / VecSize) : ZeroVector;
 
 		VecSize = FFixedPointMath::Clamp(VecSize, Min, Max);
 
@@ -822,18 +822,18 @@ public:
 	}
 
 	/** Create a copy of this vector, with the 2D magnitude clamped between Min and Max. Z is unchanged. */
-	FORCEINLINE FFixedVector GetClampedToSize2D(FFixed64 Min, FFixed64 Max) const
+	FORCEINLINE FFixedVector64 GetClampedToSize2D(FFixed64 Min, FFixed64 Max) const
 	{
 		FFixed64 VecSize2D = Size2D();
-		const FFixedVector VecDir = (VecSize2D > FixedPoint::Constants::Fixed64::SmallNumber) ? (*this / VecSize2D) : ZeroVector;
+		const FFixedVector64 VecDir = (VecSize2D > FixedPoint::Constants::Fixed64::SmallNumber) ? (*this / VecSize2D) : ZeroVector;
 
 		VecSize2D = FFixedPointMath::Clamp(VecSize2D, Min, Max);
 
-		return FFixedVector(VecSize2D * VecDir.X, VecSize2D * VecDir.Y, Z);
+		return FFixedVector64(VecSize2D * VecDir.X, VecSize2D * VecDir.Y, Z);
 	}
 
 	/** Create a copy of this vector, with its maximum magnitude clamped to MaxSize. */
-	FORCEINLINE FFixedVector GetClampedToMaxSize(FFixed64 MaxSize) const
+	FORCEINLINE FFixedVector64 GetClampedToMaxSize(FFixed64 MaxSize) const
 	{
 		if (MaxSize < FixedPoint::Constants::Fixed64::KindaSmallNumber)
 		{
@@ -844,7 +844,7 @@ public:
 		if (VSq > FFixedPointMath::Square(MaxSize))
 		{
 			const FFixed64 Scale = MaxSize * FFixedPointMath::InvSqrt(VSq);
-			return FFixedVector(X * Scale, Y * Scale, Z * Scale);
+			return FFixedVector64(X * Scale, Y * Scale, Z * Scale);
 		}
 		else
 		{
@@ -853,18 +853,18 @@ public:
 	}
 
 	/** Create a copy of this vector, with the maximum 2D magnitude clamped to MaxSize. Z is unchanged. */
-	FORCEINLINE FFixedVector GetClampedToMaxSize2D(FFixed64 MaxSize) const
+	FORCEINLINE FFixedVector64 GetClampedToMaxSize2D(FFixed64 MaxSize) const
 	{
 		if (MaxSize < FixedPoint::Constants::Fixed64::KindaSmallNumber)
 		{
-			return FFixedVector(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, Z);
+			return FFixedVector64(FixedPoint::Constants::Fixed64::Zero, FixedPoint::Constants::Fixed64::Zero, Z);
 		}
 
 		const FFixed64 VSq2D = SizeSquared2D();
 		if (VSq2D > FFixedPointMath::Square(MaxSize))
 		{
 			const FFixed64 Scale = MaxSize * FFixedPointMath::InvSqrt(VSq2D);
-			return FFixedVector(X * Scale, Y * Scale, Z);
+			return FFixedVector64(X * Scale, Y * Scale, Z);
 		}
 		else
 		{
@@ -878,7 +878,7 @@ public:
 	 * @param V Vector to add.
 	 * @param Radius Half size of the cube.
 	 */
-	FORCEINLINE void AddBounded(const FFixedVector& V, FFixed64 Radius = MAX_int16)
+	FORCEINLINE void AddBounded(const FFixedVector64& V, FFixed64 Radius = MAX_int16)
 	{
 		*this = (*this + V).BoundToCube(Radius);
 	}
@@ -889,9 +889,9 @@ public:
 	 *
 	 * @return Reciprocal of this vector.
 	 */
-	FORCEINLINE FFixedVector Reciprocal() const
+	FORCEINLINE FFixedVector64 Reciprocal() const
 	{
-		FFixedVector RecVector;
+		FFixedVector64 RecVector;
 		if (X != FixedPoint::Constants::Fixed64::Zero)
 		{
 			RecVector.X = FixedPoint::Constants::Fixed64::One / X;
@@ -968,7 +968,7 @@ public:
 	 * @param Axis Axis to rotate around.
 	 * @return Rotated Vector.
 	 */
-	FORCEINLINE FFixedVector RotateAngleAxisRad(const FFixed64 AngleRad, const FFixedVector& Axis) const
+	FORCEINLINE FFixedVector64 RotateAngleAxisRad(const FFixed64 AngleRad, const FFixedVector64& Axis) const
 	{
 		FFixed64 S, C;
 		FFixedPointMath::SinCos(&S, &C, AngleRad);
@@ -987,7 +987,7 @@ public:
 			  
 		const FFixed64 OMC = FixedPoint::Constants::Fixed64::One - C;
 
-		return FFixedVector(
+		return FFixedVector64(
 			(OMC * XX + C) * X + (OMC * XY - ZS) * Y + (OMC * ZX + YS) * Z,
 			(OMC * XY + ZS) * X + (OMC * YY + C) * Y + (OMC * YZ - XS) * Z,
 			(OMC * ZX - YS) * X + (OMC * YZ + XS) * Y + (OMC * ZZ + C) * Z
@@ -1001,7 +1001,7 @@ public:
 	 * @param Axis Axis to rotate around.
 	 * @return Rotated Vector.
 	 */
-	FORCEINLINE FFixedVector RotateAngleAxis(const FFixed64 AngleDeg, const FFixedVector& Axis) const
+	FORCEINLINE FFixedVector64 RotateAngleAxis(const FFixed64 AngleDeg, const FFixedVector64& Axis) const
 	{
 		return RotateAngleAxisRad(FFixedPointMath::DegreesToRadians(AngleDeg), Axis);
 	}
@@ -1012,9 +1012,9 @@ public:
 	 * @param B the other vector to find the 2D cosine of the angle with.
 	 * @return The cosine.
 	 */
-	FORCEINLINE FFixed64 CosineAngle2D(FFixedVector B) const
+	FORCEINLINE FFixed64 CosineAngle2D(FFixedVector64 B) const
 	{
-		FFixedVector A(*this);
+		FFixedVector64 A(*this);
 		A.Z = 0.0f;
 		B.Z = 0.0f;
 		A.Normalize();
@@ -1028,7 +1028,7 @@ public:
 	 * @param A	Vector to project onto, does not assume it is normalized.
 	 * @return Projected vector.
 	 */
-	FORCEINLINE FFixedVector ProjectOnTo(const FFixedVector& A) const
+	FORCEINLINE FFixedVector64 ProjectOnTo(const FFixedVector64& A) const
 	{
 		return (A * ((*this | A) / (A | A)));
 	}
@@ -1039,7 +1039,7 @@ public:
 	 * @param  Normal Vector to project onto (assumed to be unit length).
 	 * @return Projected vector.
 	 */
-	FORCEINLINE FFixedVector ProjectOnToNormal(const FFixedVector& Normal) const
+	FORCEINLINE FFixedVector64 ProjectOnToNormal(const FFixedVector64& Normal) const
 	{
 		return (Normal * (*this | Normal));
 	}
@@ -1084,17 +1084,17 @@ public:
 	 * @param Axis1 Reference to first axis.
 	 * @param Axis2 Reference to second axis.
 	 */
-	void FindBestAxisVectors(FFixedVector& Axis1, FFixedVector& Axis2) const
+	void FindBestAxisVectors(FFixedVector64& Axis1, FFixedVector64& Axis2) const
 	{
 		const FFixed64 NX = FFixedPointMath::Abs(X);
 		const FFixed64 NY = FFixedPointMath::Abs(Y);
 		const FFixed64 NZ = FFixedPointMath::Abs(Z);
 
 		// Find best basis vectors.
-		if (NZ > NX && NZ > NY)	Axis1 = FFixedVector(1, 0, 0);
-		else					Axis1 = FFixedVector(0, 0, 1);
+		if (NZ > NX && NZ > NY)	Axis1 = FFixedVector64(1, 0, 0);
+		else					Axis1 = FFixedVector64(0, 0, 1);
 
-		FFixedVector Tmp = Axis1 - *this * (Axis1 | *this);
+		FFixedVector64 Tmp = Axis1 - *this * (Axis1 | *this);
 		Axis1 = Tmp.GetSafeNormal();
 		Axis2 = Axis1 ^ *this;
 	}
@@ -1161,7 +1161,7 @@ public:
 		FVector parsedvector;
 		if (parsedvector.InitFromString(InSourceString))
 		{
-			*this = FFixedVector(parsedvector);
+			*this = FFixedVector64(parsedvector);
 			return true;
 		}
 		return false;
@@ -1180,7 +1180,7 @@ public:
 		FVector parsedvector;
 		if (parsedvector.InitFromCompactString(InSourceString))
 		{
-			*this = FFixedVector(parsedvector);
+			*this = FFixedVector64(parsedvector);
 			return true;
 		}
 		return false;
@@ -1200,7 +1200,7 @@ public:
 	FFixed64 HeadingAngle() const
 	{
 		// Project Dir into Z plane.
-		FFixedVector PlaneDir = *this;
+		FFixedVector64 PlaneDir = *this;
 		PlaneDir.Z = 0.f;
 		PlaneDir = PlaneDir.GetSafeNormal();
 
@@ -1224,7 +1224,7 @@ public:
 	 * @param YAxis The input basis' YAxis, and upon return the orthonormal basis' YAxis.
 	 * @param ZAxis The input basis' ZAxis, and upon return the orthonormal basis' ZAxis.
 	 */
-	static void CreateOrthonormalBasis(FFixedVector& XAxis, FFixedVector& YAxis, FFixedVector& ZAxis)
+	static void CreateOrthonormalBasis(FFixedVector64& XAxis, FFixedVector64& YAxis, FFixedVector64& ZAxis)
 	{
 		// Project the X and Y axes onto the plane perpendicular to the Z axis.
 		XAxis -= ZAxis * (ZAxis | ZAxis) / (XAxis | ZAxis);
@@ -1255,7 +1255,7 @@ public:
 	 * @param Q Second vector.
 	 * @return Whether points are the same within a threshold. Uses fast distance approximation (linear per-component distance).
 	 */
-	FORCEINLINE static bool PointsAreSame(const FFixedVector& P, const FFixedVector& Q)
+	FORCEINLINE static bool PointsAreSame(const FFixedVector64& P, const FFixedVector64& Q)
 	{
 		FFixed64 Temp;
 		Temp = P.X - Q.X;
@@ -1282,7 +1282,7 @@ public:
 	 * @param Dist Specified distance.
 	 * @return Whether two points are within the specified distance. Uses fast distance approximation (linear per-component distance).
 	 */
-	static bool PointsAreNear(const FFixedVector& Point1, const FFixedVector& Point2, FFixed64 Dist)
+	static bool PointsAreNear(const FFixedVector64& Point1, const FFixedVector64& Point2, FFixed64 Dist)
 	{
 		FFixed64 Temp;
 		Temp = (Point1.X - Point2.X); if (FFixedPointMath::Abs(Temp) >= Dist) return false;
@@ -1299,7 +1299,7 @@ public:
 	 * @param PlaneNormal The Normal of the plane (assumed to be unit length).
 	 * @return Signed distance between point and plane.
 	 */
-	FORCEINLINE static FFixed64 PointPlaneDist(const FFixedVector& Point, const FFixedVector& PlaneBase, const FFixedVector& PlaneNormal)
+	FORCEINLINE static FFixed64 PointPlaneDist(const FFixedVector64& Point, const FFixedVector64& PlaneBase, const FFixedVector64& PlaneNormal)
 	{
 		return (Point - PlaneBase) | PlaneNormal;
 	}
@@ -1311,7 +1311,7 @@ public:
 	 * @param Size The size of the box.
 	 * @return Pushout required.
 	 */
-	static FORCEINLINE FFixed64 BoxPushOut(const FFixedVector& Normal, const FFixedVector& Size)
+	static FORCEINLINE FFixed64 BoxPushOut(const FFixedVector64& Normal, const FFixedVector64& Size)
 	{
 		return FFixedPointMath::Abs(Normal.X * Size.X) + FFixedPointMath::Abs(Normal.Y * Size.Y) + FFixedPointMath::Abs(Normal.Z * Size.Z);
 	}
@@ -1319,36 +1319,36 @@ public:
 	/**
 	 * Min, Max, Min3, Max3 like FMath
 	 */
-	static FORCEINLINE FFixedVector Min(const FFixedVector& A, const FFixedVector& B)
+	static FORCEINLINE FFixedVector64 Min(const FFixedVector64& A, const FFixedVector64& B)
 	{
-		return FFixedVector(
+		return FFixedVector64(
 			FFixedPointMath::Min(A.X, B.X),
 			FFixedPointMath::Min(A.Y, B.Y),
 			FFixedPointMath::Min(A.Z, B.Z)
 			);
 	}
 
-	static FORCEINLINE FFixedVector Max(const FFixedVector& A, const FFixedVector& B)
+	static FORCEINLINE FFixedVector64 Max(const FFixedVector64& A, const FFixedVector64& B)
 	{
-		return FFixedVector(
+		return FFixedVector64(
 			FFixedPointMath::Max(A.X, B.X),
 			FFixedPointMath::Max(A.Y, B.Y),
 			FFixedPointMath::Max(A.Z, B.Z)
 			);
 	}
 
-	static FORCEINLINE FFixedVector Min3(const FFixedVector& A, const FFixedVector& B, const FFixedVector& C)
+	static FORCEINLINE FFixedVector64 Min3(const FFixedVector64& A, const FFixedVector64& B, const FFixedVector64& C)
 	{
-		return FFixedVector(
+		return FFixedVector64(
 			FFixedPointMath::Min3(A.X, B.X, C.X),
 			FFixedPointMath::Min3(A.Y, B.Y, C.Y),
 			FFixedPointMath::Min3(A.Z, B.Z, C.Z)
 			);
 	}
 
-	static FORCEINLINE FFixedVector Max3(const FFixedVector& A, const FFixedVector& B, const FFixedVector& C)
+	static FORCEINLINE FFixedVector64 Max3(const FFixedVector64& A, const FFixedVector64& B, const FFixedVector64& C)
 	{
-		return FFixedVector(
+		return FFixedVector64(
 			FFixedPointMath::Max3(A.X, B.X, C.X),
 			FFixedPointMath::Max3(A.Y, B.Y, C.Y),
 			FFixedPointMath::Max3(A.Z, B.Z, C.Z)
@@ -1363,7 +1363,7 @@ public:
 	 * @param  ParallelCosineThreshold Normals are parallel if absolute value of dot product (cosine of angle between them) is greater than or equal to this. For example: cos(1.0 degrees).
 	 * @return true if vectors are nearly parallel, false otherwise.
 	 */
-	FORCEINLINE static bool Parallel(const FFixedVector& Normal1, const FFixedVector& Normal2, FFixed64 ParallelCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreParallel)
+	FORCEINLINE static bool Parallel(const FFixedVector64& Normal1, const FFixedVector64& Normal2, FFixed64 ParallelCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreParallel)
 	{
 		const FFixed64 NormalDot = Normal1 | Normal2;
 		return FFixedPointMath::Abs(NormalDot) >= ParallelCosineThreshold;
@@ -1377,7 +1377,7 @@ public:
 	 * @param  ParallelCosineThreshold Normals are coincident if dot product (cosine of angle between them) is greater than or equal to this. For example: cos(1.0 degrees).
 	 * @return true if vectors are coincident (nearly parallel and point in the same direction), false otherwise.
 	 */
-	FORCEINLINE static bool Coincident(const FFixedVector& Normal1, const FFixedVector& Normal2, FFixed64 ParallelCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreParallel)
+	FORCEINLINE static bool Coincident(const FFixedVector64& Normal1, const FFixedVector64& Normal2, FFixed64 ParallelCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreParallel)
 	{
 		const FFixed64 NormalDot = Normal1 | Normal2;
 		return NormalDot >= ParallelCosineThreshold;
@@ -1391,7 +1391,7 @@ public:
 	 * @param  OrthogonalCosineThreshold Normals are orthogonal if absolute value of dot product (cosine of angle between them) is less than or equal to this. For example: cos(89.0 degrees).
 	 * @return true if vectors are orthogonal (perpendicular), false otherwise.
 	 */
-	FORCEINLINE static bool Orthogonal(const FFixedVector& Normal1, const FFixedVector& Normal2, FFixed64 OrthogonalCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreOrthogonal)
+	FORCEINLINE static bool Orthogonal(const FFixedVector64& Normal1, const FFixedVector64& Normal2, FFixed64 OrthogonalCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreOrthogonal)
 	{
 		const FFixed64 NormalDot = Normal1 | Normal2;
 		return FFixedPointMath::Abs(NormalDot) <= OrthogonalCosineThreshold;
@@ -1407,10 +1407,10 @@ public:
 	 * @param ParallelCosineThreshold Normals are parallel if absolute value of dot product is greater than or equal to this.
 	 * @return true if the planes are coplanar, false otherwise.
 	 */
-	static bool Coplanar(const FFixedVector& Base1, const FFixedVector& Normal1, const FFixedVector& Base2, const FFixedVector& Normal2, FFixed64 ParallelCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreParallel)
+	static bool Coplanar(const FFixedVector64& Base1, const FFixedVector64& Normal1, const FFixedVector64& Base2, const FFixedVector64& Normal2, FFixed64 ParallelCosineThreshold = FixedPoint::Constants::Fixed64::ThreshNormalsAreParallel)
 	{
-		if (!FFixedVector::Parallel(Normal1, Normal2, ParallelCosineThreshold)) return false;
-		else if (FFixedPointMath::Abs(FFixedVector::PointPlaneDist(Base2, Base1, Normal1)) > FixedPoint::Constants::Fixed64::ThreshPointOnPlane) return false;
+		if (!FFixedVector64::Parallel(Normal1, Normal2, ParallelCosineThreshold)) return false;
+		else if (FFixedPointMath::Abs(FFixedVector64::PointPlaneDist(Base2, Base1, Normal1)) > FixedPoint::Constants::Fixed64::ThreshPointOnPlane) return false;
 		else return true;
 	}
 
@@ -1420,17 +1420,17 @@ public:
 	}
 };
 
-FORCEINLINE FFixedVector operator*(FFixed64 Scale, const FFixedVector& V)
+FORCEINLINE FFixedVector64 operator*(FFixed64 Scale, const FFixedVector64& V)
 {
 	return V.operator*(Scale);
 }
 
 template<>
-struct TCustomLerp<FFixedVector>
+struct TCustomLerp<FFixedVector64>
 {
 	enum { Value = true };
 
-	static FORCEINLINE_DEBUGGABLE FFixedVector Lerp(const FFixedVector& A, const FFixedVector& B, const FFixed64& Alpha)
+	static FORCEINLINE_DEBUGGABLE FFixedVector64 Lerp(const FFixedVector64& A, const FFixedVector64& B, const FFixed64& Alpha)
 	{
 		return A + Alpha * (B - A);
 	}

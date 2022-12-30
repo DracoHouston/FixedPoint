@@ -58,7 +58,7 @@ public:
 	 * @param InZ Z vector
 	 * @param InW W vector
 	 */
-	FORCEINLINE FFixedMatrix(const FFixedVector& InX, const FFixedVector& InY, const FFixedVector& InZ, const FFixedVector& InW);
+	FORCEINLINE FFixedMatrix(const FFixedVector64& InX, const FFixedVector64& InY, const FFixedVector64& InZ, const FFixedVector64& InW);
 
 	FFixed64 M[4][4];
 
@@ -315,22 +315,22 @@ public:
 	FORCEINLINE FFixedVector4d TransformFVector4(const FFixedVector4d& V) const;
 
 	/** Transform a location - will take into account translation part of the FFixedMatrix. */
-	FORCEINLINE FFixedVector4d TransformPosition(const FFixedVector& V) const;
+	FORCEINLINE FFixedVector4d TransformPosition(const FFixedVector64& V) const;
 
 	/** Inverts the matrix and then transforms V - correctly handles scaling in this matrix. */
-	FORCEINLINE FFixedVector InverseTransformPosition(const FFixedVector& V) const;
+	FORCEINLINE FFixedVector64 InverseTransformPosition(const FFixedVector64& V) const;
 
 	/**
 	 *	Transform a direction vector - will not take into account translation part of the FFixedMatrix.
 	 *	If you want to transform a surface normal (or plane) and correctly account for non-uniform scaling you should use TransformByUsingAdjointT.
 	 */
-	FORCEINLINE FFixedVector4d TransformVector(const FFixedVector& V) const;
+	FORCEINLINE FFixedVector4d TransformVector(const FFixedVector64& V) const;
 
 	/**
 	 *	Transform a direction vector by the inverse of this matrix - will not take into account translation part.
 	 *	If you want to transform a surface normal (or plane) and correctly account for non-uniform scaling you should use TransformByUsingAdjointT with adjoint of matrix inverse.
 	 */
-	FORCEINLINE FFixedVector InverseTransformVector(const FFixedVector& V) const;
+	FORCEINLINE FFixedVector64 InverseTransformVector(const FFixedVector64& V) const;
 
 	// Transpose.
 
@@ -460,10 +460,10 @@ public:
 	}
 
 	/** Remove any scaling from this matrix (ie magnitude of each row is 1) and return the 3D scale vector that was initially present with error Tolerance */
-	inline FFixedVector ExtractScaling(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber);
+	inline FFixedVector64 ExtractScaling(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber);
 
 	/** return a 3D scale vector calculated from this matrix (where each component is the magnitude of a row vector) with error Tolerance. */
-	inline FFixedVector GetScaleVector(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber) const;
+	inline FFixedVector64 GetScaleVector(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber) const;
 
 	// Remove any translation from this matrix
 	inline FFixedMatrix RemoveTranslation() const
@@ -476,7 +476,7 @@ public:
 	}
 
 	/** Returns a matrix with an additional translation concatenated. */
-	inline FFixedMatrix ConcatTranslation(const FFixedVector& Translation) const;
+	inline FFixedMatrix ConcatTranslation(const FFixedVector64& Translation) const;
 
 	/** Returns true if any element of this matrix is NaN */
 	inline bool ContainsNaN() const
@@ -485,7 +485,7 @@ public:
 	}
 
 	/** Scale the translation part of the matrix by the supplied vector. */
-	inline void ScaleTranslation(const FFixedVector& Scale3D);
+	inline void ScaleTranslation(const FFixedVector64& Scale3D);
 
 	/** @return the minimum magnitude of any row of the matrix. */
 	inline FFixed64 GetMinimumAxisScale() const
@@ -517,7 +517,7 @@ public:
 	inline FFixedMatrix ApplyScale(FFixed64 Scale) const;
 
 	// @return the origin of the co-ordinate system
-	inline FFixedVector GetOrigin() const;
+	inline FFixedVector64 GetOrigin() const;
 
 	/**
 	 * get axis of this matrix scaled by the scale of the matrix
@@ -525,7 +525,7 @@ public:
 	 * @param i index into the axis of the matrix
 	 * @ return vector of the axis
 	 */
-	FORCEINLINE FFixedVector GetScaledAxis(EAxis::Type Axis) const;
+	FORCEINLINE FFixedVector64 GetScaledAxis(EAxis::Type Axis) const;
 
 	/**
 	 * get axes of this matrix scaled by the scale of the matrix
@@ -534,7 +534,7 @@ public:
 	 * @param Y axes returned to this param
 	 * @param Z axes returned to this param
 	 */
-	inline void GetScaledAxes(FFixedVector& X, FFixedVector& Y, FFixedVector& Z) const;
+	inline void GetScaledAxes(FFixedVector64& X, FFixedVector64& Y, FFixedVector64& Z) const;
 
 	/**
 	 * get unit length axis of this matrix
@@ -542,7 +542,7 @@ public:
 	 * @param i index into the axis of the matrix
 	 * @return vector of the axis
 	 */
-	inline FFixedVector GetUnitAxis(EAxis::Type Axis) const;
+	inline FFixedVector64 GetUnitAxis(EAxis::Type Axis) const;
 
 	/**
 	 * get unit length axes of this matrix
@@ -551,7 +551,7 @@ public:
 	 * @param Y axes returned to this param
 	 * @param Z axes returned to this param
 	 */
-	inline void GetUnitAxes(FFixedVector& X, FFixedVector& Y, FFixedVector& Z) const;
+	inline void GetUnitAxes(FFixedVector64& X, FFixedVector64& Y, FFixedVector64& Z) const;
 
 	/**
 	 * set an axis of this matrix
@@ -559,10 +559,10 @@ public:
 	 * @param i index into the axis of the matrix
 	 * @param Axis vector of the axis
 	 */
-	inline void SetAxis(int32 i, const FFixedVector& Axis);
+	inline void SetAxis(int32 i, const FFixedVector64& Axis);
 
 	// Set the origin of the coordinate system to the given vector
-	inline void SetOrigin(const FFixedVector& NewOrigin);
+	inline void SetOrigin(const FFixedVector64& NewOrigin);
 
 	/**
 	 * Update the axes of the matrix if any value is NULL do not update that axis
@@ -572,7 +572,7 @@ public:
 	 * @param Axis2 set matrix row 2
 	 * @param Origin set matrix row 3
 	 */
-	inline void SetAxes(const FFixedVector* Axis0 = NULL, const FFixedVector* Axis1 = NULL, const FFixedVector* Axis2 = NULL, const FFixedVector* Origin = NULL);
+	inline void SetAxes(const FFixedVector64* Axis0 = NULL, const FFixedVector64* Axis1 = NULL, const FFixedVector64* Axis2 = NULL, const FFixedVector64* Origin = NULL);
 
 	/**
 	 * get a column of this matrix
@@ -580,7 +580,7 @@ public:
 	 * @param i index into the column of the matrix
 	 * @return vector of the column
 	 */
-	inline FFixedVector GetColumn(int32 i) const;
+	inline FFixedVector64 GetColumn(int32 i) const;
 
 	/**
 	 * Set a column of this matrix
@@ -588,10 +588,10 @@ public:
 	 * @param i index of the matrix column
 	 * @param Value new value of the column
 	 */
-	inline void SetColumn(int32 i, FFixedVector Value);
+	inline void SetColumn(int32 i, FFixedVector64 Value);
 
 	/** @return rotator representation of this matrix */
-	FFixedRotator Rotator() const;
+	FFixedRotator64 Rotator() const;
 
 	/**
 	 * Utility for mirroring this transform across a certain plane, and flipping one of the axis as well.

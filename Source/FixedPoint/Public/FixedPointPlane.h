@@ -7,7 +7,7 @@
 #include "FixedPointPlane.generated.h"
 
 USTRUCT(BlueprintType)
-struct FIXEDPOINT_API FFixedPlane : public FFixedVector
+struct FIXEDPOINT_API FFixedPlane : public FFixedVector64
 {
 public:
 	GENERATED_BODY()
@@ -23,7 +23,7 @@ public:
 	 *
 	 * @param V 4D vector to set up plane.
 	 */
-	FORCEINLINE FFixedPlane(const FFixedVector4d& V) : FFixedVector(V), W(V.W) {}
+	FORCEINLINE FFixedPlane(const FFixedVector4d& V) : FFixedVector64(V), W(V.W) {}
 
 	/**
 	 * Constructor.
@@ -33,7 +33,7 @@ public:
 	 * @param InZ Z-coefficient.
 	 * @param InW W-coefficient.
 	 */
-	FORCEINLINE FFixedPlane(FFixed64 InX, FFixed64 InY, FFixed64 InZ, FFixed64 InW) : FFixedVector(InX, InY, InZ), W(InW)
+	FORCEINLINE FFixedPlane(FFixed64 InX, FFixed64 InY, FFixed64 InZ, FFixed64 InW) : FFixedVector64(InX, InY, InZ), W(InW)
 	{
 	}
 
@@ -43,7 +43,7 @@ public:
 	 * @param InNormal Plane Normal Vector.
 	 * @param InW Plane W-coefficient.
 	 */
-	FORCEINLINE FFixedPlane(FFixedVector InNormal, FFixed64 InW) : FFixedVector(InNormal), W(InW)
+	FORCEINLINE FFixedPlane(FFixedVector64 InNormal, FFixed64 InW) : FFixedVector64(InNormal), W(InW)
 	{
 	}
 
@@ -53,7 +53,7 @@ public:
 	 * @param InBase Base point in plane.
 	 * @param InNormal Plane Normal Vector.
 	 */
-	FORCEINLINE FFixedPlane(FFixedVector InBase, const FFixedVector& InNormal) : FFixedVector(InNormal), W(InBase | InNormal)
+	FORCEINLINE FFixedPlane(FFixedVector64 InBase, const FFixedVector64& InNormal) : FFixedVector64(InNormal), W(InBase | InNormal)
 	{
 	}
 
@@ -64,9 +64,9 @@ public:
 	 * @param B Second point in the plane.
 	 * @param C Third point in the plane.
 	 */
-	FFixedPlane(FFixedVector A, FFixedVector B, FFixedVector C) : FFixedVector(((B - A) ^ (C - A)).GetSafeNormal())
+	FFixedPlane(FFixedVector64 A, FFixedVector64 B, FFixedVector64 C) : FFixedVector64(((B - A) ^ (C - A)).GetSafeNormal())
 	{
-		W = A | (FFixedVector)(*this);
+		W = A | (FFixedVector64)(*this);
 	}
 
 	/**
@@ -75,7 +75,7 @@ public:
 	 * @param EForceInit Force Init Enum.
 	 */
 	explicit FORCEINLINE FFixedPlane(EForceInit)
-		: FFixedVector(FixedPoint::Constants::Fixed64::Zero), W(FixedPoint::Constants::Fixed64::Zero)
+		: FFixedVector64(FixedPoint::Constants::Fixed64::Zero), W(FixedPoint::Constants::Fixed64::Zero)
 	{}
 
 	/**
@@ -93,7 +93,7 @@ public:
 	 *
 	 * @return The origin (base point) of this plane.
 	 */
-	FORCEINLINE FFixedVector GetOrigin() const
+	FORCEINLINE FFixedVector64 GetOrigin() const
 	{
 		return GetNormal() * W;
 	}
@@ -103,7 +103,7 @@ public:
 	 *
 	 * @return The normal of this plane.
 	 */
-	FORCEINLINE const FFixedVector& GetNormal() const
+	FORCEINLINE const FFixedVector64& GetNormal() const
 	{
 		return *this;
 	}
@@ -115,7 +115,7 @@ public:
 	 * @param P The other point.
 	 * @return The distance from the plane to the point. 0: Point is on the plane. >0: Point is in front of the plane. <0: Point is behind the plane.
 	 */
-	FORCEINLINE FFixed64 PlaneDot(const FFixedVector& P) const
+	FORCEINLINE FFixed64 PlaneDot(const FFixedVector64& P) const
 	{
 		return X * P.X + Y * P.Y + Z * P.Z - W;
 	}
@@ -174,7 +174,7 @@ public:
 	 * @param V The translation amount
 	 * @return The result of transform.
 	 */
-	FORCEINLINE FFixedPlane TranslateBy(const FFixedVector& V) const
+	FORCEINLINE FFixedPlane TranslateBy(const FFixedVector64& V) const
 	{
 		return FFixedPlane(GetOrigin() + V, GetNormal());
 	}

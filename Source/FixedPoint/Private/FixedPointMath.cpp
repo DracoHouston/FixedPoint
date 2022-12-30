@@ -22,7 +22,8 @@ FFixed64 FFixedPointMath::Sqrt(const FFixed64& inValue)
 
 FFixed64 FFixedPointMath::InvSqrt(const FFixed64& inValue)
 {
-	return FixedPoint::Constants::Fixed64::One / Sqrt(inValue);
+	FFixed64 valsqrt = Sqrt(inValue);
+	return valsqrt <= FixedPoint::Constants::Fixed64::Zero ? FixedPoint::Constants::Fixed64::Zero : FixedPoint::Constants::Fixed64::One / valsqrt;
 }
 
 FFixed32 FFixedPointMath::Sqrt(const FFixed32& inValue)
@@ -354,7 +355,7 @@ bool FFixedPointMath::IsEqual(const FFixed64& A, const FFixed64& B, const FFixed
 {
 	return FFixedPointMath::Abs(A - B) <= inTolerance;
 }
-
+/*
 FFixed32 FFixedPointMath::Pow(FFixed32 inValue, int32 inPower)
 {
 	FFixed32 retval = inValue;
@@ -374,7 +375,7 @@ FFixed64 FFixedPointMath::Pow(const FFixed64& inValue, int32 inPower)
 	}
 	return retval;
 }
-
+*/
 FFixed64 FFixedPointMath::Fmod(FFixed64 X, FFixed64 Y)
 {
 	const FFixed64 AbsY = Abs(Y);

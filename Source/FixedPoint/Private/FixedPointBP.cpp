@@ -70,10 +70,10 @@ FFixed64 UFixedPointBP::SquareRootFixed64(const FFixed64& inValue)
     return FFixedPointMath::Sqrt(inValue);
 }
 
-FFixed64 UFixedPointBP::PowFixed64(const FFixed64& inValue, const int32& inPower)
-{
-    return FFixedPointMath::Pow(inValue, inPower);
-}
+//FFixed64 UFixedPointBP::PowFixed64(const FFixed64& inValue, const int32& inPower)
+//{
+//    return FFixedPointMath::Pow(inValue, inPower);
+//}
 
 FFixed64 UFixedPointBP::MaxFixed64(const FFixed64& A, const FFixed64& B)
 {
