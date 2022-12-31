@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "FixedPointFwd.h"
 #include "FixedPointNumbers.h"
+#include "Misc/AssertionMacros.h"
 #include "FixedPointVector.generated.h"
 
 USTRUCT(BlueprintType)
@@ -127,7 +128,7 @@ public:
 	*/
 	FORCEINLINE bool Equals(const FFixedVector64& Other, const FFixed64& inTolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber) const
 	{
-		return FFixedVector64::IsEqual(*this, Other, inTolerance);
+		return FFixedPointMath::Abs(X - Other.X) <= inTolerance && FFixedPointMath::Abs(Y - Other.Y) <= inTolerance && FFixedPointMath::Abs(Z - Other.Z) <= inTolerance;
 	}
 
 	/**
@@ -279,10 +280,10 @@ public:
 	/**
 	* Is Equal, will find if 2 FFixedVectors are within supplied tolerance
 	*/
-	FORCEINLINE static bool IsEqual(const FFixedVector64& A, const FFixedVector64& B, const FFixed64& inTolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
+	/*FORCEINLINE static bool IsEqual(const FFixedVector64& A, const FFixedVector64& B, const FFixed64& inTolerance = FixedPoint::Constants::Fixed64::KindaSmallNumber)
 	{
 		return FFixedPointMath::IsEqual(A.X, B.X, inTolerance) && FFixedPointMath::IsEqual(A.Y, B.Y, inTolerance) && FFixedPointMath::IsEqual(A.Z, B.Z, inTolerance);
-	}
+	}*/
 
 	/**
 	 * Normalize this vector in-place if it is larger than a given tolerance. Leaves it unchanged if not.
@@ -352,6 +353,17 @@ public:
 		return FFixedPointMath::Sqrt(DistSquaredXY(V1, V2));
 	}
 	static FORCEINLINE FFixed64 Dist2D(const FFixedVector64& V1, const FFixedVector64& V2) { return DistXY(V1, V2); }
+
+	/**
+	 * Calculate cross product between this and another vector.
+	 *
+	 * @param V The other vector.
+	 * @return The cross product.
+	 */
+	FORCEINLINE FFixedVector64 Cross(const FFixedVector64& V2) const
+	{
+		return *this ^ V2;
+	}
 
 	FORCEINLINE static FFixedVector64 CrossProduct(const FFixedVector64& A, const FFixedVector64& B)
 	{
@@ -932,6 +944,17 @@ public:
 	}
 
 	/**
+	 * Mirror a vector about a normal vector.
+	 *
+	 * @param MirrorNormal Normal vector to mirror about.
+	 * @return Mirrored vector.
+	 */
+	FORCEINLINE FFixedVector64 MirrorByVector(const FFixedVector64& MirrorNormal) const
+	{
+		return *this - MirrorNormal * (FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value * 2) * (*this | MirrorNormal));
+	}
+
+	/**
 	 * Mirrors a vector about a plane.
 	 *
 	 * @param Plane Plane to mirror about.
@@ -958,6 +981,18 @@ public:
 	 * @return Projection of Point onto plane ABC
 	 */
 	static FFixedVector64 PointPlaneProject(const FFixedVector64& Point, const FFixedVector64& A, const FFixedVector64& B, const FFixedVector64& C);
+
+	/**
+	 * Calculate the projection of a vector on the plane defined by PlaneNormal.
+	 *
+	 * @param  V The vector to project onto the plane.
+	 * @param  PlaneNormal Normal of the plane (assumed to be unit length).
+	 * @return Projection of V onto plane.
+	 */
+	FORCEINLINE static FFixedVector64 VectorPlaneProject(const FFixedVector64& V, const FFixedVector64& PlaneNormal)
+	{
+		return V - V.ProjectOnToNormal(PlaneNormal);
+	}
 
 	/**
 	 * Rotates around Axis (assumes Axis.Size() == 1).
@@ -1409,6 +1444,113 @@ public:
 		else return true;
 	}
 
+	/**
+	 * Generates a list of sample points on a Bezier curve defined by 2 points.
+	 *
+	 * @param ControlPoints	Array of 4 FVectors (vert1, controlpoint1, controlpoint2, vert2).
+	 * @param NumPoints Number of samples.
+	 * @param OutPoints Receives the output samples.
+	 * @return The path length.
+	 */
+	FORCEINLINE static FFixed64 EvaluateBezier(const FFixedVector64* ControlPoints, int32 NumPoints, TArray<FFixedVector64>& OutPoints);
+
+	/**
+	 * Converts a vector containing radian values to a vector containing degree values.
+	 *
+	 * @param RadVector	Vector containing radian values
+	 * @return Vector  containing degree values
+	 */
+	FORCEINLINE static FFixedVector64 RadiansToDegrees(const FFixedVector64& RadVector)
+	{
+		return RadVector * (FixedPoint::Constants::Fixed64::OneEighty / FixedPoint::Constants::Fixed64::Pi);
+	}
+
+	/**
+	 * Converts a vector containing degree values to a vector containing radian values.
+	 *
+	 * @param DegVector	Vector containing degree values
+	 * @return Vector containing radian values
+	 */
+	FORCEINLINE static FFixedVector64 DegreesToRadians(const FFixedVector64& DegVector)
+	{
+		return DegVector * (FixedPoint::Constants::Fixed64::Pi / FixedPoint::Constants::Fixed64::OneEighty);
+	}
+
+	/**
+	 * Given a current set of cluster centers, a set of points, iterate N times to move clusters to be central.
+	 *
+	 * @param Clusters Reference to array of Clusters.
+	 * @param Points Set of points.
+	 * @param NumIterations Number of iterations.
+	 * @param NumConnectionsToBeValid Sometimes you will have long strings that come off the mass of points
+	 * which happen to have been chosen as Cluster starting points.  You want to be able to disregard those.
+	 */
+	FORCEINLINE static void GenerateClusterCenters(TArray<FFixedVector64>& Clusters, const TArray<FFixedVector64>& Points, int32 NumIterations, int32 NumConnectionsToBeValid)
+	{
+		struct FClusterMovedHereToMakeCompile
+		{
+			FFixedVector64 ClusterPosAccum;
+			int32 ClusterSize;
+		};
+
+		// Check we have >0 points and clusters
+		if (Points.Num() == 0 || Clusters.Num() == 0)
+		{
+			return;
+		}
+
+		// Temp storage for each cluster that mirrors the order of the passed in Clusters array
+		TArray<FClusterMovedHereToMakeCompile> ClusterData;
+		ClusterData.AddZeroed(Clusters.Num());
+
+		// Then iterate
+		for (int32 ItCount = 0; ItCount < NumIterations; ItCount++)
+		{
+			// Classify each point - find closest cluster center
+			for (int32 i = 0; i < Points.Num(); i++)
+			{
+				const FFixedVector64& Pos = Points[i];
+
+				// Iterate over all clusters to find closes one
+				int32 NearestClusterIndex = INDEX_NONE;
+				FFixed64 NearestClusterDistSqr = FixedPoint::Constants::Fixed64::BigNumber;
+				for (int32 j = 0; j < Clusters.Num(); j++)
+				{
+					const FFixed64 DistSqr = (Pos - Clusters[j]).SizeSquared();
+					if (DistSqr < NearestClusterDistSqr)
+					{
+						NearestClusterDistSqr = DistSqr;
+						NearestClusterIndex = j;
+					}
+				}
+				// Update its info with this point
+				if (NearestClusterIndex != INDEX_NONE)
+				{
+					ClusterData[NearestClusterIndex].ClusterPosAccum += Pos;
+					ClusterData[NearestClusterIndex].ClusterSize++;
+				}
+			}
+
+			// All points classified - update cluster center as average of membership
+			for (int32 i = 0; i < Clusters.Num(); i++)
+			{
+				if (ClusterData[i].ClusterSize > 0)
+				{
+					Clusters[i] = ClusterData[i].ClusterPosAccum / FFixed64((int64)ClusterData[i].ClusterSize);
+				}
+			}
+		}
+
+		// so now after we have possible cluster centers we want to remove the ones that are outliers and not part of the main cluster
+		for (int32 i = 0; i < ClusterData.Num(); i++)
+		{
+			if (ClusterData[i].ClusterSize < NumConnectionsToBeValid)
+			{
+				Clusters.RemoveAt(i);
+			}
+		}
+	}
+
 	FORCEINLINE operator FVector() const
 	{
 		return FVector((double)X,(double)Y,(double)Z);
@@ -1418,6 +1560,57 @@ public:
 FORCEINLINE FFixedVector64 operator*(FFixed64 Scale, const FFixedVector64& V)
 {
 	return V.operator*(Scale);
+}
+
+FORCEINLINE FFixed64 FFixedVector64::EvaluateBezier(const FFixedVector64* ControlPoints, int32 NumPoints, TArray<FFixedVector64>& OutPoints)
+{
+	check(ControlPoints);
+	check(NumPoints >= 2);
+
+	// var q is the change in t between successive evaluations.
+	const FFixed64 q = FixedPoint::Constants::Fixed64::One / (FFixed64)(NumPoints - 1); // q is dependent on the number of GAPS = POINTS-1
+
+	// recreate the names used in the derivation
+	const FFixedVector64& P0 = ControlPoints[0];
+	const FFixedVector64& P1 = ControlPoints[1];
+	const FFixedVector64& P2 = ControlPoints[2];
+	const FFixedVector64& P3 = ControlPoints[3];
+
+	// coefficients of the cubic polynomial that we're FDing -
+	const FFixedVector64 a = P0;
+	const FFixedVector64 b = FFixed64((int64)3) * (P1 - P0);
+	const FFixedVector64 c = FFixed64((int64)3) * (P2 - FFixed64((int64)2) * P1 + P0);
+	const FFixedVector64 d = P3 - FFixed64((int64)3) * P2 + FFixed64((int64)3) * P1 - P0;
+
+	// initial values of the poly and the 3 diffs -
+	FFixedVector64 S = a;						// the poly value
+	FFixedVector64 U = b * q + c * q * q + d * q * q * q;	// 1st order diff (quadratic)
+	FFixedVector64 V = 2 * c * q * q + 6 * d * q * q * q;	// 2nd order diff (linear)
+	FFixedVector64 W = 6 * d * q * q * q;				// 3rd order diff (constant)
+
+	// Path length.
+	FFixed64 Length = 0;
+
+	FFixedVector64 OldPos = P0;
+	OutPoints.Add(P0);	// first point on the curve is always P0.
+
+	for (int32 i = 1; i < NumPoints; ++i)
+	{
+		// calculate the next value and update the deltas
+		S += U;			// update poly value
+		U += V;			// update 1st order diff value
+		V += W;			// update 2st order diff value
+		// 3rd order diff is constant => no update needed.
+
+		// Update Length.
+		Length += FFixedVector64::Dist(S, OldPos);
+		OldPos = S;
+
+		OutPoints.Add(S);
+	}
+
+	// Return path length as experienced in sequence (linear interpolation between points).
+	return Length;
 }
 
 /** Component-wise clamp for FFixedVector64 */

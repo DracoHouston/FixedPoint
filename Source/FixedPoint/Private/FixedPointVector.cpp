@@ -30,16 +30,6 @@ FFixedVector64 FFixedVector64::PointPlaneProject(const FFixedVector64& Point, co
 	return Point - Plane.PlaneDot(Point) * Plane;
 }
 
-FFixedVector64 FFixedVector64::PointPlaneProject(const FFixedVector64& Point, const FFixedVector64& A, const FFixedVector64& B, const FFixedVector64& C)
-{
-	//Compute the plane normal from ABC
-	FFixedPlane Plane(A, B, C);
-
-	//Find the distance of X from the plane
-	//Add the distance back along the normal from the point
-	return Point - Plane.PlaneDot(Point) * Plane;
-}
-
 FFixedRotator64 FFixedVector64::ToOrientationRotator() const
 {
 	FFixedRotator64 R;
@@ -60,8 +50,8 @@ FFixedQuat64 FFixedVector64::ToOrientationQuat() const
 {
 	// Essentially an optimized Vector->Rotator->Quat made possible by knowing Roll == 0, and avoiding radians->degrees->radians.
 	// This is done to avoid adding any roll (which our API states as a constraint).
-	const FFixed64 YawRad = FMath::Atan2(Y, X);
-	const FFixed64 PitchRad = FMath::Atan2(Z, FMath::Sqrt(X * X + Y * Y));
+	const FFixed64 YawRad = FFixedPointMath::Atan2(Y, X);
+	const FFixed64 PitchRad = FFixedPointMath::Atan2(Z, FFixedPointMath::Sqrt(X * X + Y * Y));
 
 	FFixed64 SP, SY;
 	FFixed64 CP, CY;

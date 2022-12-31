@@ -638,4 +638,24 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 
 	UE_NODISCARD FORCEINLINE_DEBUGGABLE static FFixed64 ClampAngle(FFixed64 AngleDegrees, FFixed64 MinAngleDegrees, FFixed64 MaxAngleDegrees);
 	UE_NODISCARD FORCEINLINE_DEBUGGABLE static FFixed32 ClampAngle(FFixed32 AngleDegrees, FFixed32 MinAngleDegrees, FFixed32 MaxAngleDegrees);
+
+	/**
+	 * Find the intersection of a line and an offset plane. Assumes that the
+	 * line and plane do indeed intersect; you must make sure they're not
+	 * parallel before calling.
+	 *
+	 * @param Point1 the first point defining the line
+	 * @param Point2 the second point defining the line
+	 * @param PlaneOrigin the origin of the plane
+	 * @param PlaneNormal the normal of the plane
+	 *
+	 * @return The point of intersection between the line and the plane.
+	 */
+	UE_NODISCARD static FFixedVector64 LinePlaneIntersection(const FFixedVector64& Point1, const FFixedVector64& Point2, const FFixedVector64& PlaneOrigin, const FFixedVector64& PlaneNormal);
+
+	/** Determines whether a line intersects a sphere. */
+	UE_NODISCARD static bool LineSphereIntersection(const FFixedVector64& Start, const FFixedVector64& Dir, FFixed64 Length, const FFixedVector64& Origin, FFixed64 Radius);
+
+	/** Return a uniformly distributed random unit length vector = point on the unit sphere surface. */
+	UE_NODISCARD static FFixedVector64 VRand();
 };

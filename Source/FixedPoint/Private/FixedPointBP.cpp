@@ -195,10 +195,10 @@ FFixed32 UFixedPointBP::SquareRootFixed32(const FFixed32& inValue)
     return FFixedPointMath::Sqrt(inValue);
 }
 
-FFixed32 UFixedPointBP::PowFixed32(const FFixed32& inValue, const int32& inPower)
-{
-    return FFixedPointMath::Pow(inValue, inPower);
-}
+//FFixed32 UFixedPointBP::PowFixed32(const FFixed32& inValue, const int32& inPower)
+//{
+//    return FFixedPointMath::Pow(inValue, inPower);
+//}
 
 FFixed32 UFixedPointBP::MaxFixed32(const FFixed32& A, const FFixed32& B)
 {

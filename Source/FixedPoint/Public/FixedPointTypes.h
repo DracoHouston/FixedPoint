@@ -48,6 +48,16 @@ FORCEINLINE FFixedRotator64 FFixedVector64::Rotation() const
 	return ToOrientationRotator();
 }
 
+FORCEINLINE FFixedVector64 FFixedVector64::PointPlaneProject(const FFixedVector64& Point, const FFixedVector64& A, const FFixedVector64& B, const FFixedVector64& C)
+{
+	//Compute the plane normal from ABC
+	FFixedPlane Plane(A, B, C);
+
+	//Find the distance of X from the plane
+	//Add the distance back along the normal from the point
+	return Point - Plane.PlaneDot(Point) * Plane;
+}
+
 FORCEINLINE FFixedMatrix::FFixedMatrix(const FFixedPlane& InX, const FFixedPlane& InY, const FFixedPlane& InZ, const FFixedPlane& InW)
 {
 	M[0][0] = InX.X; M[0][1] = InX.Y;  M[0][2] = InX.Z;  M[0][3] = InX.W;
@@ -447,6 +457,56 @@ FORCEINLINE_DEBUGGABLE FFixed32 FFixedPointMath::ClampAngle(FFixed32 AngleDegree
 
 	// already in range, just return it
 	return FFixedRotator64::NormalizeAxis(AngleDegrees);
+}
+
+inline FFixedVector64 FFixedPointMath::LinePlaneIntersection
+(
+	const FFixedVector64& Point1,
+	const FFixedVector64& Point2,
+	const FFixedVector64& PlaneOrigin,
+	const FFixedVector64& PlaneNormal
+)
+{
+	return
+		Point1
+		+ (Point2 - Point1)
+		* (((PlaneOrigin - Point1) | PlaneNormal) / ((Point2 - Point1) | PlaneNormal));
+}
+
+inline bool FFixedPointMath::LineSphereIntersection(const FFixedVector64& Start, const FFixedVector64& Dir, FFixed64 Length, const FFixedVector64& Origin, FFixed64 Radius)
+{
+	const FFixedVector64	EO = Start - Origin;
+	const FFixed64		v = (Dir | (Origin - Start));
+	const FFixed64		disc = Radius * Radius - ((EO | EO) - v * v);
+
+	if (disc >= FixedPoint::Constants::Fixed64::Zero)
+	{
+		const FFixed64	Time = (v - Sqrt(disc)) / Length;
+
+		if (Time >= FixedPoint::Constants::Fixed64::Zero && Time <= FixedPoint::Constants::Fixed64::One)
+			return 1;
+		else
+			return 0;
+	}
+	else
+		return 0;
+}
+
+inline FFixedVector64 FFixedPointMath::VRand()
+{
+	FFixedVector64 Result;
+	FFixed64 L;
+
+	do
+	{
+		// Check random vectors in the unit sphere so result is statistically uniform.
+		Result.X = FRand() * 2.f - 1.f;
+		Result.Y = FRand() * 2.f - 1.f;
+		Result.Z = FRand() * 2.f - 1.f;
+		L = Result.SizeSquared();
+	} while (L > FixedPoint::Constants::Fixed64::One || L < FixedPoint::Constants::Fixed64::KindaSmallNumber);
+
+	return Result * (FixedPoint::Constants::Fixed64::One / Sqrt(L));
 }
 
 inline void FFixedMatrix::SetAxis(int32 i, const FFixedVector64& Axis)

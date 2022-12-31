@@ -168,8 +168,8 @@ class FIXEDPOINT_API UFixedPointBP : public UBlueprintFunctionLibrary
 	/**
 	* Power, multiplies inValue to the power of InPower
 	*/
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-		static FFixed32 PowFixed32(const FFixed32& inValue, const int32& inPower);
+	/*UFUNCTION(BlueprintCallable, BlueprintPure)
+		static FFixed32 PowFixed32(const FFixed32& inValue, const int32& inPower);*/
 
 	/**
 	* Max, returns the greater of 2 FFixed32s
