@@ -931,15 +931,13 @@ public:
 		return AllComponentsEqual(Tolerance);
 	}
 
-	//FIXME: NEED FIXED PLANE STRUCT
-
 	/**
 	 * Mirrors a vector about a plane.
 	 *
 	 * @param Plane Plane to mirror about.
 	 * @return Mirrored vector.
 	 */
-	//FFixedVector MirrorByPlane(const FFixedPlane& Plane) const;
+	FFixedVector64 MirrorByPlane(const FFixedPlane& Plane) const;
 
 	/**
 	 * Calculate the projection of a point on the given plane.
@@ -948,7 +946,7 @@ public:
 	 * @param Plane The plane
 	 * @return Projection of Point onto Plane
 	 */
-	//static FFixedVector PointPlaneProject(const FFixedVector& Point, const FFixedPlane& Plane);
+	static FFixedVector64 PointPlaneProject(const FFixedVector64& Point, const FFixedPlane& Plane);
 
 	/**
 	 * Calculate the projection of a point on the plane defined by counter-clockwise (CCW) points A,B,C.
@@ -959,7 +957,7 @@ public:
 	 * @param C 3rd of three points in CCW order defining the plane
 	 * @return Projection of Point onto plane ABC
 	 */
-	//static FFixedVector PointPlaneProject(const FFixedVector& Point, const FFixedVector& A, const FFixedVector& B, const FFixedVector& C);
+	static FFixedVector64 PointPlaneProject(const FFixedVector64& Point, const FFixedVector64& A, const FFixedVector64& B, const FFixedVector64& C);
 
 	/**
 	 * Rotates around Axis (assumes Axis.Size() == 1).
@@ -1051,7 +1049,7 @@ public:
 	 * @return TRotator from the Vector's direction, without any roll.
 	 * @see ToOrientationQuat()
 	 */
-	//CORE_API TRotator<T> ToOrientationRotator() const;
+	FFixedRotator64 ToOrientationRotator() const;
 
 	/**
 	 * Return the Quaternion orientation corresponding to the direction in which the vector points.
@@ -1063,7 +1061,7 @@ public:
 	 * @return Quaternion from the Vector's direction, without any roll.
 	 * @see ToOrientationRotator(), FQuat::FindBetweenVectors()
 	 */
-	//CORE_API TQuat<T> ToOrientationQuat() const;
+	FFixedQuat64 ToOrientationQuat() const;
 
 	/**
 	 * Return the UE::Math::TRotator<T> orientation corresponding to the direction in which the vector points.
@@ -1072,10 +1070,7 @@ public:
 	 * @return UE::Math::TRotator<T> from the Vector's direction.
 	 * @see ToOrientationRotator(), ToOrientationQuat()
 	 */
-	/*FORCEINLINE UE::Math::TRotator<T> Rotation() const
-	{
-		return ToOrientationRotator();
-	}*/
+	FORCEINLINE FFixedRotator64 Rotation() const;
 
 	/**
 	 * Find good arbitrary axis vectors to represent U and V axes of a plane,
@@ -1423,6 +1418,61 @@ public:
 FORCEINLINE FFixedVector64 operator*(FFixed64 Scale, const FFixedVector64& V)
 {
 	return V.operator*(Scale);
+}
+
+/** Component-wise clamp for FFixedVector64 */
+FORCEINLINE FFixedVector64 ClampVector(const FFixedVector64& V, const FFixedVector64& Min, const FFixedVector64& Max)
+{
+	return FFixedVector64(
+		FFixedPointMath::Clamp(V.X, Min.X, Max.X),
+		FFixedPointMath::Clamp(V.Y, Min.Y, Max.Y),
+		FFixedPointMath::Clamp(V.Z, Min.Z, Max.Z)
+		);
+}
+
+/**
+ * Util to calculate distance from a point to a bounding box
+ *
+ * @param Mins 3D Point defining the lower values of the axis of the bound box
+ * @param Max 3D Point defining the lower values of the axis of the bound box
+ * @param Point 3D position of interest
+ * @return the distance from the Point to the bounding box.
+ */
+FORCEINLINE FFixed64 ComputeSquaredDistanceFromBoxToPoint(const FFixedVector64& Mins, const FFixedVector64& Maxs, const FFixedVector64& Point)
+{
+	// Accumulates the distance as we iterate axis
+	FFixed64 DistSquared = 0;
+
+	// Check each axis for min/max and add the distance accordingly
+	// NOTE: Loop manually unrolled for > 2x speed up
+	if (Point.X < Mins.X)
+	{
+		DistSquared += FFixedPointMath::Square(Point.X - Mins.X);
+	}
+	else if (Point.X > Maxs.X)
+	{
+		DistSquared += FFixedPointMath::Square(Point.X - Maxs.X);
+	}
+
+	if (Point.Y < Mins.Y)
+	{
+		DistSquared += FFixedPointMath::Square(Point.Y - Mins.Y);
+	}
+	else if (Point.Y > Maxs.Y)
+	{
+		DistSquared += FFixedPointMath::Square(Point.Y - Maxs.Y);
+	}
+
+	if (Point.Z < Mins.Z)
+	{
+		DistSquared += FFixedPointMath::Square(Point.Z - Mins.Z);
+	}
+	else if (Point.Z > Maxs.Z)
+	{
+		DistSquared += FFixedPointMath::Square(Point.Z - Maxs.Z);
+	}
+
+	return DistSquared;
 }
 
 template<>

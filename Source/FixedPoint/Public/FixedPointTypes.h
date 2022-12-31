@@ -43,6 +43,11 @@ FORCEINLINE FFixedVector2d FFixedVector64::UnitCartesianToSpherical() const
 	return FFixedVector2d(Theta, Phi);
 }
 
+FORCEINLINE FFixedRotator64 FFixedVector64::Rotation() const
+{
+	return ToOrientationRotator();
+}
+
 FORCEINLINE FFixedMatrix::FFixedMatrix(const FFixedPlane& InX, const FFixedPlane& InY, const FFixedPlane& InZ, const FFixedPlane& InW)
 {
 	M[0][0] = InX.X; M[0][1] = InX.Y;  M[0][2] = InX.Z;  M[0][3] = InX.W;
@@ -396,6 +401,52 @@ FORCEINLINE FFixedVector64 FFixedRotator64::RotateVector(const FFixedVector64& V
 FORCEINLINE FFixedVector64 FFixedRotator64::UnrotateVector(const FFixedVector64& V) const
 {
 	return FFixedRotationMatrix(*this).GetTransposed().TransformVector(V);
+}
+
+FORCEINLINE_DEBUGGABLE FFixedRotator64 FFixedPointMath::LerpRange(const FFixedRotator64& A, const FFixedRotator64& B, FFixed64 Alpha)
+{
+	// Similar to Lerp, but does not take the shortest path. Allows interpolation over more than 180 degrees.
+	return (A * (FixedPoint::Constants::Fixed64::One - Alpha) + B * Alpha).GetNormalized();
+}
+
+FORCEINLINE_DEBUGGABLE FFixed64 FFixedPointMath::ClampAngle(FFixed64 AngleDegrees, FFixed64 MinAngleDegrees, FFixed64 MaxAngleDegrees)
+{
+	const FFixed64 MaxDelta = FFixedRotator64::ClampAxis(MaxAngleDegrees - MinAngleDegrees) * FixedPoint::Constants::Fixed64::Half;			// 0..180
+	const FFixed64 RangeCenter = FFixedRotator64::ClampAxis(MinAngleDegrees + MaxDelta);						// 0..360
+	const FFixed64 DeltaFromCenter = FFixedRotator64::NormalizeAxis(AngleDegrees - RangeCenter);				// -180..180
+
+	// maybe clamp to nearest edge
+	if (DeltaFromCenter > MaxDelta)
+	{
+		return FFixedRotator64::NormalizeAxis(RangeCenter + MaxDelta);
+	}
+	else if (DeltaFromCenter < -MaxDelta)
+	{
+		return FFixedRotator64::NormalizeAxis(RangeCenter - MaxDelta);
+	}
+
+	// already in range, just return it
+	return FFixedRotator64::NormalizeAxis(AngleDegrees);
+}
+
+FORCEINLINE_DEBUGGABLE FFixed32 FFixedPointMath::ClampAngle(FFixed32 AngleDegrees, FFixed32 MinAngleDegrees, FFixed32 MaxAngleDegrees)
+{
+	const FFixed32 MaxDelta = FFixedRotator64::ClampAxis(MaxAngleDegrees - MinAngleDegrees) * FixedPoint::Constants::Fixed32::Half;			// 0..180
+	const FFixed32 RangeCenter = FFixedRotator64::ClampAxis(MinAngleDegrees + MaxDelta);						// 0..360
+	const FFixed32 DeltaFromCenter = FFixedRotator64::NormalizeAxis(AngleDegrees - RangeCenter);				// -180..180
+
+	// maybe clamp to nearest edge
+	if (DeltaFromCenter > MaxDelta)
+	{
+		return FFixedRotator64::NormalizeAxis(RangeCenter + MaxDelta);
+	}
+	else if (DeltaFromCenter < -MaxDelta)
+	{
+		return FFixedRotator64::NormalizeAxis(RangeCenter - MaxDelta);
+	}
+
+	// already in range, just return it
+	return FFixedRotator64::NormalizeAxis(AngleDegrees);
 }
 
 inline void FFixedMatrix::SetAxis(int32 i, const FFixedVector64& Axis)

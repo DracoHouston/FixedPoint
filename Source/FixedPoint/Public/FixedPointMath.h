@@ -633,4 +633,9 @@ struct FIXEDPOINT_API FFixedPointMath : public FMath
 
 	static void FmodReportError(FFixed64 X, FFixed64 Y);
 	static void FmodReportError(FFixed32 X, FFixed32 Y);
+
+	UE_NODISCARD FORCEINLINE_DEBUGGABLE static FFixedRotator64 LerpRange(const FFixedRotator64& A, const FFixedRotator64& B, FFixed64 Alpha);
+
+	UE_NODISCARD FORCEINLINE_DEBUGGABLE static FFixed64 ClampAngle(FFixed64 AngleDegrees, FFixed64 MinAngleDegrees, FFixed64 MaxAngleDegrees);
+	UE_NODISCARD FORCEINLINE_DEBUGGABLE static FFixed32 ClampAngle(FFixed32 AngleDegrees, FFixed32 MinAngleDegrees, FFixed32 MaxAngleDegrees);
 };

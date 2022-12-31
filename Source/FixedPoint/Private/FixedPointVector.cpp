@@ -2,6 +2,7 @@
 
 
 #include "FixedPointVector.h"
+#include "FixedPointTypes.h"
 
 
 const FFixedVector64 FFixedVector64::ZeroVector =		FFixedVector64((int64)0,	(int64)0,	(int64)0);
@@ -17,24 +18,61 @@ const FFixedVector64 FFixedVector64::YAxisVector =		FFixedVector64((int64)0,	(in
 const FFixedVector64 FFixedVector64::ZAxisVector =		FFixedVector64((int64)0,	(int64)0,	(int64)1);
 
 
-//FFixedVector FFixedVector::MirrorByPlane(const FFixedPlane& Plane) const
-//{
-//	return *this - Plane * (2.f * Plane.PlaneDot(*this));
-//}
-//
-//FFixedVector FFixedVector::PointPlaneProject(const FFixedVector& Point, const FFixedPlane& Plane)
-//{
-//	//Find the distance of X from the plane
-//	//Add the distance back along the normal from the point
-//	return Point - Plane.PlaneDot(Point) * Plane;
-//}
-//
-//FFixedVector FFixedVector::PointPlaneProject(const FFixedVector& Point, const FFixedVector& A, const FFixedVector& B, const FFixedVector& C)
-//{
-//	//Compute the plane normal from ABC
-//	FFixedPlane Plane(A, B, C);
-//
-//	//Find the distance of X from the plane
-//	//Add the distance back along the normal from the point
-//	return Point - Plane.PlaneDot(Point) * Plane;
-//}
+FFixedVector64 FFixedVector64::MirrorByPlane(const FFixedPlane& Plane) const
+{
+	return *this - Plane * (FFixed64::MakeFromRawInt(FixedPoint::Constants::Fixed64::One.Value * 2) * Plane.PlaneDot(*this));
+}
+
+FFixedVector64 FFixedVector64::PointPlaneProject(const FFixedVector64& Point, const FFixedPlane& Plane)
+{
+	//Find the distance of X from the plane
+	//Add the distance back along the normal from the point
+	return Point - Plane.PlaneDot(Point) * Plane;
+}
+
+FFixedVector64 FFixedVector64::PointPlaneProject(const FFixedVector64& Point, const FFixedVector64& A, const FFixedVector64& B, const FFixedVector64& C)
+{
+	//Compute the plane normal from ABC
+	FFixedPlane Plane(A, B, C);
+
+	//Find the distance of X from the plane
+	//Add the distance back along the normal from the point
+	return Point - Plane.PlaneDot(Point) * Plane;
+}
+
+FFixedRotator64 FFixedVector64::ToOrientationRotator() const
+{
+	FFixedRotator64 R;
+
+	// Find yaw.
+	R.Yaw = FFixedPointMath::RadiansToDegrees(FFixedPointMath::Atan2(Y, X));
+
+	// Find pitch.
+	R.Pitch = FFixedPointMath::RadiansToDegrees(FFixedPointMath::Atan2(Z, FFixedPointMath::Sqrt(X * X + Y * Y)));
+
+	// Find roll.
+	R.Roll = 0;
+
+	return R;
+}
+
+FFixedQuat64 FFixedVector64::ToOrientationQuat() const
+{
+	// Essentially an optimized Vector->Rotator->Quat made possible by knowing Roll == 0, and avoiding radians->degrees->radians.
+	// This is done to avoid adding any roll (which our API states as a constraint).
+	const FFixed64 YawRad = FMath::Atan2(Y, X);
+	const FFixed64 PitchRad = FMath::Atan2(Z, FMath::Sqrt(X * X + Y * Y));
+
+	FFixed64 SP, SY;
+	FFixed64 CP, CY;
+
+	FFixedPointMath::SinCos(&SP, &CP, PitchRad * FixedPoint::Constants::Fixed64::Half);
+	FFixedPointMath::SinCos(&SY, &CY, YawRad * FixedPoint::Constants::Fixed64::Half);
+
+	FFixedQuat64 RotationQuat;
+	RotationQuat.X = SP * SY;
+	RotationQuat.Y = -SP * CY;
+	RotationQuat.Z = CP * SY;
+	RotationQuat.W = CP * CY;
+	return RotationQuat;
+}
