@@ -689,7 +689,7 @@ namespace FixedPoint
 			constexpr FFixed32 ThreshNormalsAreOrthogonal = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshNormalsAreOrthogonal);
 			constexpr FFixed32 ThreshVectorNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshVectorNormalized);
 			constexpr FFixed32 ThreshQuatNormalized = FFixed32::MakeFromRawInt(FixedPoint::Constants::Raw32::ThreshQuatNormalized);
-			constexpr FFixed64 ZeroAnimWeightThresh = FFixed64::MakeFromRawInt(1);  //too small for precision, so just Small Number
+			constexpr FFixed32 ZeroAnimWeightThresh = FFixed32::MakeFromRawInt(1);  //too small for precision, so just Small Number
 			constexpr FFixed32 InvTrigMagicOne = FFixed32::MakeFromRawInt(-1227);	//-0.0187293
 			constexpr FFixed32 InvTrigMagicTwo = FFixed32::MakeFromRawInt(4866);	//0.0742610
 			constexpr FFixed32 InvTrigMagicThree = FFixed32::MakeFromRawInt(13901);	//0.2121144

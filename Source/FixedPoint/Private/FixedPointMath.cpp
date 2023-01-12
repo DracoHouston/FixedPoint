@@ -30,7 +30,11 @@ FFixed32 FFixedPointMath::Sqrt(const FFixed32& inValue)
 {
 	if (inValue.Value == 0)
 	{
-		return FFixed32();
+		return FixedPoint::Constants::Fixed64::Zero;
+	}
+	if (inValue < FixedPoint::Constants::Fixed64::Zero)
+	{
+		return FixedPoint::Constants::Fixed64::Zero;
 	}
 	int64 a = (inValue.Value >> 1) + 1;
 	int64 b = (a + (inValue.Value / a)) >> 1;
@@ -44,7 +48,8 @@ FFixed32 FFixedPointMath::Sqrt(const FFixed32& inValue)
 
 FFixed32 FFixedPointMath::InvSqrt(const FFixed32& inValue)
 {
-	return FixedPoint::Constants::Fixed32::One / Sqrt(inValue);
+	FFixed32 valsqrt = Sqrt(inValue);
+	return valsqrt <= FixedPoint::Constants::Fixed32::Zero ? FixedPoint::Constants::Fixed32::Zero : FixedPoint::Constants::Fixed32::One / valsqrt;
 }
 
 FFixed64 FFixedPointMath::Sin(const FFixed64& inValue)

@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FixedPointFwd.h"
-#include "FixedPointNumbers.h"
-#include "FixedPointMath.h"
-#include "FixedPointMatrix.generated.h"
+#include "DeterministicFloatFwd.h"
+#include "DeterministicFloatNumbers.h"
+#include "DeterministicFloatMath.h"
+#include "DeterministicFloatMatrix64.generated.h"
 
 USTRUCT(BlueprintType)
-struct FIXEDPOINT_API FFixedMatrix
+struct DETERMINISTICFLOAT_API FDeterministicMatrix64
 {
 public:
 	GENERATED_BODY()
@@ -19,27 +19,27 @@ public:
 	/**
 	* Default constructor
 	*/
-	FORCEINLINE FFixedMatrix() {}
+	FORCEINLINE FDeterministicMatrix64() {}
 
 	/**
 	 * Constructor.
 	 *
 	 * @param EForceInit Force Init Enum.
 	 */
-	explicit FORCEINLINE FFixedMatrix(EForceInit)
+	explicit FORCEINLINE FDeterministicMatrix64(EForceInit)
 	{
 		FMemory::Memzero(this, sizeof(*this));
 	}
 
 	/**
-	* Constructor that casts FMatrix to FFixedMatrix
+	* Constructor that casts FMatrix to FDeterministicMatrix64
 	*/
-	FORCEINLINE FFixedMatrix(FMatrix inValue)
+	FORCEINLINE FDeterministicMatrix64(FMatrix inValue)
 	{
-		M[0][0] = FFixed64(inValue.M[0][0]); M[0][1] = FFixed64(inValue.M[0][1]); M[0][2] = FFixed64(inValue.M[0][2]); M[0][3] = FFixed64(inValue.M[0][3]);
-		M[1][0] = FFixed64(inValue.M[1][0]); M[1][1] = FFixed64(inValue.M[1][1]); M[1][2] = FFixed64(inValue.M[1][2]); M[1][3] = FFixed64(inValue.M[1][3]);
-		M[2][0] = FFixed64(inValue.M[2][0]); M[2][1] = FFixed64(inValue.M[2][1]); M[2][2] = FFixed64(inValue.M[2][2]); M[2][3] = FFixed64(inValue.M[2][3]);
-		M[3][0] = FFixed64(inValue.M[3][0]); M[3][1] = FFixed64(inValue.M[3][1]); M[3][2] = FFixed64(inValue.M[3][2]); M[3][3] = FFixed64(inValue.M[3][3]);
+		M[0][0] = FDeterministicNumber64(inValue.M[0][0]); M[0][1] = FDeterministicNumber64(inValue.M[0][1]); M[0][2] = FDeterministicNumber64(inValue.M[0][2]); M[0][3] = FDeterministicNumber64(inValue.M[0][3]);
+		M[1][0] = FDeterministicNumber64(inValue.M[1][0]); M[1][1] = FDeterministicNumber64(inValue.M[1][1]); M[1][2] = FDeterministicNumber64(inValue.M[1][2]); M[1][3] = FDeterministicNumber64(inValue.M[1][3]);
+		M[2][0] = FDeterministicNumber64(inValue.M[2][0]); M[2][1] = FDeterministicNumber64(inValue.M[2][1]); M[2][2] = FDeterministicNumber64(inValue.M[2][2]); M[2][3] = FDeterministicNumber64(inValue.M[2][3]);
+		M[3][0] = FDeterministicNumber64(inValue.M[3][0]); M[3][1] = FDeterministicNumber64(inValue.M[3][1]); M[3][2] = FDeterministicNumber64(inValue.M[3][2]); M[3][3] = FDeterministicNumber64(inValue.M[3][3]);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public:
 	 * @param InZ Z plane
 	 * @param InW W plane
 	 */
-	FORCEINLINE FFixedMatrix(const FFixedPlane& InX, const FFixedPlane& InY, const FFixedPlane& InZ, const FFixedPlane& InW);
+	FORCEINLINE FDeterministicMatrix64(const FDeterministicPlane64& InX, const FDeterministicPlane64& InY, const FDeterministicPlane64& InZ, const FDeterministicPlane64& InW);
 
 	/**
 	 * Constructor.
@@ -60,16 +60,16 @@ public:
 	 * @param InZ Z vector
 	 * @param InW W vector
 	 */
-	FORCEINLINE FFixedMatrix(const FFixedVector64& InX, const FFixedVector64& InY, const FFixedVector64& InZ, const FFixedVector64& InW);
+	FORCEINLINE FDeterministicMatrix64(const FDeterministicVector64& InX, const FDeterministicVector64& InY, const FDeterministicVector64& InZ, const FDeterministicVector64& InW);
 
-	FFixed64 M[4][4];
+	FDeterministicNumber64 M[4][4];
 
-	static const FFixedMatrix Identity;
+	static const FDeterministicMatrix64 Identity;
 
-	static void Internal_MatrixInverse(FFixedMatrix& DstMatrix, const FFixedMatrix& SrcMatrix)
+	static void Internal_MatrixInverse(FDeterministicMatrix64& DstMatrix, const FDeterministicMatrix64& SrcMatrix)
 	{
-		FFixed64 Det[4];
-		FFixedMatrix Tmp;
+		FDeterministicNumber64 Det[4];
+		FDeterministicMatrix64 Tmp;
 
 		Tmp.M[0][0] = SrcMatrix.M[2][2] * SrcMatrix.M[3][3] - SrcMatrix.M[2][3] * SrcMatrix.M[3][2];
 		Tmp.M[0][1] = SrcMatrix.M[1][2] * SrcMatrix.M[3][3] - SrcMatrix.M[1][3] * SrcMatrix.M[3][2];
@@ -92,8 +92,8 @@ public:
 		Det[2] = SrcMatrix.M[0][1] * Tmp.M[2][0] - SrcMatrix.M[1][1] * Tmp.M[2][1] + SrcMatrix.M[3][1] * Tmp.M[2][2];
 		Det[3] = SrcMatrix.M[0][1] * Tmp.M[3][0] - SrcMatrix.M[1][1] * Tmp.M[3][1] + SrcMatrix.M[2][1] * Tmp.M[3][2];
 
-		const FFixed64 Determinant = SrcMatrix.M[0][0] * Det[0] - SrcMatrix.M[1][0] * Det[1] + SrcMatrix.M[2][0] * Det[2] - SrcMatrix.M[3][0] * Det[3];
-		const FFixed64	RDet = FixedPoint::Constants::Fixed64::One / Determinant;
+		const FDeterministicNumber64 Determinant = SrcMatrix.M[0][0] * Det[0] - SrcMatrix.M[1][0] * Det[1] + SrcMatrix.M[2][0] * Det[2] - SrcMatrix.M[3][0] * Det[3];
+		const FDeterministicNumber64	RDet = DeterministicFloat::Constants::Number64::One / Determinant;
 
 		DstMatrix.M[0][0] = RDet * Det[0];
 		DstMatrix.M[0][1] = -RDet * Det[1];
@@ -148,10 +148,10 @@ public:
 	// Set this to the identity matrix
 	FORCEINLINE void SetIdentity()
 	{
-		M[0][0] = FixedPoint::Constants::Fixed64::One;	M[0][1] = FixedPoint::Constants::Fixed64::Zero;	M[0][2] = FixedPoint::Constants::Fixed64::Zero;	M[0][3] = FixedPoint::Constants::Fixed64::Zero;
-		M[1][0] = FixedPoint::Constants::Fixed64::Zero;	M[1][1] = FixedPoint::Constants::Fixed64::One;	M[1][2] = FixedPoint::Constants::Fixed64::Zero;	M[1][3] = FixedPoint::Constants::Fixed64::Zero;
-		M[2][0] = FixedPoint::Constants::Fixed64::Zero;	M[2][1] = FixedPoint::Constants::Fixed64::Zero;	M[2][2] = FixedPoint::Constants::Fixed64::One;	M[2][3] = FixedPoint::Constants::Fixed64::Zero;
-		M[3][0] = FixedPoint::Constants::Fixed64::Zero;	M[3][1] = FixedPoint::Constants::Fixed64::Zero;	M[3][2] = FixedPoint::Constants::Fixed64::Zero;	M[3][3] = FixedPoint::Constants::Fixed64::One;
+		M[0][0] = DeterministicFloat::Constants::Number64::One;	M[0][1] = DeterministicFloat::Constants::Number64::Zero;	M[0][2] = DeterministicFloat::Constants::Number64::Zero;	M[0][3] = DeterministicFloat::Constants::Number64::Zero;
+		M[1][0] = DeterministicFloat::Constants::Number64::Zero;	M[1][1] = DeterministicFloat::Constants::Number64::One;	M[1][2] = DeterministicFloat::Constants::Number64::Zero;	M[1][3] = DeterministicFloat::Constants::Number64::Zero;
+		M[2][0] = DeterministicFloat::Constants::Number64::Zero;	M[2][1] = DeterministicFloat::Constants::Number64::Zero;	M[2][2] = DeterministicFloat::Constants::Number64::One;	M[2][3] = DeterministicFloat::Constants::Number64::Zero;
+		M[3][0] = DeterministicFloat::Constants::Number64::Zero;	M[3][1] = DeterministicFloat::Constants::Number64::Zero;	M[3][2] = DeterministicFloat::Constants::Number64::Zero;	M[3][3] = DeterministicFloat::Constants::Number64::One;
 	}
 
 	/**
@@ -160,9 +160,9 @@ public:
 	 * @param Other The matrix to multiply this by.
 	 * @return The result of multiplication.
 	 */
-	FORCEINLINE FFixedMatrix operator* (const FFixedMatrix& Other) const
+	FORCEINLINE FDeterministicMatrix64 operator* (const FDeterministicMatrix64& Other) const
 	{
-		FFixedMatrix Result;
+		FDeterministicMatrix64 Result;
 		Result.M[0][0] = M[0][0] * Other.M[0][0] + M[0][1] * Other.M[1][0] + M[0][2] * Other.M[2][0] + M[0][3] * Other.M[3][0];
 		Result.M[0][1] = M[0][0] * Other.M[0][1] + M[0][1] * Other.M[1][1] + M[0][2] * Other.M[2][1] + M[0][3] * Other.M[3][1];
 		Result.M[0][2] = M[0][0] * Other.M[0][2] + M[0][1] * Other.M[1][2] + M[0][2] * Other.M[2][2] + M[0][3] * Other.M[3][2];
@@ -191,7 +191,7 @@ public:
 	 * @param Other the matrix to multiply by this.
 	 * @return reference to this after multiply.
 	 */
-	FORCEINLINE void operator*=(const FFixedMatrix& Other)
+	FORCEINLINE void operator*=(const FDeterministicMatrix64& Other)
 	{
 		*this = *this * Other;
 	}
@@ -202,9 +202,9 @@ public:
 	 * @param Other The Matrix to add.
 	 * @return The result of addition.
 	 */
-	FORCEINLINE FFixedMatrix operator+ (const FFixedMatrix& Other) const
+	FORCEINLINE FDeterministicMatrix64 operator+ (const FDeterministicMatrix64& Other) const
 	{
-		FFixedMatrix ResultMat;
+		FDeterministicMatrix64 ResultMat;
 
 		for (int32 X = 0; X < 4; X++)
 		{
@@ -223,7 +223,7 @@ public:
 	 * @param Other The matrix to add to this.
 	 * @return Reference to this after addition.
 	 */
-	FORCEINLINE void operator+=(const FFixedMatrix& Other)
+	FORCEINLINE void operator+=(const FDeterministicMatrix64& Other)
 	{
 		*this = *this + Other;
 	}
@@ -231,9 +231,9 @@ public:
 	/**
 	  * This isn't applying SCALE, just multiplying the value to all members - i.e. weighting
 	  */
-	FORCEINLINE FFixedMatrix operator* (FFixed64 Other) const
+	FORCEINLINE FDeterministicMatrix64 operator* (FDeterministicNumber64 Other) const
 	{
-		FFixedMatrix ResultMat;
+		FDeterministicMatrix64 ResultMat;
 
 		for (int32 X = 0; X < 4; X++)
 		{
@@ -252,7 +252,7 @@ public:
 	 * @param other The weight.
 	 * @return a reference to this after weighting.
 	 */
-	FORCEINLINE void operator*=(FFixed64 Other)
+	FORCEINLINE void operator*=(FDeterministicNumber64 Other)
 	{
 		*this = *this * Other;
 	}
@@ -263,7 +263,7 @@ public:
 	 * @param Other The other matrix.
 	 * @return true if two matrix are identical, otherwise false.
 	 */
-	FORCEINLINE bool operator==(const FFixedMatrix& Other) const
+	FORCEINLINE bool operator==(const FDeterministicMatrix64& Other) const
 	{
 		for (int32 X = 0; X < 4; X++)
 		{
@@ -286,13 +286,13 @@ public:
 	 * @param Tolerance Error Tolerance.
 	 * @return true if two Matrix are equal, within specified tolerance, otherwise false.
 	 */
-	FORCEINLINE bool Equals(const FFixedMatrix& Other, FFixed64 Tolerance) const
+	FORCEINLINE bool Equals(const FDeterministicMatrix64& Other, FDeterministicNumber64 Tolerance) const
 	{
 		for (int32 X = 0; X < 4; X++)
 		{
 			for (int32 Y = 0; Y < 4; Y++)
 			{
-				if (FFixedPointMath::Abs(M[X][Y] - Other.M[X][Y]) > Tolerance)
+				if (FDeterministicFloatMath::Abs(M[X][Y] - Other.M[X][Y]) > Tolerance)
 				{
 					return false;
 				}
@@ -308,37 +308,37 @@ public:
 	 * @param Other The other Matrix.
 	 * @return true if two Matrix are not equal, within specified tolerance, otherwise false.
 	 */
-	FORCEINLINE bool operator!=(const FFixedMatrix& Other) const
+	FORCEINLINE bool operator!=(const FDeterministicMatrix64& Other) const
 	{
 		return !(*this == Other);
 	}
 
 	// Homogeneous transform.
-	FORCEINLINE FFixedVector4d TransformFVector4(const FFixedVector4d& V) const;
+	FORCEINLINE FDeterministicVector4D64 TransformFVector4(const FDeterministicVector4D64& V) const;
 
-	/** Transform a location - will take into account translation part of the FFixedMatrix. */
-	FORCEINLINE FFixedVector4d TransformPosition(const FFixedVector64& V) const;
+	/** Transform a location - will take into account translation part of the FDeterministicMatrix64. */
+	FORCEINLINE FDeterministicVector4D64 TransformPosition(const FDeterministicVector64& V) const;
 
 	/** Inverts the matrix and then transforms V - correctly handles scaling in this matrix. */
-	FORCEINLINE FFixedVector64 InverseTransformPosition(const FFixedVector64& V) const;
+	FORCEINLINE FDeterministicVector64 InverseTransformPosition(const FDeterministicVector64& V) const;
 
 	/**
-	 *	Transform a direction vector - will not take into account translation part of the FFixedMatrix.
+	 *	Transform a direction vector - will not take into account translation part of the FDeterministicMatrix64.
 	 *	If you want to transform a surface normal (or plane) and correctly account for non-uniform scaling you should use TransformByUsingAdjointT.
 	 */
-	FORCEINLINE FFixedVector4d TransformVector(const FFixedVector64& V) const;
+	FORCEINLINE FDeterministicVector4D64 TransformVector(const FDeterministicVector64& V) const;
 
 	/**
 	 *	Transform a direction vector by the inverse of this matrix - will not take into account translation part.
 	 *	If you want to transform a surface normal (or plane) and correctly account for non-uniform scaling you should use TransformByUsingAdjointT with adjoint of matrix inverse.
 	 */
-	FORCEINLINE FFixedVector64 InverseTransformVector(const FFixedVector64& V) const;
+	FORCEINLINE FDeterministicVector64 InverseTransformVector(const FDeterministicVector64& V) const;
 
 	// Transpose.
 
-	FORCEINLINE FFixedMatrix GetTransposed() const
+	FORCEINLINE FDeterministicMatrix64 GetTransposed() const
 	{
-		FFixedMatrix Result;
+		FDeterministicMatrix64 Result;
 
 		Result.M[0][0] = M[0][0];
 		Result.M[0][1] = M[1][0];
@@ -365,7 +365,7 @@ public:
 
 	// @return determinant of this matrix.
 
-	FORCEINLINE FFixed64 Determinant() const
+	FORCEINLINE FDeterministicNumber64 Determinant() const
 	{
 		return	M[0][0] * (
 			M[1][1] * (M[2][2] * M[3][3] - M[2][3] * M[3][2]) -
@@ -390,7 +390,7 @@ public:
 	}
 
 	/** @return the determinant of rotation 3x3 matrix */
-	FORCEINLINE FFixed64 RotDeterminant() const
+	FORCEINLINE FDeterministicNumber64 RotDeterminant() const
 	{
 		return
 			M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]) -
@@ -399,49 +399,49 @@ public:
 	}
 
 	/** Fast path, doesn't check for nil matrices in final release builds */
-	FORCEINLINE FFixedMatrix InverseFast() const;
+	FORCEINLINE FDeterministicMatrix64 InverseFast() const;
 
 	/** Fast path, and handles nil matrices. */
-	FORCEINLINE FFixedMatrix Inverse() const;
+	FORCEINLINE FDeterministicMatrix64 Inverse() const;
 
-	FORCEINLINE FFixedMatrix TransposeAdjoint() const
+	FORCEINLINE FDeterministicMatrix64 TransposeAdjoint() const
 	{
-		FFixedMatrix TA;
+		FDeterministicMatrix64 TA;
 
 		TA.M[0][0] = this->M[1][1] * this->M[2][2] - this->M[1][2] * this->M[2][1];
 		TA.M[0][1] = this->M[1][2] * this->M[2][0] - this->M[1][0] * this->M[2][2];
 		TA.M[0][2] = this->M[1][0] * this->M[2][1] - this->M[1][1] * this->M[2][0];
-		TA.M[0][3] = FixedPoint::Constants::Fixed64::Zero;
+		TA.M[0][3] = DeterministicFloat::Constants::Number64::Zero;
 
 		TA.M[1][0] = this->M[2][1] * this->M[0][2] - this->M[2][2] * this->M[0][1];
 		TA.M[1][1] = this->M[2][2] * this->M[0][0] - this->M[2][0] * this->M[0][2];
 		TA.M[1][2] = this->M[2][0] * this->M[0][1] - this->M[2][1] * this->M[0][0];
-		TA.M[1][3] = FixedPoint::Constants::Fixed64::Zero;
+		TA.M[1][3] = DeterministicFloat::Constants::Number64::Zero;
 
 		TA.M[2][0] = this->M[0][1] * this->M[1][2] - this->M[0][2] * this->M[1][1];
 		TA.M[2][1] = this->M[0][2] * this->M[1][0] - this->M[0][0] * this->M[1][2];
 		TA.M[2][2] = this->M[0][0] * this->M[1][1] - this->M[0][1] * this->M[1][0];
-		TA.M[2][3] = FixedPoint::Constants::Fixed64::Zero;
+		TA.M[2][3] = DeterministicFloat::Constants::Number64::Zero;
 
-		TA.M[3][0] = FixedPoint::Constants::Fixed64::Zero;
-		TA.M[3][1] = FixedPoint::Constants::Fixed64::Zero;
-		TA.M[3][2] = FixedPoint::Constants::Fixed64::Zero;
-		TA.M[3][3] = FixedPoint::Constants::Fixed64::One;
+		TA.M[3][0] = DeterministicFloat::Constants::Number64::Zero;
+		TA.M[3][1] = DeterministicFloat::Constants::Number64::Zero;
+		TA.M[3][2] = DeterministicFloat::Constants::Number64::Zero;
+		TA.M[3][3] = DeterministicFloat::Constants::Number64::One;
 
 		return TA;
 	}
 
 	// NOTE: There is some compiler optimization issues with WIN64 that cause FORCEINLINE to cause a crash
 	// Remove any scaling from this matrix (ie magnitude of each row is 1) with error Tolerance
-	inline void RemoveScaling(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber)
+	inline void RemoveScaling(FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::SmallNumber)
 	{
 		// For each row, find magnitude, and if its non-zero re-scale so its unit length.
-		const FFixed64 SquareSum0 = (M[0][0] * M[0][0]) + (M[0][1] * M[0][1]) + (M[0][2] * M[0][2]);
-		const FFixed64 SquareSum1 = (M[1][0] * M[1][0]) + (M[1][1] * M[1][1]) + (M[1][2] * M[1][2]);
-		const FFixed64 SquareSum2 = (M[2][0] * M[2][0]) + (M[2][1] * M[2][1]) + (M[2][2] * M[2][2]);
-		const FFixed64 Scale0 = FFixedPointMath::FloatSelect(SquareSum0 - Tolerance, FFixedPointMath::InvSqrt(SquareSum0), FFixed64(1));
-		const FFixed64 Scale1 = FFixedPointMath::FloatSelect(SquareSum1 - Tolerance, FFixedPointMath::InvSqrt(SquareSum1), FFixed64(1));
-		const FFixed64 Scale2 = FFixedPointMath::FloatSelect(SquareSum2 - Tolerance, FFixedPointMath::InvSqrt(SquareSum2), FFixed64(1));
+		const FDeterministicNumber64 SquareSum0 = (M[0][0] * M[0][0]) + (M[0][1] * M[0][1]) + (M[0][2] * M[0][2]);
+		const FDeterministicNumber64 SquareSum1 = (M[1][0] * M[1][0]) + (M[1][1] * M[1][1]) + (M[1][2] * M[1][2]);
+		const FDeterministicNumber64 SquareSum2 = (M[2][0] * M[2][0]) + (M[2][1] * M[2][1]) + (M[2][2] * M[2][2]);
+		const FDeterministicNumber64 Scale0 = FDeterministicFloatMath::FloatSelect(SquareSum0 - Tolerance, FDeterministicFloatMath::InvSqrt(SquareSum0), FDeterministicNumber64(1));
+		const FDeterministicNumber64 Scale1 = FDeterministicFloatMath::FloatSelect(SquareSum1 - Tolerance, FDeterministicFloatMath::InvSqrt(SquareSum1), FDeterministicNumber64(1));
+		const FDeterministicNumber64 Scale2 = FDeterministicFloatMath::FloatSelect(SquareSum2 - Tolerance, FDeterministicFloatMath::InvSqrt(SquareSum2), FDeterministicNumber64(1));
 		M[0][0] *= Scale0;
 		M[0][1] *= Scale0;
 		M[0][2] *= Scale0;
@@ -454,23 +454,23 @@ public:
 	}
 
 	// Returns matrix after RemoveScaling with error Tolerance
-	inline FFixedMatrix GetMatrixWithoutScale(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber) const
+	inline FDeterministicMatrix64 GetMatrixWithoutScale(FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::SmallNumber) const
 	{
-		FFixedMatrix Result = *this;
+		FDeterministicMatrix64 Result = *this;
 		Result.RemoveScaling(Tolerance);
 		return Result;
 	}
 
 	/** Remove any scaling from this matrix (ie magnitude of each row is 1) and return the 3D scale vector that was initially present with error Tolerance */
-	inline FFixedVector64 ExtractScaling(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber);
+	inline FDeterministicVector64 ExtractScaling(FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::SmallNumber);
 
 	/** return a 3D scale vector calculated from this matrix (where each component is the magnitude of a row vector) with error Tolerance. */
-	inline FFixedVector64 GetScaleVector(FFixed64 Tolerance = FixedPoint::Constants::Fixed64::SmallNumber) const;
+	inline FDeterministicVector64 GetScaleVector(FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::SmallNumber) const;
 
 	// Remove any translation from this matrix
-	inline FFixedMatrix RemoveTranslation() const
+	inline FDeterministicMatrix64 RemoveTranslation() const
 	{
-		FFixedMatrix Result = *this;
+		FDeterministicMatrix64 Result = *this;
 		Result.M[3][0] = 0.0f;
 		Result.M[3][1] = 0.0f;
 		Result.M[3][2] = 0.0f;
@@ -478,7 +478,7 @@ public:
 	}
 
 	/** Returns a matrix with an additional translation concatenated. */
-	inline FFixedMatrix ConcatTranslation(const FFixedVector64& Translation) const;
+	inline FDeterministicMatrix64 ConcatTranslation(const FDeterministicVector64& Translation) const;
 
 	/** Returns true if any element of this matrix is NaN */
 	inline bool ContainsNaN() const
@@ -487,39 +487,19 @@ public:
 	}
 
 	/** Scale the translation part of the matrix by the supplied vector. */
-	inline void ScaleTranslation(const FFixedVector64& Scale3D);
+	inline void ScaleTranslation(const FDeterministicVector64& Scale3D);
 
 	/** @return the minimum magnitude of any row of the matrix. */
-	inline FFixed64 GetMinimumAxisScale() const
-	{
-		const FFixed64 MaxRowScaleSquared = FFixedPointMath::Min(
-			GetScaledAxis(EAxis::X).SizeSquared(),
-			FFixedPointMath::Min(
-				GetScaledAxis(EAxis::Y).SizeSquared(),
-				GetScaledAxis(EAxis::Z).SizeSquared()
-			)
-		);
-		return FFixedPointMath::Sqrt(MaxRowScaleSquared);
-	}
+	inline FDeterministicNumber64 GetMinimumAxisScale() const;
 
 	/** @return the maximum magnitude of any row of the matrix. */
-	inline FFixed64 GetMaximumAxisScale() const
-	{
-		const FFixed64 MaxRowScaleSquared = FFixedPointMath::Max(
-			GetScaledAxis(EAxis::X).SizeSquared(),
-			FFixedPointMath::Max(
-				GetScaledAxis(EAxis::Y).SizeSquared(),
-				GetScaledAxis(EAxis::Z).SizeSquared()
-			)
-		);
-		return FFixedPointMath::Sqrt(MaxRowScaleSquared);
-	}
+	inline FDeterministicNumber64 GetMaximumAxisScale() const;
 
 	/** Apply Scale to this matrix **/
-	inline FFixedMatrix ApplyScale(FFixed64 Scale) const;
+	inline FDeterministicMatrix64 ApplyScale(FDeterministicNumber64 Scale) const;
 
 	// @return the origin of the co-ordinate system
-	inline FFixedVector64 GetOrigin() const;
+	inline FDeterministicVector64 GetOrigin() const;
 
 	/**
 	 * get axis of this matrix scaled by the scale of the matrix
@@ -527,7 +507,7 @@ public:
 	 * @param i index into the axis of the matrix
 	 * @ return vector of the axis
 	 */
-	FORCEINLINE FFixedVector64 GetScaledAxis(EAxis::Type Axis) const;
+	FORCEINLINE FDeterministicVector64 GetScaledAxis(EAxis::Type Axis) const;
 
 	/**
 	 * get axes of this matrix scaled by the scale of the matrix
@@ -536,7 +516,7 @@ public:
 	 * @param Y axes returned to this param
 	 * @param Z axes returned to this param
 	 */
-	inline void GetScaledAxes(FFixedVector64& X, FFixedVector64& Y, FFixedVector64& Z) const;
+	inline void GetScaledAxes(FDeterministicVector64& X, FDeterministicVector64& Y, FDeterministicVector64& Z) const;
 
 	/**
 	 * get unit length axis of this matrix
@@ -544,7 +524,7 @@ public:
 	 * @param i index into the axis of the matrix
 	 * @return vector of the axis
 	 */
-	inline FFixedVector64 GetUnitAxis(EAxis::Type Axis) const;
+	inline FDeterministicVector64 GetUnitAxis(EAxis::Type Axis) const;
 
 	/**
 	 * get unit length axes of this matrix
@@ -553,7 +533,7 @@ public:
 	 * @param Y axes returned to this param
 	 * @param Z axes returned to this param
 	 */
-	inline void GetUnitAxes(FFixedVector64& X, FFixedVector64& Y, FFixedVector64& Z) const;
+	inline void GetUnitAxes(FDeterministicVector64& X, FDeterministicVector64& Y, FDeterministicVector64& Z) const;
 
 	/**
 	 * set an axis of this matrix
@@ -561,10 +541,10 @@ public:
 	 * @param i index into the axis of the matrix
 	 * @param Axis vector of the axis
 	 */
-	inline void SetAxis(int32 i, const FFixedVector64& Axis);
+	inline void SetAxis(int32 i, const FDeterministicVector64& Axis);
 
 	// Set the origin of the coordinate system to the given vector
-	inline void SetOrigin(const FFixedVector64& NewOrigin);
+	inline void SetOrigin(const FDeterministicVector64& NewOrigin);
 
 	/**
 	 * Update the axes of the matrix if any value is NULL do not update that axis
@@ -574,7 +554,7 @@ public:
 	 * @param Axis2 set matrix row 2
 	 * @param Origin set matrix row 3
 	 */
-	inline void SetAxes(const FFixedVector64* Axis0 = NULL, const FFixedVector64* Axis1 = NULL, const FFixedVector64* Axis2 = NULL, const FFixedVector64* Origin = NULL);
+	inline void SetAxes(const FDeterministicVector64* Axis0 = NULL, const FDeterministicVector64* Axis1 = NULL, const FDeterministicVector64* Axis2 = NULL, const FDeterministicVector64* Origin = NULL);
 
 	/**
 	 * get a column of this matrix
@@ -582,7 +562,7 @@ public:
 	 * @param i index into the column of the matrix
 	 * @return vector of the column
 	 */
-	inline FFixedVector64 GetColumn(int32 i) const;
+	inline FDeterministicVector64 GetColumn(int32 i) const;
 
 	/**
 	 * Set a column of this matrix
@@ -590,10 +570,10 @@ public:
 	 * @param i index of the matrix column
 	 * @param Value new value of the column
 	 */
-	inline void SetColumn(int32 i, FFixedVector64 Value);
+	inline void SetColumn(int32 i, FDeterministicVector64 Value);
 
 	/** @return rotator representation of this matrix */
-	FFixedRotator64 Rotator() const;
+	FDeterministicRotator64 Rotator() const;
 
 	/**
 	 * Utility for mirroring this transform across a certain plane, and flipping one of the axis as well.
@@ -602,46 +582,46 @@ public:
 	{
 		if (MirrorAxis == EAxis::X)
 		{
-			M[0][0] *= -FixedPoint::Constants::Fixed64::One;
-			M[1][0] *= -FixedPoint::Constants::Fixed64::One;
-			M[2][0] *= -FixedPoint::Constants::Fixed64::One;
+			M[0][0] *= -DeterministicFloat::Constants::Number64::One;
+			M[1][0] *= -DeterministicFloat::Constants::Number64::One;
+			M[2][0] *= -DeterministicFloat::Constants::Number64::One;
 
-			M[3][0] *= -FixedPoint::Constants::Fixed64::One;
+			M[3][0] *= -DeterministicFloat::Constants::Number64::One;
 		}
 		else if (MirrorAxis == EAxis::Y)
 		{
-			M[0][1] *= -FixedPoint::Constants::Fixed64::One;
-			M[1][1] *= -FixedPoint::Constants::Fixed64::One;
-			M[2][1] *= -FixedPoint::Constants::Fixed64::One;
+			M[0][1] *= -DeterministicFloat::Constants::Number64::One;
+			M[1][1] *= -DeterministicFloat::Constants::Number64::One;
+			M[2][1] *= -DeterministicFloat::Constants::Number64::One;
 
-			M[3][1] *= -FixedPoint::Constants::Fixed64::One;
+			M[3][1] *= -DeterministicFloat::Constants::Number64::One;
 		}
 		else if (MirrorAxis == EAxis::Z)
 		{
-			M[0][2] *= -FixedPoint::Constants::Fixed64::One;
-			M[1][2] *= -FixedPoint::Constants::Fixed64::One;
-			M[2][2] *= -FixedPoint::Constants::Fixed64::One;
+			M[0][2] *= -DeterministicFloat::Constants::Number64::One;
+			M[1][2] *= -DeterministicFloat::Constants::Number64::One;
+			M[2][2] *= -DeterministicFloat::Constants::Number64::One;
 
-			M[3][2] *= -FixedPoint::Constants::Fixed64::One;
+			M[3][2] *= -DeterministicFloat::Constants::Number64::One;
 		}
 
 		if (FlipAxis == EAxis::X)
 		{
-			M[0][0] *= -FixedPoint::Constants::Fixed64::One;
-			M[0][1] *= -FixedPoint::Constants::Fixed64::One;
-			M[0][2] *= -FixedPoint::Constants::Fixed64::One;
+			M[0][0] *= -DeterministicFloat::Constants::Number64::One;
+			M[0][1] *= -DeterministicFloat::Constants::Number64::One;
+			M[0][2] *= -DeterministicFloat::Constants::Number64::One;
 		}
 		else if (FlipAxis == EAxis::Y)
 		{
-			M[1][0] *= -FixedPoint::Constants::Fixed64::One;
-			M[1][1] *= -FixedPoint::Constants::Fixed64::One;
-			M[1][2] *= -FixedPoint::Constants::Fixed64::One;
+			M[1][0] *= -DeterministicFloat::Constants::Number64::One;
+			M[1][1] *= -DeterministicFloat::Constants::Number64::One;
+			M[1][2] *= -DeterministicFloat::Constants::Number64::One;
 		}
 		else if (FlipAxis == EAxis::Z)
 		{
-			M[2][0] *= -FixedPoint::Constants::Fixed64::One;
-			M[2][1] *= -FixedPoint::Constants::Fixed64::One;
-			M[2][2] *= -FixedPoint::Constants::Fixed64::One;
+			M[2][0] *= -DeterministicFloat::Constants::Number64::One;
+			M[2][1] *= -DeterministicFloat::Constants::Number64::One;
+			M[2][2] *= -DeterministicFloat::Constants::Number64::One;
 		}
 	}
 
