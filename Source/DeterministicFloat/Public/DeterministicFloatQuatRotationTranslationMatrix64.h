@@ -24,7 +24,7 @@ public:
 	
 	FORCEINLINE FDeterministicQuatRotationTranslationMatrix64(const FDeterministicQuat64& Q, const FDeterministicVector64& Origin);
 
-	static FDeterministicMatrix64 Make(const FDeterministicQuat64& Q, const FDeterministicVector64& Origin);
+	FORCEINLINE static FDeterministicMatrix64 Make(const FDeterministicQuat64& Q, const FDeterministicVector64& Origin);
 };
 
 USTRUCT(BlueprintType)
@@ -34,10 +34,10 @@ struct DETERMINISTICFLOAT_API FDeterministicQuatRotationMatrix64
 public:
 	GENERATED_BODY()
 
-	FDeterministicQuatRotationMatrix64();
+	FORCEINLINE FDeterministicQuatRotationMatrix64();
 	
-	FDeterministicQuatRotationMatrix64(const FDeterministicQuat64& Q);
+	FORCEINLINE FDeterministicQuatRotationMatrix64(const FDeterministicQuat64& Q);
 
 	/** Matrix factory. Return an FMatrix so we don't have type conversion issues in expressions. */
-	static FDeterministicMatrix64 Make(const FDeterministicQuat64& Q);
+	FORCEINLINE static FDeterministicMatrix64 Make(const FDeterministicQuat64& Q);
 };

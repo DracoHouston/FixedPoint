@@ -307,3 +307,15 @@ public:
 
 	FORCEINLINE operator FQuat() const;
 };
+
+// Global operator for (Number32 * Quat)
+FORCEINLINE FDeterministicQuat64 operator*(const FDeterministicNumber32 Scale, const FDeterministicQuat64& Q)
+{
+	return Q.operator*(Scale);
+}
+
+// Global operator for (number64 * Quat)
+FORCEINLINE FDeterministicQuat64 operator*(const FDeterministicNumber64 Scale, const FDeterministicQuat64& Q)
+{
+	return Q.operator*(Scale);
+}

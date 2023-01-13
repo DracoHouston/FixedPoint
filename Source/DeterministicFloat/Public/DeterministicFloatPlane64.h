@@ -17,14 +17,14 @@ public:
 	FDeterministicNumber64 W;
 
 	/** Default constructor (no initialization). */
-	FORCEINLINE FDeterministicPlane64() {}
+	FORCEINLINE FDeterministicPlane64();
 
 	/**
 	 * Constructor.
 	 *
 	 * @param V 4D vector to set up plane.
 	 */
-	FORCEINLINE FDeterministicPlane64(const FDeterministicVector4D64& V) : FDeterministicVector64(V), W(V.W) {}
+	FORCEINLINE FDeterministicPlane64(const FDeterministicVector4D64& V);
 
 	/**
 	 * Constructor.
@@ -34,9 +34,7 @@ public:
 	 * @param InZ Z-coefficient.
 	 * @param InW W-coefficient.
 	 */
-	FORCEINLINE FDeterministicPlane64(FDeterministicNumber64 InX, FDeterministicNumber64 InY, FDeterministicNumber64 InZ, FDeterministicNumber64 InW) : FDeterministicVector64(InX, InY, InZ), W(InW)
-	{
-	}
+	FORCEINLINE FDeterministicPlane64(FDeterministicNumber64 InX, FDeterministicNumber64 InY, FDeterministicNumber64 InZ, FDeterministicNumber64 InW);
 
 	/**
 	 * Constructor.
@@ -44,9 +42,7 @@ public:
 	 * @param InNormal Plane Normal Vector.
 	 * @param InW Plane W-coefficient.
 	 */
-	FORCEINLINE FDeterministicPlane64(FDeterministicVector64 InNormal, FDeterministicNumber64 InW) : FDeterministicVector64(InNormal), W(InW)
-	{
-	}
+	FORCEINLINE FDeterministicPlane64(FDeterministicVector64 InNormal, FDeterministicNumber64 InW);
 
 	/**
 	 * Constructor.
@@ -54,9 +50,7 @@ public:
 	 * @param InBase Base point in plane.
 	 * @param InNormal Plane Normal Vector.
 	 */
-	FORCEINLINE FDeterministicPlane64(FDeterministicVector64 InBase, const FDeterministicVector64& InNormal) : FDeterministicVector64(InNormal), W(InBase | InNormal)
-	{
-	}
+	FORCEINLINE FDeterministicPlane64(FDeterministicVector64 InBase, const FDeterministicVector64& InNormal);
 
 	/**
 	 * Constructor.
@@ -65,49 +59,35 @@ public:
 	 * @param B Second point in the plane.
 	 * @param C Third point in the plane.
 	 */
-	FDeterministicPlane64(FDeterministicVector64 A, FDeterministicVector64 B, FDeterministicVector64 C) : FDeterministicVector64(((B - A) ^ (C - A)).GetSafeNormal())
-	{
-		W = A | (FDeterministicVector64)(*this);
-	}
+	FDeterministicPlane64(FDeterministicVector64 A, FDeterministicVector64 B, FDeterministicVector64 C);
 
 	/**
 	 * Constructor
 	 *
 	 * @param EForceInit Force Init Enum.
 	 */
-	explicit FORCEINLINE FDeterministicPlane64(EForceInit)
-		: FDeterministicVector64(DeterministicFloat::Constants::Number64::Zero), W(DeterministicFloat::Constants::Number64::Zero)
-	{}
+	explicit FORCEINLINE FDeterministicPlane64(EForceInit);
 
 	/**
 	 * Checks if this plane is valid (ie: if it has a non-zero normal).
 	 *
 	 * @return true if the plane is well-defined (has a non-zero normal), otherwise false.
 	 */
-	FORCEINLINE bool IsValid() const
-	{
-		return !this->IsNearlyZero();
-	}
+	FORCEINLINE bool IsValid() const;
 
 	/**
 	 * Get the origin of this plane.
 	 *
 	 * @return The origin (base point) of this plane.
 	 */
-	FORCEINLINE FDeterministicVector64 GetOrigin() const
-	{
-		return GetNormal() * W;
-	}
+	FORCEINLINE FDeterministicVector64 GetOrigin() const;
 
 	/**
 	 * Get the normal of this plane.
 	 *
 	 * @return The normal of this plane.
 	 */
-	FORCEINLINE const FDeterministicVector64& GetNormal() const
-	{
-		return *this;
-	}
+	FORCEINLINE const FDeterministicVector64& GetNormal() const;
 
 
 	/**
@@ -116,10 +96,7 @@ public:
 	 * @param P The other point.
 	 * @return The distance from the plane to the point. 0: Point is on the plane. >0: Point is in front of the plane. <0: Point is behind the plane.
 	 */
-	FORCEINLINE FDeterministicNumber64 PlaneDot(const FDeterministicVector64& P) const
-	{
-		return X * P.X + Y * P.Y + Z * P.Z - W;
-	}
+	FORCEINLINE FDeterministicNumber64 PlaneDot(const FDeterministicVector64& P) const;
 
 	/**
 	 * Normalize this plane in-place if it is larger than a given tolerance. Leaves it unchanged if not.
@@ -127,27 +104,14 @@ public:
 	 * @param Tolerance Minimum squared length of vector for normalization.
 	 * @return true if the plane was normalized correctly, false otherwise.
 	 */
-	bool Normalize(FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::SmallNumber)
-	{
-		const FDeterministicNumber64 SquareSum = X * X + Y * Y + Z * Z;
-		if (SquareSum > Tolerance)
-		{
-			const FDeterministicNumber64 Scale = FDeterministicFloatMath::InvSqrt(SquareSum);
-			X *= Scale; Y *= Scale; Z *= Scale; W *= Scale;
-			return true;
-		}
-		return false;
-	}
+	bool Normalize(FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::SmallNumber);
 
 	/**
 	 * Get a flipped version of the plane.
 	 *
 	 * @return A flipped version of the plane.
 	 */
-	FDeterministicPlane64 Flip() const
-	{
-		return FDeterministicPlane64(-X, -Y, -Z, -W);
-	}
+	FDeterministicPlane64 Flip() const;
 
 	/**
 	 * Get the result of transforming the plane by a Matrix.
@@ -167,7 +131,7 @@ public:
 	 * @param TA Transpose-adjoint of Matrix.
 	 * @return The result of transform.
 	 */
-	FORCEINLINE FDeterministicPlane64 TransformByUsingAdjointT(const FDeterministicMatrix64& M, FDeterministicNumber64 DetM, const FDeterministicMatrix64& TA) const { return FDeterministicPlane64(); }
+	FORCEINLINE FDeterministicPlane64 TransformByUsingAdjointT(const FDeterministicMatrix64& M, FDeterministicNumber64 DetM, const FDeterministicMatrix64& TA) const;
 
 	/**
 	 * Get the result of translating the plane by the given offset
@@ -175,10 +139,7 @@ public:
 	 * @param V The translation amount
 	 * @return The result of transform.
 	 */
-	FORCEINLINE FDeterministicPlane64 TranslateBy(const FDeterministicVector64& V) const
-	{
-		return FDeterministicPlane64(GetOrigin() + V, GetNormal());
-	}
+	FORCEINLINE FDeterministicPlane64 TranslateBy(const FDeterministicVector64& V) const;
 
 	/**
 	 * Check if two planes are identical.
@@ -186,10 +147,7 @@ public:
 	 * @param V The other plane.
 	 * @return true if planes are identical, otherwise false.
 	 */
-	FORCEINLINE bool operator==(const FDeterministicPlane64& V) const
-	{
-		return (X == V.X) && (Y == V.Y) && (Z == V.Z) && (W == V.W);
-	}
+	FORCEINLINE bool operator==(const FDeterministicPlane64& V) const;
 
 	/**
 	 * Check if two planes are different.
@@ -197,10 +155,7 @@ public:
 	 * @param V The other plane.
 	 * @return true if planes are different, otherwise false.
 	 */
-	FORCEINLINE bool operator!=(const FDeterministicPlane64& V) const
-	{
-		return (X != V.X) || (Y != V.Y) || (Z != V.Z) || (W != V.W);
-	}
+	FORCEINLINE bool operator!=(const FDeterministicPlane64& V) const;
 
 	/**
 	 * Checks whether two planes are equal within specified tolerance.
@@ -209,10 +164,7 @@ public:
 	 * @param Tolerance Error Tolerance.
 	 * @return true if the two planes are equal within specified tolerance, otherwise false.
 	 */
-	FORCEINLINE bool Equals(const FDeterministicPlane64& V, FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::KindaSmallNumber) const
-	{
-		return (FDeterministicFloatMath::Abs(X - V.X) < Tolerance) && (FDeterministicFloatMath::Abs(Y - V.Y) < Tolerance) && (FDeterministicFloatMath::Abs(Z - V.Z) < Tolerance) && (FDeterministicFloatMath::Abs(W - V.W) < Tolerance);
-	}
+	FORCEINLINE bool Equals(const FDeterministicPlane64& V, FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::KindaSmallNumber) const;
 
 	/**
 	 * Calculates dot product of two planes.
@@ -220,10 +172,7 @@ public:
 	 * @param V The other plane.
 	 * @return The dot product.
 	 */
-	FORCEINLINE FDeterministicNumber64 operator|(const FDeterministicPlane64& V) const
-	{
-		return X * V.X + Y * V.Y + Z * V.Z + W * V.W;
-	}
+	FORCEINLINE FDeterministicNumber64 operator|(const FDeterministicPlane64& V) const;
 
 	/**
 	 * Gets result of adding a plane to this.
@@ -231,10 +180,7 @@ public:
 	 * @param V The other plane.
 	 * @return The result of adding a plane to this.
 	 */
-	FORCEINLINE FDeterministicPlane64 operator+(const FDeterministicPlane64& V) const
-	{
-		return FDeterministicPlane64(X + V.X, Y + V.Y, Z + V.Z, W + V.W);
-	}
+	FORCEINLINE FDeterministicPlane64 operator+(const FDeterministicPlane64& V) const;
 
 	/**
 	 * Gets result of subtracting a plane from this.
@@ -242,10 +188,7 @@ public:
 	 * @param V The other plane.
 	 * @return The result of subtracting a plane from this.
 	 */
-	FORCEINLINE FDeterministicPlane64 operator-(const FDeterministicPlane64& V) const
-	{
-		return FDeterministicPlane64(X - V.X, Y - V.Y, Z - V.Z, W - V.W);
-	}
+	FORCEINLINE FDeterministicPlane64 operator-(const FDeterministicPlane64& V) const;
 
 	/**
 	 * Gets result of dividing a plane.
@@ -253,11 +196,7 @@ public:
 	 * @param Scale What to divide by.
 	 * @return The result of division.
 	 */
-	FORCEINLINE FDeterministicPlane64 operator/(FDeterministicNumber64 Scale) const
-	{
-		const FDeterministicNumber64 RScale = DeterministicFloat::Constants::Number64::One / Scale;
-		return FDeterministicPlane64(X * RScale, Y * RScale, Z * RScale, W * RScale);
-	}
+	FORCEINLINE FDeterministicPlane64 operator/(FDeterministicNumber64 Scale) const;
 
 	/**
 	 * Gets result of scaling a plane.
@@ -265,10 +204,7 @@ public:
 	 * @param Scale The scaling factor.
 	 * @return The result of scaling.
 	 */
-	FORCEINLINE FDeterministicPlane64 operator*(FDeterministicNumber64 Scale) const
-	{
-		return FDeterministicPlane64(X * Scale, Y * Scale, Z * Scale, W * Scale);
-	}
+	FORCEINLINE FDeterministicPlane64 operator*(FDeterministicNumber64 Scale) const;
 
 	/**
 	 * Gets result of multiplying a plane with this.
@@ -276,10 +212,7 @@ public:
 	 * @param V The other plane.
 	 * @return The result of multiplying a plane with this.
 	 */
-	FORCEINLINE FDeterministicPlane64 operator*(const FDeterministicPlane64& V)
-	{
-		return FDeterministicPlane64(X * V.X, Y * V.Y, Z * V.Z, W * V.W);
-	}
+	FORCEINLINE FDeterministicPlane64 operator*(const FDeterministicPlane64& V);
 
 	/**
 	 * Add another plane to this.
@@ -287,11 +220,7 @@ public:
 	 * @param V The other plane.
 	 * @return Copy of plane after addition.
 	 */
-	FORCEINLINE FDeterministicPlane64 operator+=(const FDeterministicPlane64& V)
-	{
-		X += V.X; Y += V.Y; Z += V.Z; W += V.W;
-		return *this;
-	}
+	FORCEINLINE FDeterministicPlane64 operator+=(const FDeterministicPlane64& V);
 
 	/**
 	 * Subtract another plane from this.
@@ -299,11 +228,7 @@ public:
 	 * @param V The other plane.
 	 * @return Copy of plane after subtraction.
 	 */
-	FORCEINLINE FDeterministicPlane64 operator-=(const FDeterministicPlane64& V)
-	{
-		X -= V.X; Y -= V.Y; Z -= V.Z; W -= V.W;
-		return *this;
-	}
+	FORCEINLINE FDeterministicPlane64 operator-=(const FDeterministicPlane64& V);
 
 	/**
 	 * Scale this plane.
@@ -311,11 +236,7 @@ public:
 	 * @param Scale The scaling factor.
 	 * @return Copy of plane after scaling.
 	 */
-	FORCEINLINE FDeterministicPlane64 operator*=(FDeterministicNumber64 Scale)
-	{
-		X *= Scale; Y *= Scale; Z *= Scale; W *= Scale;
-		return *this;
-	}
+	FORCEINLINE FDeterministicPlane64 operator*=(FDeterministicNumber64 Scale);
 
 	/**
 	 * Multiply another plane with this.
@@ -323,11 +244,7 @@ public:
 	 * @param V The other plane.
 	 * @return Copy of plane after multiplication.
 	 */
-	FORCEINLINE FDeterministicPlane64 operator*=(const FDeterministicPlane64& V)
-	{
-		X *= V.X; Y *= V.Y; Z *= V.Z; W *= V.W;
-		return *this;
-	}
+	FORCEINLINE FDeterministicPlane64 operator*=(const FDeterministicPlane64& V);
 
 	/**
 	 * Divide this plane.
@@ -335,10 +252,5 @@ public:
 	 * @param V What to divide by.
 	 * @return Copy of plane after division.
 	 */
-	FORCEINLINE FDeterministicPlane64 operator/=(FDeterministicNumber64 V)
-	{
-		const FDeterministicNumber64 RV = DeterministicFloat::Constants::Number64::One / V;
-		X *= RV; Y *= RV; Z *= RV; W *= RV;
-		return *this;
-	}
+	FORCEINLINE FDeterministicPlane64 operator/=(FDeterministicNumber64 V);
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "DeterministicFloatFwd.h"
 #include "DeterministicFloatNumbers.h"
+#include "DeterministicFloatMath.h"
 #include "DeterministicFloatVector4D64.generated.h"
 
 USTRUCT(BlueprintType)
@@ -271,5 +272,22 @@ public:
 			(X * Other.Y) - (Y * Other.X),
 			FDeterministicNumber64()
 		);
+	}
+
+	/**
+	 * Returns a normalized copy of the vector if safe to normalize.
+	 *
+	 * @param Tolerance Minimum squared length of vector for normalization.
+	 * @return A normalized copy of the vector or a zero vector.
+	 */
+	FORCEINLINE FDeterministicVector4D64 GetSafeNormal(FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::SmallNumber) const
+	{
+		const FDeterministicNumber64 SquareSum = X * X + Y * Y + Z * Z;
+		if (SquareSum > Tolerance)
+		{
+			const FDeterministicNumber64 Scale = FDeterministicFloatMath::InvSqrt(SquareSum);
+			return FDeterministicVector4D64(X * Scale, Y * Scale, Z * Scale, 0.0f);
+		}
+		return FDeterministicVector4D64(DeterministicFloat::Constants::Number64::Zero);
 	}
 };

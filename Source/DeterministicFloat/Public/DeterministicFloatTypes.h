@@ -280,13 +280,6 @@ inline FDeterministicVector64 FDeterministicMatrix64::GetOrigin() const
 	return FDeterministicVector64(M[3][0], M[3][1], M[3][2]);
 }
 
-inline FDeterministicPlane64 FDeterministicPlane64::TransformBy(const FDeterministicMatrix64& M) const
-{
-	const FDeterministicMatrix64 tmpTA = M.TransposeAdjoint();
-	const FDeterministicNumber64 DetM = M.Determinant();
-	return this->TransformByUsingAdjointT(M, DetM, tmpTA);
-}
-
 FORCEINLINE FDeterministicVector4D64 FDeterministicMatrix64::TransformFVector4(const FDeterministicVector4D64& P) const
 {
 	FDeterministicVector4D64 VOurX = FDeterministicVector4D64(M[0][0], M[0][1], M[0][2], M[0][3]);
@@ -558,5 +551,8 @@ inline void FDeterministicMatrix64::SetColumn(int32 i, FDeterministicVector64 Va
 //}
 
 #include "DeterministicFloatVector64Funcs.h"
+#include "DeterministicFloatPlane64Funcs.h"
 #include "DeterministicFloatQuat64Funcs.h"
 #include "DeterministicFloatQuatRotationTranslationMatrix64Funcs.h"
+#include "DeterministicFloatRotationTranslationMatrix64Funcs.h"
+#include "DeterministicFloatRotationMatrix64Funcs.h"
