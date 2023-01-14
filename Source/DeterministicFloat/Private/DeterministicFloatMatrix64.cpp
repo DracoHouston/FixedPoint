@@ -3,11 +3,14 @@
 
 #include "DeterministicFloatMatrix64.h"
 #include "DeterministicFloatNumbers.h"
+#include "DeterministicFloatMath.h"
 #include "DeterministicFloatPlane64.h"
 #include "DeterministicFloatVector64.h"
-#include "DeterministicFloatMath.h"
 #include "DeterministicFloatRotator64.h"
 #include "DeterministicFloatRotationMatrix64.h"
+#include "DeterministicFloatPlane64Funcs.h"
+#include "DeterministicFloatVector64Funcs.h"
+#include "DeterministicFloatRotator64Funcs.h"
 
 const FDeterministicMatrix64 FDeterministicMatrix64::Identity(
 	FDeterministicPlane64(DeterministicFloat::Constants::Number64::One, DeterministicFloat::Constants::Number64::Zero, DeterministicFloat::Constants::Number64::Zero, DeterministicFloat::Constants::Number64::Zero),

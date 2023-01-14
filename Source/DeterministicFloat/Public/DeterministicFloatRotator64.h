@@ -29,18 +29,18 @@ public:
 	/** A rotator of zero degrees on each axis. */
 	static const FDeterministicRotator64 ZeroRotator;
 
-	FORCEINLINE void DiagnosticCheckNaN() const {}
-	FORCEINLINE void DiagnosticCheckNaN(const TCHAR* Message) const {}
+	FORCEINLINE void DiagnosticCheckNaN() const;
+	FORCEINLINE void DiagnosticCheckNaN(const TCHAR* Message) const;
 
 	/** Default constructor (no initialization). */
-	FORCEINLINE FDeterministicRotator64() {}
+	FORCEINLINE FDeterministicRotator64();
 
 	/**
 	 * Constructor
 	 *
 	 * @param InF Value to set all components to.
 	 */
-	FORCEINLINE FDeterministicRotator64(FDeterministicNumber64 InF) : Pitch(InF), Yaw(InF), Roll(InF) {}
+	FORCEINLINE FDeterministicRotator64(FDeterministicNumber64 InF);
 
 	/**
 	 * Constructor.
@@ -49,14 +49,14 @@ public:
 	 * @param InYaw Yaw in degrees.
 	 * @param InRoll Roll in degrees.
 	 */
-	FORCEINLINE FDeterministicRotator64(FDeterministicNumber64 InPitch, FDeterministicNumber64 InYaw, FDeterministicNumber64 InRoll) : Pitch(InPitch), Yaw(InYaw), Roll(InRoll)	{}
+	FORCEINLINE FDeterministicRotator64(FDeterministicNumber64 InPitch, FDeterministicNumber64 InYaw, FDeterministicNumber64 InRoll);
 
 	/**
 	 * Constructor
 	 *
 	 * @param EForceInit Force Init Enum.
 	 */
-	explicit FORCEINLINE FDeterministicRotator64(EForceInit) : Pitch(DeterministicFloat::Constants::Number64::Zero), Yaw(DeterministicFloat::Constants::Number64::Zero), Roll(DeterministicFloat::Constants::Number64::Zero) {}
+	explicit FORCEINLINE FDeterministicRotator64(EForceInit);
 
 	/**
 	 * Constructor.
@@ -65,12 +65,7 @@ public:
 	 */
 	explicit FORCEINLINE FDeterministicRotator64(const FDeterministicQuat64& Quat);
 
-	FORCEINLINE FDeterministicRotator64(const FRotator& Rot)
-	{
-		Pitch = Rot.Pitch;
-		Yaw = Rot.Yaw;
-		Roll = Rot.Roll;
-	}
+	FORCEINLINE FDeterministicRotator64(const FRotator& Rot);
 
 	// Binary arithmetic operators.
 
@@ -80,10 +75,7 @@ public:
 	 * @param R The other rotator.
 	 * @return The result of adding a rotator to this.
 	 */
-	FORCEINLINE FDeterministicRotator64 operator+(const FDeterministicRotator64& R) const
-	{
-		return FDeterministicRotator64(Pitch + R.Pitch, Yaw + R.Yaw, Roll + R.Roll);
-	}
+	FORCEINLINE FDeterministicRotator64 operator+(const FDeterministicRotator64& R) const;
 
 	/**
 	 * Get the result of subtracting a rotator from this.
@@ -91,10 +83,7 @@ public:
 	 * @param R The other rotator.
 	 * @return The result of subtracting a rotator from this.
 	 */
-	FORCEINLINE FDeterministicRotator64 operator-(const FDeterministicRotator64& R) const
-	{
-		return FDeterministicRotator64(Pitch - R.Pitch, Yaw - R.Yaw, Roll - R.Roll);
-	}
+	FORCEINLINE FDeterministicRotator64 operator-(const FDeterministicRotator64& R) const;
 
 	/**
 	 * Get the result of scaling this rotator.
@@ -102,10 +91,7 @@ public:
 	 * @param Scale The scaling factor.
 	 * @return The result of scaling.
 	 */
-	FORCEINLINE FDeterministicRotator64 operator*(FDeterministicNumber64 Scale) const
-	{
-		return FDeterministicRotator64(Pitch * Scale, Yaw * Scale, Roll * Scale);
-	}
+	FORCEINLINE FDeterministicRotator64 operator*(FDeterministicNumber64 Scale) const;
 
 	/**
 	 * Multiply this rotator by a scaling factor.
@@ -113,11 +99,7 @@ public:
 	 * @param Scale The scaling factor.
 	 * @return Copy of the rotator after scaling.
 	 */
-	FORCEINLINE FDeterministicRotator64 operator*=(FDeterministicNumber64 Scale)
-	{
-		Pitch = Pitch * Scale; Yaw = Yaw * Scale; Roll = Roll * Scale;
-		return *this;
-	}
+	FORCEINLINE FDeterministicRotator64 operator*=(FDeterministicNumber64 Scale);
 
 	// Binary comparison operators.
 
@@ -128,10 +110,7 @@ public:
 	 * @return true if two rotators are identical, otherwise false.
 	 * @see Equals()
 	 */
-	FORCEINLINE bool operator==(const FDeterministicRotator64& R) const
-	{
-		return Pitch == R.Pitch && Yaw == R.Yaw && Roll == R.Roll;
-	}
+	FORCEINLINE bool operator==(const FDeterministicRotator64& R) const;
 
 	/**
 	 * Checks whether two rotators are different.
@@ -139,10 +118,7 @@ public:
 	 * @param V The other rotator.
 	 * @return true if two rotators are different, otherwise false.
 	 */
-	FORCEINLINE bool operator!=(const FDeterministicRotator64& V) const
-	{
-		return Pitch != V.Pitch || Yaw != V.Yaw || Roll != V.Roll;
-	}
+	FORCEINLINE bool operator!=(const FDeterministicRotator64& V) const;
 
 	// Assignment operators.
 
@@ -152,11 +128,7 @@ public:
 	 * @param R The other rotator.
 	 * @return Copy of rotator after addition.
 	 */
-	FORCEINLINE FDeterministicRotator64 operator+=(const FDeterministicRotator64& R)
-	{
-		Pitch += R.Pitch; Yaw += R.Yaw; Roll += R.Roll;
-		return *this;
-	}
+	FORCEINLINE FDeterministicRotator64 operator+=(const FDeterministicRotator64& R);
 
 	/**
 	 * Subtracts another rotator from this.
@@ -164,11 +136,7 @@ public:
 	 * @param R The other rotator.
 	 * @return Copy of rotator after subtraction.
 	 */
-	FORCEINLINE FDeterministicRotator64 operator-=(const FDeterministicRotator64& R)
-	{
-		Pitch -= R.Pitch; Yaw -= R.Yaw; Roll -= R.Roll;
-		return *this;
-	}
+	FORCEINLINE FDeterministicRotator64 operator-=(const FDeterministicRotator64& R);
 
 	/**
 	 * Checks whether rotator is nearly zero within specified tolerance, when treated as an orientation.
@@ -177,13 +145,7 @@ public:
 	 * @param Tolerance Error Tolerance.
 	 * @return true if rotator is nearly zero, within specified tolerance, otherwise false.
 	 */
-	FORCEINLINE bool IsNearlyZero(FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::KindaSmallNumber) const
-	{
-		return
-			FDeterministicFloatMath::Abs(NormalizeAxis(Pitch)) <= Tolerance
-			&& FDeterministicFloatMath::Abs(NormalizeAxis(Yaw)) <= Tolerance
-			&& FDeterministicFloatMath::Abs(NormalizeAxis(Roll)) <= Tolerance;
-	}
+	FORCEINLINE bool IsNearlyZero(FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::KindaSmallNumber) const;
 
 	/**
 	 * Checks whether this has exactly zero rotation, when treated as an orientation.
@@ -191,10 +153,7 @@ public:
 	 *
 	 * @return true if this has exactly zero rotation, otherwise false.
 	 */
-	FORCEINLINE bool IsZero() const
-	{
-		return (ClampAxis(Pitch) == DeterministicFloat::Constants::Number64::Zero) && (ClampAxis(Yaw) == DeterministicFloat::Constants::Number64::Zero) && (ClampAxis(Roll) == DeterministicFloat::Constants::Number64::Zero);
-	}
+	FORCEINLINE bool IsZero() const;
 
 	/**
 	 * Checks whether two rotators are equal within specified tolerance, when treated as an orientation.
@@ -204,12 +163,7 @@ public:
 	 * @param Tolerance Error Tolerance.
 	 * @return true if two rotators are equal, within specified tolerance, otherwise false.
 	 */
-	FORCEINLINE bool Equals(const FDeterministicRotator64& R, FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::KindaSmallNumber) const
-	{
-		return (FDeterministicFloatMath::Abs(NormalizeAxis(Pitch - R.Pitch)) <= Tolerance)
-			&& (FDeterministicFloatMath::Abs(NormalizeAxis(Yaw - R.Yaw)) <= Tolerance)
-			&& (FDeterministicFloatMath::Abs(NormalizeAxis(Roll - R.Roll)) <= Tolerance);
-	}
+	FORCEINLINE bool Equals(const FDeterministicRotator64& R, FDeterministicNumber64 Tolerance = DeterministicFloat::Constants::Number64::KindaSmallNumber) const;
 
 	/**
 	 * Adds to each component of the rotator.
@@ -219,13 +173,7 @@ public:
 	 * @param DeltaRoll Change in roll. (+/-)
 	 * @return Copy of rotator after addition.
 	 */
-	FORCEINLINE FDeterministicRotator64 Add(FDeterministicNumber64 DeltaPitch, FDeterministicNumber64 DeltaYaw, FDeterministicNumber64 DeltaRoll)
-	{
-		Yaw += DeltaYaw;
-		Pitch += DeltaPitch;
-		Roll += DeltaRoll;
-		return *this;
-	}
+	FORCEINLINE FDeterministicRotator64 Add(FDeterministicNumber64 DeltaPitch, FDeterministicNumber64 DeltaYaw, FDeterministicNumber64 DeltaRoll);
 
 	/**
 	 * Returns the inverse of the rotator.
@@ -238,15 +186,7 @@ public:
 	 * @param RotGrid A Rotator specifying how to snap each component.
 	 * @return Snapped version of rotation.
 	 */
-	FORCEINLINE FDeterministicRotator64 GridSnap(const FDeterministicRotator64& RotGrid) const
-	{
-		return FDeterministicRotator64
-		(
-			FDeterministicFloatMath::GridSnap(Pitch, RotGrid.Pitch),
-			FDeterministicFloatMath::GridSnap(Yaw, RotGrid.Yaw),
-			FDeterministicFloatMath::GridSnap(Roll, RotGrid.Roll)
-		);
-	}
+	FORCEINLINE FDeterministicRotator64 GridSnap(const FDeterministicRotator64& RotGrid) const;
 
 	/**
 	 * Convert a rotation into a unit vector facing in its direction.
@@ -290,79 +230,32 @@ public:
 	 *
 	 * @return Clamped version of rotator.
 	 */
-	FORCEINLINE FDeterministicRotator64 Clamp() const
-	{
-		return FDeterministicRotator64(ClampAxis(Pitch), ClampAxis(Yaw), ClampAxis(Roll));
-	}
+	FORCEINLINE FDeterministicRotator64 Clamp() const;
 
 	/**
 	 * Create a copy of this rotator and normalize, removes all winding and creates the "shortest route" rotation.
 	 *
 	 * @return Normalized copy of this rotator
 	 */
-	FORCEINLINE FDeterministicRotator64 GetNormalized() const
-	{
-		FDeterministicRotator64 Rot = *this;
-		Rot.Normalize();
-		return Rot;
-	}
+	FORCEINLINE FDeterministicRotator64 GetNormalized() const;
 
 	/**
 	 * Create a copy of this rotator and denormalize, clamping each axis to 0 - 360.
 	 *
 	 * @return Denormalized copy of this rotator
 	 */
-	FORCEINLINE FDeterministicRotator64 GetDenormalized() const
-	{
-		FDeterministicRotator64 Rot = *this;
-		Rot.Pitch = ClampAxis(Rot.Pitch);
-		Rot.Yaw = ClampAxis(Rot.Yaw);
-		Rot.Roll = ClampAxis(Rot.Roll);
-		return Rot;
-	}
+	FORCEINLINE FDeterministicRotator64 GetDenormalized() const;
 
 	/** Get a specific component of the vector, given a specific axis by enum */
-	FORCEINLINE FDeterministicNumber64 GetComponentForAxis(EAxis::Type Axis) const
-	{
-		switch (Axis)
-		{
-		case EAxis::X:
-			return Roll;
-		case EAxis::Y:
-			return Pitch;
-		case EAxis::Z:
-			return Yaw;
-		default:
-			return DeterministicFloat::Constants::Number64::Zero;
-		}
-	}
+	FORCEINLINE FDeterministicNumber64 GetComponentForAxis(EAxis::Type Axis) const;
 
 	/** Set a specified componet of the vector, given a specific axis by enum */
-	FORCEINLINE void SetComponentForAxis(EAxis::Type Axis, FDeterministicNumber64 Component)
-	{
-		switch (Axis)
-		{
-		case EAxis::X:
-			Roll = Component;
-			break;
-		case EAxis::Y:
-			Pitch = Component;
-			break;
-		case EAxis::Z:
-			Yaw = Component;
-			break;
-		}
-	}
+	FORCEINLINE void SetComponentForAxis(EAxis::Type Axis, FDeterministicNumber64 Component);
 
 	/**
 	 * In-place normalize, removes all winding and creates the "shortest route" rotation.
 	 */
-	void Normalize()
-	{
-		Pitch = NormalizeAxis(Pitch);
-		Yaw = NormalizeAxis(Yaw);
-		Roll = NormalizeAxis(Roll);
-	}
+	void Normalize();
 
 	/**
 	 * Decompose this Rotator into a Winding part (multiples of 360) and a Remainder part.
@@ -378,20 +271,14 @@ public:
 	* @param Rotator[In] the Rotator we are comparing with.
 	* @return Distance(Manhattan) between the two rotators.
 	*/
-	FORCEINLINE FDeterministicNumber64 GetManhattanDistance(const FDeterministicRotator64& Rotator) const
-	{
-		return FDeterministicFloatMath::Abs(Yaw - Rotator.Yaw) + FDeterministicFloatMath::Abs(Pitch - Rotator.Pitch) + FDeterministicFloatMath::Abs(Roll - Rotator.Roll);
-	}
+	FORCEINLINE FDeterministicNumber64 GetManhattanDistance(const FDeterministicRotator64& Rotator) const;
 
 	/**
 	* Return a Rotator that has the same rotation but has different degree values for Yaw, Pitch, and Roll.
 	* This rotator should be within -180,180 range,
 	* @return A Rotator with the same rotation but different degrees.
 	*/
-	FORCEINLINE FDeterministicRotator64 GetEquivalentRotator() const
-	{
-		return FDeterministicRotator64(DeterministicFloat::Constants::Number64::OneEighty - Pitch, Yaw + DeterministicFloat::Constants::Number64::OneEighty, Roll + DeterministicFloat::Constants::Number64::OneEighty);
-	}
+	FORCEINLINE FDeterministicRotator64 GetEquivalentRotator() const;
 
 	/**
 	* Modify if necessary the passed in rotator to be the closest rotator to it based upon it's equivalent.
@@ -400,61 +287,17 @@ public:
 	* @param MakeClosest[In/Out] the Rotator we want to make closest to us. Should be between
 	* (-180, 180]. This Rotator may change if we need to use different degree values to make it closer.
 	*/
-	FORCEINLINE void SetClosestToMe(FDeterministicRotator64& MakeClosest) const
-	{
-		FDeterministicRotator64 OtherChoice = MakeClosest.GetEquivalentRotator();
-		FDeterministicNumber64 FirstDiff = GetManhattanDistance(MakeClosest);
-		FDeterministicNumber64 SecondDiff = GetManhattanDistance(OtherChoice);
-		if (SecondDiff < FirstDiff)
-			MakeClosest = OtherChoice;
-	}
+	FORCEINLINE void SetClosestToMe(FDeterministicRotator64& MakeClosest) const;
 
 	/**
 	 * Get a textual representation of the vector.
 	 *
 	 * @return Text describing the vector.
 	 */
-	FORCEINLINE FString ToString() const
-	{
-		return FString::Printf(TEXT("P=%f Y=%f R=%f"), (double)Pitch, (double)Yaw, (double)Roll);
-	}
+	FORCEINLINE FString ToString() const;
 
 	/** Get a short textural representation of this vector, for compact readable logging. */
-	FORCEINLINE FString ToCompactString() const
-	{
-		if (IsNearlyZero())
-		{
-			return FString::Printf(TEXT("R(0)"));
-		}
-
-		FString ReturnString(TEXT("R("));
-		bool bIsEmptyString = true;
-		if (!FDeterministicFloatMath::IsNearlyZero(Pitch))
-		{
-			ReturnString += FString::Printf(TEXT("P=%.2f"), (double)Pitch);
-			bIsEmptyString = false;
-		}
-		if (!FDeterministicFloatMath::IsNearlyZero(Yaw))
-		{
-			if (!bIsEmptyString)
-			{
-				ReturnString += FString(TEXT(", "));
-			}
-			ReturnString += FString::Printf(TEXT("Y=%.2f"), (double)Yaw);
-			bIsEmptyString = false;
-		}
-		if (!FDeterministicFloatMath::IsNearlyZero(Roll))
-		{
-			if (!bIsEmptyString)
-			{
-				ReturnString += FString(TEXT(", "));
-			}
-			ReturnString += FString::Printf(TEXT("R=%.2f"), (double)Roll);
-			bIsEmptyString = false;
-		}
-		ReturnString += FString(TEXT(")"));
-		return ReturnString;
-	}
+	FORCEINLINE FString ToCompactString() const;
 
 	/**
 	 * Initialize this Rotator based on an FString. The String is expected to contain P=, Y=, R=.
@@ -463,32 +306,14 @@ public:
 	 * @param InSourceString	FString containing the rotator values.
 	 * @return true if the P,Y,R values were read successfully; false otherwise.
 	 */
-	FORCEINLINE bool InitFromString(const FString& InSourceString)
-	{
-		Pitch = Yaw = Roll = 0;
-
-		// The initialization is only successful if the X, Y, and Z values can all be parsed from the string
-		double p = 0.0;
-		double y = 0.0;
-		double r = 0.0;
-		const bool bSuccessful = FParse::Value(*InSourceString, TEXT("P="), p) && FParse::Value(*InSourceString, TEXT("Y="), y) && FParse::Value(*InSourceString, TEXT("R="), r);
-		Pitch = (FDeterministicNumber64)p;
-		Yaw = (FDeterministicNumber64)y;
-		Roll = (FDeterministicNumber64)r;
-
-		DiagnosticCheckNaN();
-		return bSuccessful;
-	}
+	FORCEINLINE bool InitFromString(const FString& InSourceString);
 
 	/**
 	 * Utility to check if there are any non-finite values (NaN or Inf) in this Rotator.
 	 *
 	 * @return true if there are any non-finite values in this Rotator, otherwise false.
 	 */
-	FORCEINLINE bool ContainsNaN() const
-	{
-		return false;
-	}
+	FORCEINLINE bool ContainsNaN() const;
 
 	/**
 	 * Clamps an angle to the range of [0, 360).
@@ -496,19 +321,7 @@ public:
 	 * @param Angle The angle to clamp.
 	 * @return The clamped angle.
 	 */
-	static FDeterministicNumber64 ClampAxis(FDeterministicNumber64 Angle)
-	{
-		// returns Angle in the range (-360,360)
-		Angle = FDeterministicFloatMath::Fmod(Angle, DeterministicFloat::Constants::Number64::ThreeSixty);
-
-		if (Angle < DeterministicFloat::Constants::Number64::Zero)
-		{
-			// shift to [0,360) range
-			Angle += DeterministicFloat::Constants::Number64::ThreeSixty;
-		}
-
-		return Angle;
-	}
+	static FDeterministicNumber64 ClampAxis(FDeterministicNumber64 Angle);
 
 	/**
 	 * Clamps an angle to the range of (-180, 180].
@@ -516,19 +329,7 @@ public:
 	 * @param Angle The Angle to clamp.
 	 * @return The clamped angle.
 	 */
-	static FDeterministicNumber64 NormalizeAxis(FDeterministicNumber64 Angle)
-	{
-		// returns Angle in the range [0,360)
-		Angle = ClampAxis(Angle);
-
-		if (Angle > DeterministicFloat::Constants::Number64::OneEighty)
-		{
-			// shift to (-180,180]
-			Angle -= DeterministicFloat::Constants::Number64::ThreeSixty;
-		}
-
-		return Angle;
-	}
+	static FDeterministicNumber64 NormalizeAxis(FDeterministicNumber64 Angle);
 
 	/**
 	 * Compresses a floating point angle into a byte.
@@ -536,11 +337,7 @@ public:
 	 * @param Angle The angle to compress.
 	 * @return The angle as a byte.
 	 */
-	static uint8 CompressAxisToByte(FDeterministicNumber64 Angle)
-	{
-		// map [0->360) to [0->256) and mask off any winding
-		return (uint8)((int64)FDeterministicFloatMath::RoundToInt(Angle * FDeterministicNumber64::Make(256.0) / DeterministicFloat::Constants::Number64::ThreeSixty) & 0xFF);
-	}
+	static uint8 CompressAxisToByte(FDeterministicNumber64 Angle);
 
 	/**
 	 * Decompress a word into a floating point angle.
@@ -548,11 +345,7 @@ public:
 	 * @param Angle The word angle.
 	 * @return The decompressed angle.
 	 */
-	static FDeterministicNumber64 DecompressAxisFromByte(uint8 Angle)
-	{
-		// map [0->256) to [0->360)
-		return (FDeterministicNumber64)((double)(Angle * (360.0 / 256.0)));
-	}
+	static FDeterministicNumber64 DecompressAxisFromByte(uint8 Angle);
 
 	/**
 	 * Compress a floating point angle into a word.
@@ -560,11 +353,7 @@ public:
 	 * @param Angle The angle to compress.
 	 * @return The decompressed angle.
 	 */
-	static uint16 CompressAxisToShort(FDeterministicNumber64 Angle)
-	{
-		// map [0->360) to [0->65536) and mask off any winding
-		return (uint8)((int64)FDeterministicFloatMath::RoundToInt(Angle * FDeterministicNumber64::Make(65536.0) / DeterministicFloat::Constants::Number64::ThreeSixty) & 0xFFFF);
-	}
+	static uint16 CompressAxisToShort(FDeterministicNumber64 Angle);
 
 	/**
 	 * Decompress a short into a floating point angle.
@@ -572,11 +361,7 @@ public:
 	 * @param Angle The word angle.
 	 * @return The decompressed angle.
 	 */
-	static FDeterministicNumber64 DecompressAxisFromShort(uint16 Angle)
-	{
-		// map [0->65536) to [0->360)
-		return (FDeterministicNumber64((int64)Angle) * DeterministicFloat::Constants::Number64::ThreeSixty / FDeterministicNumber64::Make(65536.0));
-	}
+	static FDeterministicNumber64 DecompressAxisFromShort(uint16 Angle);
 
 	/**
 	 * Convert a vector of floating-point Euler angles (in degrees) into a Rotator. Rotator now stored in degrees

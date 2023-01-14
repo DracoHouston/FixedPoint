@@ -2,7 +2,9 @@
 
 
 #include "DeterministicFloatVector64.h"
-#include "DeterministicFloatTypes.h"
+#include "DeterministicFloatVector64Funcs.h"
+#include "DeterministicFloatPlane64Funcs.h"
+#include "DeterministicFloatQuat64Funcs.h"
 
 
 const FDeterministicVector64 FDeterministicVector64::ZeroVector =		FDeterministicVector64((int64)0,	(int64)0,	(int64)0);

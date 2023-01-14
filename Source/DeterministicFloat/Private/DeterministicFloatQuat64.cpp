@@ -4,6 +4,8 @@
 #include "DeterministicFloatQuat64.h"
 #include "DeterministicFloatNumbers.h"
 #include "DeterministicFloatVector64.h"
+#include "DeterministicFloatVector64Funcs.h"
+#include "DeterministicFloatQuat64Funcs.h"
 
 
 const FDeterministicQuat64 FDeterministicQuat64::Identity = FDeterministicQuat64(FDeterministicNumber64(), FDeterministicNumber64(), FDeterministicNumber64(), FDeterministicNumber64((int64)1));

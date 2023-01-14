@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DeterministicFloatRotator64.h"
+#include "DeterministicFloatRotator64Funcs.h"
 
 const FDeterministicRotator64 FDeterministicRotator64::ZeroRotator = FDeterministicRotator64(DeterministicFloat::Constants::Number64::Zero, DeterministicFloat::Constants::Number64::Zero, DeterministicFloat::Constants::Number64::Zero);
 
