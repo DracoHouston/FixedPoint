@@ -2,6 +2,7 @@
 
 
 #include "DeterministicFloatMath.h"
+#include "DeterministicFloatTypes.h"
 #include "Misc/AssertionMacros.h"
 
 FDeterministicNumber64 FDeterministicFloatMath::Sqrt(const FDeterministicNumber64& inValue)
@@ -332,16 +333,6 @@ void FDeterministicFloatMath::SinCos(FDeterministicNumber32* outSin, FDeterminis
 {
 	*outSin = FDeterministicFloatMath::Sin(inValue);
 	*outCos = FDeterministicFloatMath::Cos(inValue);
-}
-
-bool FDeterministicFloatMath::IsEqual(const FDeterministicNumber32& A, const FDeterministicNumber32& B, const FDeterministicNumber32& inTolerance)
-{
-	return FDeterministicFloatMath::Abs(A - B) <= inTolerance;
-}
-
-bool FDeterministicFloatMath::IsEqual(const FDeterministicNumber64& A, const FDeterministicNumber64& B, const FDeterministicNumber64& inTolerance)
-{
-	return FDeterministicFloatMath::Abs(A - B) <= inTolerance;
 }
 
 FDeterministicNumber64 FDeterministicFloatMath::Fmod(FDeterministicNumber64 X, FDeterministicNumber64 Y)

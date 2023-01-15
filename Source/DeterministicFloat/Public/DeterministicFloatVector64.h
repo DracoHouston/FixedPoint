@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "DeterministicFloatFwd.h"
 #include "DeterministicFloatNumbers.h"
-#include "Misc/AssertionMacros.h"
 #include "DeterministicFloatVector64.generated.h"
 
 USTRUCT(BlueprintType)

@@ -6,6 +6,8 @@
 #include "DeterministicFloatFwd.h"
 #include "DeterministicFloatNumbers.h"
 #include "DeterministicFloatMath.h"
+#include "DeterministicFloatVector64.h"
+#include "DeterministicFloatQuat64.h"
 #include "DeterministicFloatRotator64.generated.h"
 
 USTRUCT(BlueprintType)

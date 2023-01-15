@@ -3,6 +3,7 @@
 #pragma once
 
 #include "DeterministicFloatRotator64.h"
+#include "DeterministicFloatMathFuncs.h"
 #include "DeterministicFloatVector64Funcs.h"
 #include "DeterministicFloatQuat64Funcs.h"
 

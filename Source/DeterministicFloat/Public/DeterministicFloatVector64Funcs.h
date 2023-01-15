@@ -3,9 +3,13 @@
 #pragma once
 
 #include "DeterministicFloatVector64.h"
+#include "DeterministicFloatMath.h"
 #include "DeterministicFloatVector2D64.h"
 #include "DeterministicFloatVector4D64.h"
-#include "DeterministicFloatTypes.h"
+#include "Misc/AssertionMacros.h"
+#include "DeterministicFloatRotator64.h"
+#include "DeterministicFloatMathFuncs.h"
+#include "DeterministicFloatRotator64Funcs.h"
 
 FORCEINLINE FDeterministicVector64::FDeterministicVector64(const FDeterministicVector2D64& V, const FDeterministicNumber64& InZ)
 {

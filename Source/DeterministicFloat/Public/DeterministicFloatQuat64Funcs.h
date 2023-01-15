@@ -3,8 +3,14 @@
 #pragma once
 
 #include "DeterministicFloatQuat64.h"
+#include "DeterministicFloatMath.h"
+#include "DeterministicFloatVector64.h"
+#include "DeterministicFloatRotator64.h"
+#include "DeterministicFloatMatrix64.h"
 #include "Misc/AssertionMacros.h"
 #include "DeterministicFloatVector64Funcs.h"
+#include "DeterministicFloatRotator64Funcs.h"
+#include "DeterministicFloatMatrix64Funcs.h"
 
 FORCEINLINE FDeterministicQuat64::FDeterministicQuat64() {}
 
