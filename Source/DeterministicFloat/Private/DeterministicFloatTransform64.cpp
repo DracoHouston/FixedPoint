@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DeterministicFloatTransform64.h"
+#include "DeterministicFloatTransform64Funcs.h"
 #include "Misc/DefaultValueHelper.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTransform, Log, All);

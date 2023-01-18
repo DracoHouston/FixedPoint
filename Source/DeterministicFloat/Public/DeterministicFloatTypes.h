@@ -29,3 +29,4 @@
 #include "DeterministicFloatQuatRotationTranslationMatrix64Funcs.h"
 #include "DeterministicFloatRotationTranslationMatrix64Funcs.h"
 #include "DeterministicFloatRotationMatrix64Funcs.h"
+#include "DeterministicFloatTransform64Funcs.h"
